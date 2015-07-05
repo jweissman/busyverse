@@ -1,14 +1,16 @@
 #= require busyverse
+#= require person
 
 class Busyverse.City
   constructor: (@population, @buildings) ->
-    @population ?= 0
-    @buildings ?= []
+    @population   ?= []
+    @buildings    ?= []
     @_constructors = []
     console.log "New city created with population #{@population}!"
 
   grow: ->
-    @population = @population + 1
+    bob = new Busyverse.Person("Bob")
+    @population.push(bob)
 
   update: =>
     console.log "--- Updating city!!"

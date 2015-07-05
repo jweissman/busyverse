@@ -16,10 +16,8 @@ context "City", ->
     beforeEach ->
       @city = new Busyverse.City()
   
-    it 'should increase population', ->
-      old_population = @city.population
+    it 'should increase population size', ->
+      old_population = @city.population.length
       @city.grow()
-      new_population = @city.population
+      new_population = @city.population.length
       new_population.should.equal(old_population+1)
-
-
