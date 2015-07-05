@@ -1,3 +1,4 @@
+#= require busyverse
 #= require_tree ./buildings
 #= require city
 
@@ -32,49 +33,65 @@ class Busyverse.Game
   update: ->
     @city.update()
 
-class Busyverse.Renderer
-  constructor: (@ctx) ->
-    console.log("New drawing context created!")
 
-  rect: (xy, wh, color) ->
-    color ?= 'rgba(128,128,128,128)'
-    @ctx.fillStyle = color
-    @ctx.fillRect(xy[0], xy[1], wh[0], wh[1])
+# class Busyverse.Renderer
+#   constructor: (@ctx) ->
+#     console.log("New drawing context created!")
+# 
+#   rect: (x, y, w, h, color) =>
+#     color ?= 'rgba(128,128,128,128)'
+#     @ctx.fillStyle = color
+#     console.log("Drawing rectangle at #{x}, #{y} of size #{w}x#{h}")
+#     @ctx.fillRect(0,0,20,25) #x,y,w,h)
 
+class Busyverse.BuildingView
+  constructor: (@building, @context) ->
+    console.log "New building view created!"
+
+  render: =>
+    console.log "rendering building at #{@building.position} of size #{@building.size}"
+    console.log "---> #{@building.position[0]}, #{@building.position[1]} -- #{@building.size[0]}, #{@building.size[1]}"
+    @context.fillStyle='rgb(255,128,0)'
+    # @context.fillRect(0,0,20,25)
+    @context.fillRect(
+      parseInt( @building.position[0]),
+      parseInt( @building.position[1]),
+      parseInt( @building.size[0]    ),
+      parseInt( @building.size[1]    ) 
+    )
+ 
 class Busyverse.CityView
-  constructor: (@city) ->
+  buildingViews: {}
+
+  constructor: (@city, @context) ->
     console.log "New city view created!"
 
-  render: (renderer) =>
+  render: =>
     console.log "render city"
     for building in @city.buildings
-      renderer.rect(building.position, building.size, building.color)
-      # ctx.fillStyle='rgb(255,128,0)'
-      # ctx.fillRect(0,0,100,100)
-
+      @buildingViews[building] ?= new Busyverse.BuildingView(building, @context)
+      building_view = @buildingViews[building]
+      building_view.render()
 
 class Busyverse.Presenter
+  views: []
   constructor: (@game) ->
     console.log 'New presenter created!'
-    @views = []
-    @views.push(new Busyverse.CityView(@game.city))
 
   attach: (canvas) =>
     console.log "About to create drawing context"
-    console.log(canvas)
     @context = canvas.getContext('2d')
-    @renderer = new Busyverse.Renderer(@context)
 
   render: =>
-    console.log("would be running ui loop?")
-    for view in @views
-      view.render(@renderer)
+    console.log "Rendering!"
+    city_view = new Busyverse.CityView(@game.city, @context)
+    city_view.render()
 
 # kickstart
 class Busyverse.Engine
   constructor: ->
     @game = new Busyverse.Game()
-    @ui   = new Busyverse.Presenter(Busyverse.game)
+    @ui   = new Busyverse.Presenter(@game) #Busyverse.game)
 
   run: ->
     @canvas = document.getElementById('busyverse')

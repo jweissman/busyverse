@@ -92,6 +92,6 @@ context "Presenter", ->
     afterEach -> @context_mock.verify()
 
     it 'should draw buildings', ->
-      @context_mock.expects("fillRect").once().withArgs(0,0,2,2)
+      @context_mock.expects("fillRect").once().withArgs(0,0,20,25)
       @presenter.render()
-      expect(@context_api.fillStyle).to.equal('rgba(128,128,128,128)')
+      expect(@context_api.fillStyle).to.equal('rgb(255,128,0)')
