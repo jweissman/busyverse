@@ -6,15 +6,19 @@ class Busyverse.City
     @population   ?= []
     @buildings    ?= []
     @_constructors = []
-    console.log "New city created with population #{@population}!"
+    console.log "New city created with population #{@population}!" if Busyverse.verbose
 
   grow: ->
     bob = new Busyverse.Person("Bob")
     @population.push(bob)
 
-  update: =>
-    console.log "--- Updating city!!"
+  update: (world) =>
+    console.log "--- Updating city!!" if Busyverse.verbose
+    for person in @population
+      person.update(world, @)
     
   create: (structure) =>
+    console.log "creating new building"
+    console.log structure
     @buildings.push(structure)
  

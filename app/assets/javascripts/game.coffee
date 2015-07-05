@@ -2,48 +2,56 @@
 #= require_tree ./buildings
 #= require person
 #= require city
+#= require world
 #= require presenter
 #= require engine
 #= require player
 
 class Busyverse.Game
-  constructor: (@city, @player) ->
-    console.log 'New game created!'
+  stepLength: 100
+  constructor: (@city, @player, @world) ->
+    console.log 'New game created!' if Busyverse.verbose
     @city   ?= new Busyverse.City()
     @player ?= new Busyverse.Player()
+    @world  ?= new Busyverse.World()
     @setup()
 
-  setup: ->
+  setup: =>
     origin = [0,0]
     farm = new Busyverse.Buildings.Farm(origin)
     @place(farm) 
     @city.grow()
 
-  play: ->
+  play: (ui) =>
     console.log 'Playing!'
-    @launch()
+    @launch(ui)
     true
 
-  launch: ->
-    console.log 'Launching!'
+  send: (command) =>
+    person = @city.population[0]
+    console.log "Sending command #{command} to citizen #{person.name}..." if Busyverse.debug
+    person.send(command)
+
+  launch: (ui) =>
+    console.log 'Launching!' if Busyverse.verbose
+    @ui = ui
+    @step()
+
+  step: =>
+    console.log "tick" if Busyverse.debug and Busyverse.verbose
+    @update()
+    @render()
+    setTimeout @step, @stepLength
 
   place: (building) ->
     @city.create(building)
 
-  update: ->
-    @city.update()
+  update: () =>
+    @city.update(@world)
 
-
-# class Busyverse.Renderer
-#   constructor: (@ctx) ->
-#     console.log("New drawing context created!")
-# 
-#   rect: (x, y, w, h, color) =>
-#     color ?= 'rgba(128,128,128,128)'
-#     @ctx.fillStyle = color
-#     console.log("Drawing rectangle at #{x}, #{y} of size #{w}x#{h}")
-#     @ctx.fillRect(0,0,20,25) #x,y,w,h)
-
+  render: () =>
+    console.log "Rendering to UI" if Busyverse.verbose
+    @ui.render(@)
 
 # kickstart
 engine = Busyverse.engine = new Busyverse.Engine()

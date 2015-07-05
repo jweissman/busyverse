@@ -22,4 +22,10 @@ context "Person", ->
       @person.send("wander")
       expect(@person.activeTask).to.equal("wander")
 
+  describe "#wander", ->
+    it 'should advance towards a randomly selected destination', ->
+      somewhere = [10,10]
+      world = randomLocation: => somewhere # [10,10]
+      @person.wander(world)
+      expect(@person.destination).to.equal(somewhere)
 
