@@ -76,7 +76,7 @@ class Busyverse.PersonView
     @context.fillText @person.activeTask, @person.position[0] + 20, @person.position[1] + 40
 
     if typeof(@person.destination) != 'undefined' && @person.destination != null
-      @context.fillStyle='rgb(128,255,255)'
+      @context.fillStyle="red" #'rgb(128,255,255)'
       @context.fillRect(
         parseInt( @person.destination[0] ),
         parseInt( @person.destination[1] ),
@@ -98,8 +98,6 @@ class Busyverse.CityView
   renderBuildings: =>
     console.log "rendering #{@city.buildings.length} city buildings" if Busyverse.debug and Busyverse.verbose
     for building in @city.buildings
-      # @buildingViews[building] ?= new Busyverse.BuildingView(building, @context)
-      # building_view = @buildingViews[building]
       (new Busyverse.BuildingView(building, @context)).render()
 
   renderPeople: =>
@@ -108,6 +106,10 @@ class Busyverse.CityView
       @personViews[person] ?= new Busyverse.PersonView(person, @context)
       person_view = @personViews[person]
       person_view.render()
+
+    @context.fillStyle = "white"
+    @context.font = "bold 30px Helvetica"
+    @context.fillText "#{@city.name} (#{@city.buildings.length} buildings)", 200, 30
 
 class Busyverse.WorldView
   constructor: (@world, @context) ->
@@ -118,7 +120,5 @@ class Busyverse.WorldView
     @world.map.eachCell (cell) =>
       @context.fillStyle = cell.color
       console.log "rendering world cell at #{cell.location}" if Busyverse.debug and Busyverse.verbose
-      @context.fillRect(@world.cellSize * cell.location[0], 
-		        @world.cellSize * cell.location[1], 
-	                @world.cellSize - 1, @world.cellSize - 1)
+      @context.fillRect(@world.cellSize * cell.location[0], @world.cellSize * cell.location[1], @world.cellSize - 1, @world.cellSize - 1)
 

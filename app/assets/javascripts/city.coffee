@@ -2,6 +2,7 @@
 #= require person
 
 class Busyverse.City
+  name: "Busyville"
   constructor: (@population, @buildings) ->
     @population   ?= []
     @buildings    ?= []

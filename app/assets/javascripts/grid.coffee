@@ -13,7 +13,7 @@ class Busyverse.Grid
         @map[x][y] = @createCellAt([x,y])
 
   createCellAt: (location) =>
-    new Busyverse.GridCell(location, 'green')
+    new Busyverse.GridCell(location, 'darkgrey')
 
   eachCell: (callbackFn) =>
     for x in [0..@width]

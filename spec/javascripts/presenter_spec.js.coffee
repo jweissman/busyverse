@@ -36,7 +36,7 @@ context "Presenter", ->
       @game.world.cellSize = 2
       @context_mock.expects("fillRect").withArgs(0,0,1,1)
       @presenter.renderWorld(@game.world)
-      expect(@context_api.fillStyle).to.equal('green')
+      expect(@context_api.fillStyle).to.equal('darkgrey')
 
     it 'should draw buildings', ->
       @context_mock.expects("fillRect").once().withArgs(0,0,20,25)
@@ -45,7 +45,7 @@ context "Presenter", ->
 
     it 'should draw people', ->
       @context_mock.expects("fillRect").once().withArgs(0,0,10,10)
-      @context_mock.expects("fillText").twice()
+      @context_mock.expects("fillText").thrice()
       @presenter.renderPeople(@game)
-      expect(@context_api.fillStyle).to.equal('blue')
-      expect(@context_api.font).to.eql("bold 16px Arial")
+      expect(@context_api.fillStyle).to.equal('white')
+      expect(@context_api.font).to.eql("bold 30px Helvetica")

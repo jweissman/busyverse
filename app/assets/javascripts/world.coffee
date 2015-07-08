@@ -3,10 +3,10 @@ class Busyverse.Support.Randomness
     Math.floor Math.random() * range
 
 class Busyverse.World
-  cellSize: 15
+  cellSize: 10
   constructor: (@width, @height) ->
     @width  ?= 60
-    @height ?= 25
+    @height ?= 40
     @random = new Busyverse.Support.Randomness()
     @map = new Busyverse.Grid(@width, @height)
     console.log("Created new #{@width}x#{@height} world!") if Busyverse.debug

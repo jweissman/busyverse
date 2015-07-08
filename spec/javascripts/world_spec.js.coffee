@@ -7,7 +7,7 @@ context "World", ->
   beforeEach ->
     @width = 10
     @height = 25
-    @world = new Busyverse.World(@width, @height) #20, 30)
+    @world = new Busyverse.World(@width, @height)
 
   describe ".width", ->
     it 'should be 20', ->
@@ -33,4 +33,4 @@ context "World", ->
 
   describe "#canvasToMapCoordinates", ->
     it 'should convert according to cell size', ->
-      expect(@world.canvasToMapCoordinates([25.3, 26.7])).to.deep.eql([2, 2])
+      expect(@world.canvasToMapCoordinates([25.3, 26.7])).to.deep.eql([3, 3])
