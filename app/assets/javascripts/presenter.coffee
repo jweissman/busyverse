@@ -5,16 +5,28 @@ class Busyverse.Presenter
 
   attach: (canvas) =>
     console.log "About to create drawing context" if Busyverse.verbose
-    @canvas   = canvas
-    @context  = @canvas.getContext('2d')
+    if canvas != null
+      @canvas   = canvas
+      @context  = @canvas.getContext('2d')
+    else
+      console.log "WARNING: canvas is null in Presenter#attach" if Busyverse.debug
 
   render: (game) =>
     console.log "Rendering!" if Busyverse.verbose
-    @clear()
-    @renderBuildings(game) && @renderPeople(game)
+    if typeof(@canvas) != 'undefined'
+      @clear()
+      @renderWorld(game.world)
+      @renderBuildings(game) 
+      @renderPeople(game)
+    else
+      console.log "WARNING: @canvas is undefined in Presenter#render" if Busyverse.debug and Busyverse.verbose
 
   clear: ->
     @context.clearRect 0, 0, @canvas.width, @canvas.height
+
+  renderWorld: (world) =>
+    @worldView ?= new Busyverse.WorldView(world, @context)
+    @worldView.render()
 
   renderBuildings: (game) =>
     @city_view ?= new Busyverse.CityView(game.city, @context)
@@ -23,8 +35,6 @@ class Busyverse.Presenter
   renderPeople: (game) =>
     @city_view ?= new Busyverse.CityView(game.city, @context)
     @city_view.renderPeople()
-
-# todo move view objects out
 
 class Busyverse.BuildingView
   constructor: (@building, @context) ->
@@ -65,6 +75,18 @@ class Busyverse.PersonView
     @context.fillText @person.name, @person.position[0] + 10, @person.position[1] + 10
     @context.fillText @person.activeTask, @person.position[0] + 20, @person.position[1] + 40
 
+    if typeof(@person.destination) != 'undefined' && @person.destination != null
+      @context.fillStyle='rgb(128,255,255)'
+      @context.fillRect(
+        parseInt( @person.destination[0] ),
+        parseInt( @person.destination[1] ),
+        parseInt( @person.size[0]     ),
+        parseInt( @person.size[1]     ) 
+      )
+
+      @context.fillStyle = "red"
+      @context.font = "bold 18px Sans Serif"
+      @context.fillText "#{@person.name}'s destination", @person.destination[0] + 10, @person.destination[1] + 10
 
 class Busyverse.CityView
   buildingViews: {}
@@ -86,4 +108,17 @@ class Busyverse.CityView
       @personViews[person] ?= new Busyverse.PersonView(person, @context)
       person_view = @personViews[person]
       person_view.render()
+
+class Busyverse.WorldView
+  constructor: (@world, @context) ->
+    console.log "New world view created!" if Busyverse.debug
+
+  render: =>
+    console.log "rendering world!" if Busyverse.debug and Busyverse.verbose
+    @world.map.eachCell (cell) =>
+      @context.fillStyle = cell.color
+      console.log "rendering world cell at #{cell.location}" if Busyverse.debug and Busyverse.verbose
+      @context.fillRect(@world.cellSize * cell.location[0], 
+		        @world.cellSize * cell.location[1], 
+	                @world.cellSize - 1, @world.cellSize - 1)
 

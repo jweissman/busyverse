@@ -5,8 +5,8 @@
 describe "Game", ->
   beforeEach ->
     @player = new Busyverse.Player()
-    @city = new Busyverse.City()
-    @game = new Busyverse.Game(@city, @player)
+    @city   = new Busyverse.City()
+    @game   = new Busyverse.Game(@city, @player)
 
   describe '.player', ->
     it 'should have the expected player', ->

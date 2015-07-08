@@ -2,13 +2,14 @@
 #= require_tree ./buildings
 #= require person
 #= require city
+#= require grid
 #= require world
 #= require presenter
 #= require engine
 #= require player
 
 class Busyverse.Game
-  stepLength: 100
+  stepLength: 30
   constructor: (@city, @player, @world) ->
     console.log 'New game created!' if Busyverse.verbose
     @city   ?= new Busyverse.City()

@@ -30,6 +30,14 @@ context "Presenter", ->
 
     afterEach -> @context_mock.verify()
 
+    it 'should draw the world', ->
+      # zero size world (i.e., 1x1) for testing cell rendering
+      @game.world = new Busyverse.World(0,0) 
+      @game.world.cellSize = 2
+      @context_mock.expects("fillRect").withArgs(0,0,1,1)
+      @presenter.renderWorld(@game.world)
+      expect(@context_api.fillStyle).to.equal('green')
+
     it 'should draw buildings', ->
       @context_mock.expects("fillRect").once().withArgs(0,0,20,25)
       @presenter.renderBuildings(@game)
@@ -37,7 +45,7 @@ context "Presenter", ->
 
     it 'should draw people', ->
       @context_mock.expects("fillRect").once().withArgs(0,0,10,10)
-      @context_mock.expects("fillText").twice() #.withArgs(0,0,10,10)
+      @context_mock.expects("fillText").twice()
       @presenter.renderPeople(@game)
-      expect(@context_api.fillStyle).to.equal('blue') #'rgb(128,255,128)')
-      expect(@context_api.font).to.eql("bold 16px Arial") #rgb(128,255,128)')
+      expect(@context_api.fillStyle).to.equal('blue')
+      expect(@context_api.font).to.eql("bold 16px Arial")
