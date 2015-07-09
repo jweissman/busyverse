@@ -1,6 +1,7 @@
-class Busyverse.Buildings.Tower # extends Busyverse.Building
+#= require busyverse
+#= require buildings/building
+
+class Busyverse.Buildings.Tower extends Busyverse.Building
   name: 'Large Tower'
   size: [4,4]
-
-  constructor: (@position) ->
-
+  color: 'grey'

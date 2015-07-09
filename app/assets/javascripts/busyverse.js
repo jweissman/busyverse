@@ -9,6 +9,7 @@ var Busyverse = {
 
   // namespaces
   Buildings: {},
+  Views: {},
   Support: {}
 
 };

@@ -1,4 +1,9 @@
 #= require busyverse
+#= require views/view
+#= require views/world_view
+#= require views/city_view
+#= require views/building_view
+#= require views/person_view
 #= require game
 #= require presenter
 #= require sinon
@@ -39,9 +44,15 @@ context "Presenter", ->
       expect(@context_api.fillStyle).to.equal('darkgrey')
 
     it 'should draw buildings', ->
-      @context_mock.expects("fillRect").once().withArgs(0,0,20,25)
+      example_building = new Busyverse.Buildings.Farm([0,0])
+      @context_mock.expects("fillRect").once().withArgs(
+        example_building.position[0],
+        example_building.position[1],
+        (example_building.size[0] * @game.world.cellSize) - 1,
+        (example_building.size[1] * @game.world.cellSize) - 1
+      )
       @presenter.renderBuildings(@game)
-      expect(@context_api.fillStyle).to.equal('rgb(255,128,0)')
+      expect(@context_api.fillStyle).to.equal(example_building.color) #'orange')
 
     it 'should draw people', ->
       @context_mock.expects("fillRect").once().withArgs(0,0,10,10)

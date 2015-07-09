@@ -1,5 +1,7 @@
 #= require busyverse
-class Busyverse.Buildings.Farm # extends Busyverse.Building
+#= require buildings/building
+
+class Busyverse.Buildings.Farm extends Busyverse.Building
   name: 'Small Farm'
-  size: [20, 25]
-  constructor: (@position) ->
+  size: [2, 2]
+  color: 'darkgreen'

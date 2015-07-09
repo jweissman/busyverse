@@ -40,10 +40,15 @@ class Busyverse.Person
 
   build: (world, city) =>
     @destination ?= world.randomLocation()
+    # @destinationCell ?= world.randomCellCoordinates()
     @seek()
     if @atSoughtLocation()
       console.log "CREATING BUILDING AT #{@position}" if Busyverse.debug
-      city.create(new Busyverse.Buildings.Farm(@position.slice(0)))
+
+      targetCell = world.canvasToMapCoordinates(@position.slice(0))
+      targetLocation = [ targetCell[0] * world.cellSize,
+	                 targetCell[1] * world.cellSize ]
+      city.create(new Busyverse.Buildings.Farm(targetLocation))
       @destination = null
       @activeTask = "idle"
 

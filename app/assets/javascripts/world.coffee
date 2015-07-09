@@ -17,6 +17,9 @@ class Busyverse.World
 
     [ Math.round(x), Math.round(y) ]
 
+  # nearestCellCanvasCoordinates: (canvasCoords) =>
+  #   @canvasToMapCoordinates(canvasCoords)
+
   markExplored: (cellCoords) =>
     console.log "Marking #{cellCoords} explored" if Busyverse.debug and Busyverse.verbose
     cell = @map.getCellAt(cellCoords)
