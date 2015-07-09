@@ -1,21 +1,36 @@
+#= require support/randomness
+#= require buildings/farm
+
 class Busyverse.Person
   size: [10,10]
-  
-  speed: 3
+  speed: 10
   velocity: [0,0]
 
   constructor: (@name, @position, @activeTask) ->
     @position   ?= [0,0]
     @activeTask ?= "idle"
+    @random     ?= new Busyverse.Support.Randomness()
     console.log "new person (#{@name}) created at #{@position}" if Busyverse.debug
 
-  send: (cmd) => 
+  send: (cmd, city, world) => 
     console.log "updating #{@name}'s active task to #{cmd}" if Busyverse.debug
 
     if cmd == "wander" or cmd == "idle" or cmd == "build"
-      @activeTask  = cmd
       @destination = null
+
+      if cmd == "build" # pick destination (and maybe building type?)
+        @buildingToCreate = new Busyverse.Buildings.Farm()
+        openAreas = world.findOpenAreasOfSizeInCity(city, @buildingToCreate.size)
+
+        if openAreas.length == 0
+          return "NO OPEN AREAS FOR BUILDING"
+        @destinationCell = @random.valueFromList(openAreas)
+        @destination = world.mapToCanvasCoordinates(@destinationCell)
+        @buildingToCreate.position = @destinationCell #.location
+        console.log "BUILDING #{@buildingToCreate.name} AT #{@buildingToCreate.position}" if Busyverse.debug and Busyverse.verbose
+      @activeTask  = cmd
       return "Now doing #{@activeTask}"
+
     else
       return "Unknown command #{cmd}"
 
@@ -24,6 +39,7 @@ class Busyverse.Person
 
     if @activeTask == "wander"
       @wander(world)
+
     else if @activeTask == "build"
       @build(world, city)
 
@@ -39,16 +55,10 @@ class Busyverse.Person
     )
 
   build: (world, city) =>
-    @destination ?= world.randomLocation()
-    # @destinationCell ?= world.randomCellCoordinates()
     @seek()
     if @atSoughtLocation()
-      console.log "CREATING BUILDING AT #{@position}" if Busyverse.debug
-
-      targetCell = world.canvasToMapCoordinates(@position.slice(0))
-      targetLocation = [ targetCell[0] * world.cellSize,
-	                 targetCell[1] * world.cellSize ]
-      city.create(new Busyverse.Buildings.Farm(targetLocation))
+      console.log "CREATING BUILDING #{@buildingToCreate.name} at #{@buildingToCreate.position}" if Busyverse.debug
+      city.create(@buildingToCreate)
       @destination = null
       @activeTask = "idle"
 
@@ -68,6 +78,7 @@ class Busyverse.Person
     distance < (2*@speed)
 
   seek: () =>
+    # console.log "SEEKING"
     if @destination[0] < @position[0] - @speed
       @velocity[0] = -@speed
     else if @destination[0] > @position[0] + @speed

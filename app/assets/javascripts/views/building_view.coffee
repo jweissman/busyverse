@@ -9,8 +9,8 @@ class Busyverse.Views.BuildingView extends Busyverse.View
 
     @context.fillStyle = building.color
     @context.fillRect(
-      ( building.position[0] ),
-      ( building.position[1] ),
+      ( building.position[0] * world.cellSize ),
+      ( building.position[1] * world.cellSize ),
       ( building.size[0] * world.cellSize ) - 1,
       ( building.size[1] * world.cellSize ) - 1
     )

@@ -19,7 +19,13 @@ class Busyverse.City
       person.update(world, @)
     
   create: (structure) =>
-    console.log "creating new building"
+    console.log "creating new building" if Busyverse.debug
     console.log structure
     @buildings.push(structure)
- 
+
+  availableForBuilding: (location, size) =>
+    for building in @buildings
+      if building.doesOverlap(location, size)
+        return false
+    true
+

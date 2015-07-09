@@ -1,4 +1,5 @@
 class Busyverse.GridCell
+  occupied: false
   constructor: (@location, @color) ->
 
 class Busyverse.Grid

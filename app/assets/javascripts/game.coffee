@@ -31,7 +31,7 @@ class Busyverse.Game
   send: (command) =>
     person = @city.population[0]
     console.log "Sending command #{command} to citizen #{person.name}..." if Busyverse.debug
-    person.send(command)
+    person.send(command, @city, @world)
 
   launch: (ui) =>
     console.log 'Launching!' if Busyverse.verbose

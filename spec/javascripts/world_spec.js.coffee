@@ -5,16 +5,16 @@
 
 context "World", ->
   beforeEach ->
-    @width = 10
-    @height = 25
+    @width  = 5
+    @height = 5
     @world = new Busyverse.World(@width, @height)
 
   describe ".width", ->
-    it 'should be 20', ->
+    it 'should be as assigned', ->
       expect(@world.width).to.eql(@width)
 
   describe '.height', ->
-    it 'should be 30', ->
+    it 'should be as assigned', ->
       expect(@world.height).to.eql(@height)
 
   describe "#randomCell", ->
@@ -33,4 +33,18 @@ context "World", ->
 
   describe "#canvasToMapCoordinates", ->
     it 'should convert according to cell size', ->
-      expect(@world.canvasToMapCoordinates([25.3, 26.7])).to.deep.eql([3, 3])
+      x = 25.5
+      y = 54.5
+
+      expectedLocation = [ Math.round(x / @world.cellSize), Math.round(y / @world.cellSize)]
+      actualLocation = @world.canvasToMapCoordinates([x, y])
+
+      expect(actualLocation).to.deep.eql(expectedLocation)
+
+  describe "#findOpenAreaOfSizeInCity", ->
+    it 'should find open areas', ->
+      city = availableForBuilding: -> true 
+      open_regions = @world.findOpenAreasOfSizeInCity(city, [1,1])
+      expect(open_regions.length).to.equal((@width+1) * (@height+1))
+
+
