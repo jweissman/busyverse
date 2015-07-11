@@ -1,28 +1,21 @@
-== README
+= Busyverse
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+A city-building game. You control workers by giving them programmatic
+commands. 
 
-Things you may want to cover:
+== Requirements
 
-* Ruby version
+Ruby 2.2.2. No system dependencies so far. Configuration is currently all in code. No databse functionality needed yet (the game engine is entirely in JS.)
 
-* System dependencies
+== Getting Started
 
-* Configuration
+This is a Coffeescript game running inside a Ruby on Rails project. 
 
-* Database creation
+Run `be rake` to run the test suite.  
 
-* Database initialization
+A `be rails s` will fire up the server. 
 
-* How to run the test suite
+You should now be able to see the game at http://localhost:3000. 
 
-* Services (job queues, cache servers, search engines, etc.)
+You should also now be able to view test suite output at http://localhost:3500.
 
-* Deployment instructions
-
-* ...
-
-
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
