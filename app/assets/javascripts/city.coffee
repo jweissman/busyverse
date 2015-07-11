@@ -9,8 +9,16 @@ class Busyverse.City
     @_constructors = []
     console.log "New city created with population #{@population}!" if Busyverse.verbose
 
-  grow: ->
-    bob = new Busyverse.Person("Bob")
+  center: =>
+    xs = 0
+    ys = 0
+    for building in @buildings
+      xs = xs + building.position[0]
+      ys = ys + building.position[1]
+    return([( xs / @buildings.length), (ys / @buildings.length )])
+
+  grow: (world) =>
+    bob = new Busyverse.Person("Bob", world.mapToCanvasCoordinates(@center()), "wander")
     @population.push(bob)
 
   update: (world) =>

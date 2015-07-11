@@ -14,7 +14,7 @@ class Busyverse.Grid
         @map[x][y] = @createCellAt([x,y])
 
   createCellAt: (location) =>
-    new Busyverse.GridCell(location, 'darkgrey')
+    new Busyverse.GridCell(location, 'black')
 
   eachCell: (callbackFn) =>
     for x in [0..@width]
@@ -24,7 +24,7 @@ class Busyverse.Grid
   getCellAt: (location) =>
     x = location[0]
     y = location[1]
-    if x >= 0 && x < @width && y >= 0 && y < @height
+    if x >= 0 && x <= @width && y >= 0 && y <= @height
       @map[x][y]
     else
       null

@@ -18,10 +18,10 @@ class Busyverse.Game
     @setup()
 
   setup: =>
-    origin = [0,0]
-    farm = new Busyverse.Buildings.Farm(origin)
+    center = [40,30]
+    farm = new Busyverse.Buildings.Farm(center)
     @place(farm) 
-    @city.grow()
+    @city.grow(@world)
 
   play: (ui) =>
     console.log 'Playing!'
@@ -49,6 +49,7 @@ class Busyverse.Game
 
   update: () =>
     @city.update(@world)
+    # @city.grow(@world)
 
   render: () =>
     console.log "Rendering to UI" if Busyverse.verbose

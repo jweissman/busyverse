@@ -21,12 +21,19 @@ context "Person", ->
     it 'should adopt a new active task', ->
       @person.send("wander")
       expect(@person.activeTask).to.equal("wander")
+      # @person.send("build")
+      # expect(@person.activeTask).to.equal("build")
 
   describe "#wander", ->
     it 'should advance towards a randomly selected destination', ->
       somewhere = [10,10]
-      world = randomLocation: => somewhere # [10,10]
-      @person.wander(world)
+      world = { 
+        nearestUnexploredCell: => somewhere,
+        canvasToMapCoordinates: (xy) => xy
+        mapToCanvasCoordinates: (xy) => xy
+      }
+      city = center: -> 
+      @person.wander(world, city)
       expect(@person.destination).to.equal(somewhere)
 
   describe "#move", ->

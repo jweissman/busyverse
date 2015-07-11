@@ -14,8 +14,15 @@ context "World", ->
       expect(@world.width).to.eql(@width)
 
   describe '.height', ->
-    it 'should be as assigned', ->
+    it "should be as assigned", ->
       expect(@world.height).to.eql(@height)
+
+  describe '#center', ->
+    it 'should indicate the center of the cell matrix', ->
+      expect(@world.center()).to.eql([
+        @world.width / 2,
+        @world.height / 2
+      ])
 
   describe "#randomCell", ->
     it 'should be within the world', ->

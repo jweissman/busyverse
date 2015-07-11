@@ -20,7 +20,7 @@ context "City", ->
   
     it 'should increase population size', ->
       old_population = @city.population.length
-      @city.grow()
+      @city.grow(mapToCanvasCoordinates: -> )
       new_population = @city.population.length
       new_population.should.equal(old_population+1)
 

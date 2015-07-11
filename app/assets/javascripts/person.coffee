@@ -38,7 +38,7 @@ class Busyverse.Person
     console.log "Person#update called!" if Busyverse.debug and Busyverse.verbose
 
     if @activeTask == "wander"
-      @wander(world)
+      @wander(world, city)
 
     else if @activeTask == "build"
       @build(world, city)
@@ -62,33 +62,40 @@ class Busyverse.Person
       @destination = null
       @activeTask = "idle"
 
-  wander: (world) =>
-    @destination ?= world.randomLocation()
+  mapPosition: (world) => world.canvasToMapCoordinates(@position)
+
+  wander: (world, city) =>
+    @destination ?= world.mapToCanvasCoordinates world.nearestUnexploredCell(city.center()) 
+    #@mapPosition(world))
     @velocity    = [0,0]
 
     console.log "#{@name} heading to #{@destination}" if Busyverse.verbose
     @seek()
     if @atSoughtLocation()
-      @destination = world.randomLocation()
+      # world.markExploredSurrounding(
+      #   world.canvasToMapCoordinates(@position)
+      # )
+      @destination = world.mapToCanvasCoordinates world.nearestUnexploredCell(city.center())
+      #@mapPosition(world))
 
   atSoughtLocation: () =>
     dx = Math.abs(@destination[0] - @position[0])
     dy = Math.abs(@destination[1] - @position[1])
     distance = Math.sqrt( (dx*dx) + (dy*dy) )
-    distance < (2*@speed)
+    distance <  1 #(@speed)
 
   seek: () =>
     # console.log "SEEKING"
-    if @destination[0] < @position[0] - @speed
+    if @destination[0] < @position[0] # - @speed
       @velocity[0] = -@speed
-    else if @destination[0] > @position[0] + @speed
+    else if @destination[0] > @position[0] # + @speed
       @velocity[0] = @speed
     else
       @velocity[0] = 0
     
-    if @destination[1] < @position[1] - @speed
+    if @destination[1] < @position[1] # - @speed
       @velocity[1] = -@speed
-    else if @destination[1] > @position[1] + @speed
+    else if @destination[1] > @position[1] # + @speed
       @velocity[1] = @speed
     else
       @velocity[1] = 0

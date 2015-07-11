@@ -12,7 +12,7 @@ class Busyverse.Views.CityView extends Busyverse.View
       person_view.render()
 
     @context.fillStyle = "white"
-    @context.font = "bold 30px Helvetica"
-    @context.fillText "#{city.name} (#{city.buildings.length} buildings)", 200, 30
+    @context.font = "bold 20px Helvetica"
+    @context.fillText "#{city.name} (#{city.buildings.length} buildings)", 570, 500
 
 

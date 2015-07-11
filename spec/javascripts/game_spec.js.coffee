@@ -21,13 +21,18 @@ describe "Game", ->
       @game = new Busyverse.Game()
       @game.setup()
   
-    it 'should place a farm at the origin', ->
+    it 'should place a farm at the center', ->
       firstStructure = @game.city.buildings[0]
       expect(firstStructure.name).to.equal("Small Farm")
-      expect(firstStructure.position).to.deep.equal([0,0])
+      expect(firstStructure.position).to.eql(@game.world.center())
 
-    it 'should create a person', ->
+    it 'should create a person at the center', ->
       expect(@city.population.length).to.equal(1)
+      expect(@city.population[0].position).to.eql(
+        @game.world.mapToCanvasCoordinates(
+          @game.world.center()
+        )
+      )
 
   describe "#place", ->
     beforeEach ->

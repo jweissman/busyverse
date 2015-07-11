@@ -6,7 +6,6 @@ var Busyverse = {
   debug: true,
   verbose: false,
   
-
   // namespaces
   Buildings: {},
   Views: {},

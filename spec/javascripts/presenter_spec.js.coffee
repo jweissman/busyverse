@@ -41,22 +41,25 @@ context "Presenter", ->
       @game.world.cellSize = 2
       @context_mock.expects("fillRect").withArgs(0,0,1,1)
       @presenter.renderWorld(@game.world)
-      expect(@context_api.fillStyle).to.equal('darkgrey')
+      expect(@context_api.fillStyle).to.equal('black')
 
     it 'should draw buildings', ->
-      example_building = new Busyverse.Buildings.Farm([0,0])
+      example_building = new Busyverse.Buildings.Farm()
+      center = @game.world.center()
+      scale  = @game.world.cellSize
+
       @context_mock.expects("fillRect").once().withArgs(
-        example_building.position[0],
-        example_building.position[1],
-        (example_building.size[0] * @game.world.cellSize) - 1,
-        (example_building.size[1] * @game.world.cellSize) - 1
+        center[0] * scale, center[1] * scale, 
+        (example_building.size[0] * scale) - 1,
+        (example_building.size[1] * scale) - 1
       )
+
       @presenter.renderBuildings(@game)
-      expect(@context_api.fillStyle).to.equal(example_building.color) #'orange')
+      expect(@context_api.fillStyle).to.equal(example_building.color)
 
     it 'should draw people', ->
-      @context_mock.expects("fillRect").once().withArgs(0,0,10,10)
+      @context_mock.expects("fillRect").once().withArgs(400,300,10,10)
       @context_mock.expects("fillText").thrice()
       @presenter.renderPeople(@game)
       expect(@context_api.fillStyle).to.equal('white')
-      expect(@context_api.font).to.eql("bold 30px Helvetica")
+      expect(@context_api.font).to.eql("bold 20px Helvetica")

@@ -1,13 +1,21 @@
 #= require support/randomness
 
 class Busyverse.World
-  cellSize: 20
+  cellSize: 10
+
   constructor: (@width, @height) ->
-    @width  ?= 20
-    @height ?= 15
+    @width  ?= 80
+    @height ?= 60
+
     @random = new Busyverse.Support.Randomness()
     @map = new Busyverse.Grid(@width, @height)
     console.log("Created new #{@width}x#{@height} world!") if Busyverse.debug
+
+  center: => 
+    [ @width / 2, @height / 2 ]
+
+  mapToCanvasCoordinates: (pos) => 
+    [ @cellSize * pos[0], @cellSize * pos[1] ]
 
   canvasToMapCoordinates: (canvasCoords) =>
     x = canvasCoords[0] / @cellSize
@@ -16,13 +24,10 @@ class Busyverse.World
     [ Math.round(x), Math.round(y) ]
 
   mapToCanvasCoordinates: (mapCoords) =>
-    console.log "Converting #{mapCoords} to canvas coords..."
     x = mapCoords[0] * @cellSize
     y = mapCoords[1] * @cellSize
 
-    result = [ Math.round(x), Math.round(y) ]
-    console.log "RESULT OF CONVERSION: #{result}"
-    result
+    [ Math.round(x), Math.round(y) ]
 
   findOpenAreasOfSizeInCity: (city, size) =>
     open_areas = []
@@ -41,10 +46,28 @@ class Busyverse.World
     if cell != null
       cell.color = 'lightgreen'
 
+  isExplored: (cell) =>
+    cell.color == 'lightgreen'
+
   markExploredSurrounding: (cellCoords) =>
     @markExplored(cellCoords)
     for cell in @map.getCellsAround(cellCoords)
       @markExplored(cell.location)
+
+  nearestUnexploredCell: (cellCoords) =>
+    closest = null
+    min_dist = 10000
+
+    @map.eachCell (cell) =>
+      return if @isExplored(cell)
+      dx = Math.abs(cellCoords[0] - cell.location[0])
+      dy = Math.abs(cellCoords[1] - cell.location[1])
+      distance = Math.sqrt( (dx*dx) + (dy*dy) )
+      if distance < min_dist 
+        min_dist = distance
+        closest = cell
+
+    closest.location
     
   randomCell: ->
     console.log("Finding random location")
