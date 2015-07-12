@@ -4,3 +4,8 @@ class Busyverse.Support.Randomness
 
   valueFromList: (list) ->
     list[@valueInRange(list.length)]
+
+  # valueFromPercentageMap: (map) ->
+
+
+    

@@ -50,8 +50,10 @@ context "World", ->
 
   describe "#findOpenAreaOfSizeInCity", ->
     it 'should find open areas', ->
-      city = availableForBuilding: -> true 
-      open_regions = @world.findOpenAreasOfSizeInCity(city, [1,1])
-      expect(open_regions.length).to.equal((@width+1) * (@height+1))
+      city = 
+        availableForBuilding: -> true
+        center: -> [3,3]
+      open_regions = @world.findOpenAreasOfSizeInCity(city, [1,1], 4)
+      expect(open_regions.length).to.equal(35) #(@width+1) * (@height+1))
 
 

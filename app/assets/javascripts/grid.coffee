@@ -1,31 +1,40 @@
+#= require support/geometry
+#= require support/randomness
+
 class Busyverse.GridCell
-  occupied: false
   constructor: (@location, @color) ->
+    @geometry = new Busyverse.Support.Geometry()
+
+  distanceFrom: (otherLocation) =>
+    @geometry.euclideanDistance @location, otherLocation
+
 
 class Busyverse.Grid
-  map: []
   constructor: (@width, @height) ->
+    @cells = []
+    @random = new Busyverse.Support.Randomness()
     @build()
 
   build: =>
     for x in [0..@width]
-      @map[x] = []
+      @cells[x] = []
       for y in [0..@height]
-        @map[x][y] = @createCellAt([x,y])
+        @cells[x][y] = @createCellAt([x,y])
 
   createCellAt: (location) =>
-    new Busyverse.GridCell(location, 'black')
+    color = @random.valueFromList(['lightgreen', 'green', 'darkgreen'])
+    new Busyverse.GridCell(location, color)
 
   eachCell: (callbackFn) =>
     for x in [0..@width]
       for y in [0..@height]
-        callbackFn(@map[x][y])
+        callbackFn(@cells[x][y])
 
   getCellAt: (location) =>
     x = location[0]
     y = location[1]
     if x >= 0 && x <= @width && y >= 0 && y <= @height
-      @map[x][y]
+      @cells[x][y]
     else
       null
 

@@ -24,8 +24,21 @@ context "City", ->
       new_population = @city.population.length
       new_population.should.equal(old_population+1)
 
-  describe "#availableForBuilding", ->
-    it 'should indicate building locations', ->
-      @city.create(@farm)
-      expect(@city.availableForBuilding(@farm.position, [1,1])).to.equal(false)
-      expect(@city.availableForBuilding([4,5], [2,2])).to.equal(true)
+  context "exploration and building", ->
+    beforeEach ->
+      @city.explore([0,0])
+      @city.explore([0,1])
+      @city.explore([1,0])
+      @city.explore([1,1])
+
+    describe "#availableForBuilding", ->
+      it 'should indicate building locations', ->
+        expect(@city.availableForBuilding(@farm.position, [1,1])).to.equal(true)
+        console.log "CREATING FARM"
+        @city.create(@farm)
+        expect(@city.availableForBuilding(@farm.position, [1,1])).to.equal(false)
+
+    describe "#isAreaFullyExplored", ->
+      it 'should indicate whether an area has been entirely explored', ->
+        expect(@city.isAreaFullyExplored([0,0],[1,1])).to.eql(true)
+        expect(@city.isAreaFullyExplored([1,1],[1,1])).to.eql(false)

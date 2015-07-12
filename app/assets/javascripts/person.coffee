@@ -1,16 +1,19 @@
 #= require support/randomness
+#= require support/geometry
 #= require buildings/farm
 
 class Busyverse.Person
   size: [10,10]
-  speed: 10
+  speed: 5
   velocity: [0,0]
 
   constructor: (@name, @position, @activeTask) ->
     @position   ?= [0,0]
-    @activeTask ?= "idle"
     @random     ?= new Busyverse.Support.Randomness()
-    console.log "new person (#{@name}) created at #{@position}" if Busyverse.debug
+    @geometry   ?= new Busyverse.Support.Geometry()
+
+    @activeTask ?= "idle"
+    console.log "new person (#{@name}) created at #{@position} with task #{@activeTask}" if Busyverse.debug
 
   send: (cmd, city, world) => 
     console.log "updating #{@name}'s active task to #{cmd}" if Busyverse.debug
@@ -60,42 +63,52 @@ class Busyverse.Person
       console.log "CREATING BUILDING #{@buildingToCreate.name} at #{@buildingToCreate.position}" if Busyverse.debug
       city.create(@buildingToCreate)
       @destination = null
-      @activeTask = "idle"
+      @activeTask  = "idle" 
 
   mapPosition: (world) => world.canvasToMapCoordinates(@position)
 
+  pickWanderDestination: (world, city) ->
+    nearestUnexploredFromCityCenter = world.nearestUnexploredCell(city.center()) 
+    nearestUnexploredFromPerson     = world.nearestUnexploredCell(@mapPosition(world))
+
+    @random.valueFromList [
+      world.mapToCanvasCoordinates(nearestUnexploredFromCityCenter),
+      world.mapToCanvasCoordinates(nearestUnexploredFromPerson),
+      world.mapToCanvasCoordinates(nearestUnexploredFromPerson),
+      world.mapToCanvasCoordinates(nearestUnexploredFromPerson),
+      world.mapToCanvasCoordinates(nearestUnexploredFromPerson),
+      world.mapToCanvasCoordinates(nearestUnexploredFromPerson),
+      world.mapToCanvasCoordinates(nearestUnexploredFromPerson),
+      world.mapToCanvasCoordinates(nearestUnexploredFromPerson),
+      world.mapToCanvasCoordinates(nearestUnexploredFromPerson)
+    ]
+
   wander: (world, city) =>
-    @destination ?= world.mapToCanvasCoordinates world.nearestUnexploredCell(city.center()) 
-    #@mapPosition(world))
+    @destination ?= @pickWanderDestination(world, city)
     @velocity    = [0,0]
 
     console.log "#{@name} heading to #{@destination}" if Busyverse.verbose
     @seek()
     if @atSoughtLocation()
-      # world.markExploredSurrounding(
-      #   world.canvasToMapCoordinates(@position)
-      # )
-      @destination = world.mapToCanvasCoordinates world.nearestUnexploredCell(city.center())
-      #@mapPosition(world))
+      @destination = @pickWanderDestination(world, city)
 
   atSoughtLocation: () =>
-    dx = Math.abs(@destination[0] - @position[0])
-    dy = Math.abs(@destination[1] - @position[1])
-    distance = Math.sqrt( (dx*dx) + (dy*dy) )
-    distance <  1 #(@speed)
+    return false unless @destination
+    distance = @geometry.euclideanDistance @position, @destination
+    distance <  1
 
   seek: () =>
-    # console.log "SEEKING"
-    if @destination[0] < @position[0] # - @speed
+    return unless @destination
+    if @destination[0] < @position[0]
       @velocity[0] = -@speed
-    else if @destination[0] > @position[0] # + @speed
+    else if @destination[0] > @position[0]
       @velocity[0] = @speed
     else
       @velocity[0] = 0
     
-    if @destination[1] < @position[1] # - @speed
+    if @destination[1] < @position[1]
       @velocity[1] = -@speed
-    else if @destination[1] > @position[1] # + @speed
+    else if @destination[1] > @position[1]
       @velocity[1] = @speed
     else
       @velocity[1] = 0

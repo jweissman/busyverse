@@ -6,60 +6,85 @@
 #= require views/person_view
 #= require game
 #= require presenter
-#= require sinon
+#= require spec_helper
 
 context "Presenter", ->
-  beforeEach ->
-    @game = new Busyverse.Game()
-    @presenter = new Busyverse.Presenter() #@game)
-
   describe "#attach", ->
     it 'should get the canvas context', ->
+      presenter = new Busyverse.Presenter()
+
       canvas_api = getContext: ->
       canvas_mock = sinon.mock(canvas_api)
       canvas_mock.expects("getContext").once()
 
-      @presenter.attach(canvas_api)
+      presenter.attach(canvas_api)
 
       canvas_mock.verify()
 
   describe "#render", ->
     beforeEach ->
-      @context_api = 
-        fillRect: ->
-        fillText: ->
-      @context_mock = sinon.mock(@context_api)
-      @canvas_api = getContext: => @context_api
-      @canvas_mock = sinon.mock(@canvas_api)
-      @presenter.attach(@canvas_api)
+      @fillRect = sinon.spy()
+      @context  = fillRect: @fillRect
+      @canvas   = getContext: => @context
 
-    afterEach -> @context_mock.verify()
+      @world = new Busyverse.World(0,0) 
+      @presenter = new Busyverse.Presenter()
+      @presenter.attach @canvas
+      
+    it 'should draw the world as it is being explored', ->
+      @world.markExplored([0,0])
+      
+      @presenter.renderWorld @world
 
-    it 'should draw the world', ->
-      # zero size world (i.e., 1x1) for testing cell rendering
-      @game.world = new Busyverse.World(0,0) 
-      @game.world.cellSize = 2
-      @context_mock.expects("fillRect").withArgs(0,0,1,1)
-      @presenter.renderWorld(@game.world)
-      expect(@context_api.fillStyle).to.equal('black')
+      sz = @world.cellSize - 1
+      expect(@fillRect).to.have.been.calledWith(0,0,sz,sz)
+
+      cell = @world.map.getCellAt([0,0])
+      console.log cell
+      color = cell.color
+      console.log color
+      expect(@context.fillStyle).to.eql(color)
 
     it 'should draw buildings', ->
-      example_building = new Busyverse.Buildings.Farm()
-      center = @game.world.center()
-      scale  = @game.world.cellSize
+      farm = new Busyverse.Buildings.Farm([0,0])
+      @world.city.create(farm)
+      @presenter.renderBuildings(@world)
+      sz = @world.mapToCanvasCoordinates(farm.size) # * world.cellSize
+      expect(@fillRect).to.have.been.calledWith(0,0,sz[0]-1,sz[1]-1)
 
-      @context_mock.expects("fillRect").once().withArgs(
-        center[0] * scale, center[1] * scale, 
-        (example_building.size[0] * scale) - 1,
-        (example_building.size[1] * scale) - 1
-      )
+    # it 'should draw people', ->
+    #   person = new Busyverse.Person()
 
-      @presenter.renderBuildings(@game)
-      expect(@context_api.fillStyle).to.equal(example_building.color)
+    # it 'should draw buildings', ->
+    #   farm = new Busyverse.Buildings.Farm([0,0])
+    #   world = new Busyverse.World()
+    #   world.city.create(farm)
+    #   console.log "Created new world for spec"
 
-    it 'should draw people', ->
-      @context_mock.expects("fillRect").once().withArgs(400,300,10,10)
-      @context_mock.expects("fillText").thrice()
-      @presenter.renderPeople(@game)
-      expect(@context_api.fillStyle).to.equal('white')
-      expect(@context_api.font).to.eql("bold 20px Helvetica")
+    #   console.log world
+    #   scale  = world.cellSize
+
+    #   @context_mock.expects("fillRect").once().withArgs(
+    #     0, 0,
+    #     (farm.size[0] * scale) - 1,
+    #     (farm.size[1] * scale) - 1
+    #   )
+
+    #   presenter = new Busyverse.Presenter()
+    #   presenter.attach(@canvas_api)
+    #   presenter.renderBuildings(world)
+
+    #   expect(farm.color).to.eql('darkgreen')
+    #   expect(@context_api.fillStyle).to.equal(farm.color)
+
+    # it 'should draw people', ->
+    #   world = new Busyverse.World()
+    #   @context_mock.expects("fillRect").once().withArgs(400,300,10,10)
+    #   @context_mock.expects("fillText").thrice()
+    #   
+    #   presenter = new Busyverse.Presenter()
+    #   presenter.attach(@canvas_api)
+    #   presenter.renderPeople(world)
+
+    #   expect(@context_api.fillStyle).to.equal('white')
+    #   expect(@context_api.font).to.eql("bold 20px Helvetica")

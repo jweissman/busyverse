@@ -55,6 +55,7 @@ group :development, :test do
 
   # Use sinon for JS mocks
   gem 'sinon-rails'
+  gem 'sinon-chai-rails'
 
 
 end

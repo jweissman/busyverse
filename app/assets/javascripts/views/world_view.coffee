@@ -1,15 +1,35 @@
 class Busyverse.Views.WorldView extends Busyverse.View
   render: =>
-    console.log "rendering world!" if Busyverse.debug and Busyverse.verbose
+    console.log "rendering world!" if Busyverse.trace
     world = @model
 
-    world.map.eachCell (cell) =>
-      @context.fillStyle = cell.color
+    world.map.eachCell (cell) => @renderCell(world, cell)
 
-      console.log "rendering world cell at #{cell.location}" if Busyverse.debug and Busyverse.verbose
-      @context.fillRect(
-        world.cellSize * cell.location[0], 
-        world.cellSize * cell.location[1], 
-        world.cellSize - 1, 
-        world.cellSize - 1
-      )
+  renderCell: (world, cell) =>
+    console.log 'considering cell:' if Busyverse.trace
+    console.log cell if Busyverse.trace
+
+    console.log "cell location: #{cell.location}" if Busyverse.trace
+    location = cell.location
+
+    console.log "is #{location} explored?" if Busyverse.trace
+    explored = world.isCellExplored(cell) #location)
+    console.log "explored? #{explored}" if Busyverse.trace
+
+    color    = if explored then cell.color else 'black' #return #'black'
+    if color == 'black'
+      return
+    console.log "chosen color: #{color}" if Busyverse.trace
+    @context.fillStyle = color
+
+    console.log "rendering world cell at #{cell.location} in color #{cell.color}" if Busyverse.trace # && cell.color != 'black'
+    console.log cell if Busyverse.trace
+
+    x = world.cellSize * cell.location[0]
+    y = world.cellSize * cell.location[1] 
+    w = world.cellSize - 1
+    h = world.cellSize - 1
+ 
+    @context.fillRect(x, y, w, h)
+
+    console.log "---> Drew #{w}x#{h} rect at #{x}, #{y} in #{color}" if Busyverse.trace

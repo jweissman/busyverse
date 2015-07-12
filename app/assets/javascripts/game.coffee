@@ -9,19 +9,22 @@
 #= require player
 
 class Busyverse.Game
+  width: 80
+  height: 60
   stepLength: 30
-  constructor: (@city, @player, @world) ->
-    console.log 'New game created!' if Busyverse.verbose
-    @city   ?= new Busyverse.City()
+
+  constructor: (@world, @player) ->
+    @world  ?= new Busyverse.World(@width, @height)
     @player ?= new Busyverse.Player()
-    @world  ?= new Busyverse.World()
     @setup()
+    console.log "New game created for world #{@world.name}!" if Busyverse.debug
 
   setup: =>
-    center = [40,30]
-    farm = new Busyverse.Buildings.Farm(center)
+    farm = new Busyverse.Buildings.Farm(@world.center())
     @place(farm) 
-    @city.grow(@world)
+
+    for i in [1..2]
+      @world.city.grow(@world)
 
   play: (ui) =>
     console.log 'Playing!'
@@ -29,9 +32,9 @@ class Busyverse.Game
     true
 
   send: (command) =>
-    person = @city.population[0]
+    person = @world.city.population[0]
     console.log "Sending command #{command} to citizen #{person.name}..." if Busyverse.debug
-    person.send(command, @city, @world)
+    person.send(command, @world.city, @world)
 
   launch: (ui) =>
     console.log 'Launching!' if Busyverse.verbose
@@ -44,17 +47,17 @@ class Busyverse.Game
     @render()
     setTimeout @step, @stepLength
 
-  place: (building) ->
-    @city.create(building)
+  place: (building) => 
+    console.log "Game#place [building=#{building.name}] at #{building.position}"
+    @world.city.create(building)
 
-  update: () =>
-    @city.update(@world)
-    # @city.grow(@world)
+  update: () => @world.update() 
 
   render: () =>
     console.log "Rendering to UI" if Busyverse.verbose
-    @ui.render(@)
+    @ui.render(@world)
 
-# kickstart
-engine = Busyverse.engine = new Busyverse.Engine()
-window.onload = -> engine.run()
+# kickstart fn
+Busyverse.kickstart = ->
+  engine = Busyverse.engine = new Busyverse.Engine()
+  window.onload = -> engine.run()

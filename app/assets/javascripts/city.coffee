@@ -3,10 +3,12 @@
 
 class Busyverse.City
   name: "Busyville"
+  explored: []
+
   constructor: (@population, @buildings) ->
     @population   ?= []
     @buildings    ?= []
-    @_constructors = []
+    @random = new Busyverse.Support.Randomness()
     console.log "New city created with population #{@population}!" if Busyverse.verbose
 
   center: =>
@@ -18,22 +20,51 @@ class Busyverse.City
     return([( xs / @buildings.length), (ys / @buildings.length )])
 
   grow: (world) =>
-    bob = new Busyverse.Person("Bob", world.mapToCanvasCoordinates(@center()), "wander")
-    @population.push(bob)
+    name     = @random.valueFromList [
+      "Bob", "Amy", "John", "Kevin", "Tom", "Alex", "Brad", "Carrie",
+      "Alain", "Ferris", "Orff", "Enoch", "Carol", "Sam", "Deborah",
+      "George", "Gina", "Dean", "Sarah", "Cindy", "Terrence", "Clark"
+    ]
+    position = if world then world.mapToCanvasCoordinates(@center()) else [0,0]
+    task     = "wander"
+
+    person = new Busyverse.Person(name, position, task)
+
+    @population.push(person)
 
   update: (world) =>
-    console.log "--- Updating city!!" if Busyverse.verbose
     for person in @population
       person.update(world, @)
     
   create: (structure) =>
-    console.log "creating new building" if Busyverse.debug
-    console.log structure
+    console.log "creating new building [name=#{structure.name}]" if Busyverse.debug and Busyverse.verbose
     @buildings.push(structure)
 
+  explore:    (location) => 
+    console.log "City#explore [location=#{location}]" if Busyverse.debug and Busyverse.verbose
+    @explored.push(location)
+
+  isExplored: (location) => 
+    for [x, y] in @explored
+      if location[0] == x && location[1] == y
+        return true
+    false
+    
+  isAreaFullyExplored: (location, size) => 
+    console.log "City#isAreaFullyExplored [location=#{location}, size=#{size}]" if Busyverse.debug and Busyverse.verbose
+    for x in [0..size[0]]
+      for y in [0..size[1]]
+        shifted_location = [location[0] + x, location[1] + y]
+        if !@isExplored(shifted_location)
+          return false
+    true
+
   availableForBuilding: (location, size) =>
+    return false unless @isAreaFullyExplored(location, size)
+
     for building in @buildings
       if building.doesOverlap(location, size)
         return false
+
     true
 

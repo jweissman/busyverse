@@ -6,7 +6,6 @@ class Busyverse.Building
     console.log "--- creating new building at #{@position}" if Busyverse.debug
 
   doesOverlap: (location, size) ->
-    console.log "--- determining if #{location} overlaps with building at #{@position} of size #{@size}" if Busyverse.debug and Busyverse.verbose
     a_x1 = location[0]
     a_x2 = location[0] + size[0]
     a_y1 = location[1]

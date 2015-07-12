@@ -11,8 +11,8 @@ context 'Building', ->
     @tower = new Busyverse.Buildings.Tower([4,5])
 
   describe '.color', ->
-    it 'should be darkgreen for farms', ->
-      expect(@farm.color).to.eql('darkgreen')
+    it 'should be brown for farms', ->
+      expect(@farm.color).to.eql('brown')
 
     it 'should be darkred for houses', ->
       expect(@house.color).to.eql('darkred')
