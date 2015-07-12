@@ -22,7 +22,13 @@ class Busyverse.Grid
         @cells[x][y] = @createCellAt([x,y])
 
   createCellAt: (location) =>
-    color = @random.valueFromList(['lightgreen', 'green', 'darkgreen'])
+    color = @random.valueFromPercentageMap
+      10: 'lightgreen'
+      60: 'green'
+      15: 'darkgreen'
+      3:  'darkgrey'
+      1:  'white'
+      5:  'lightbrown'
     new Busyverse.GridCell(location, color)
 
   eachCell: (callbackFn) =>

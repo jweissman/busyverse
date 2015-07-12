@@ -18,7 +18,7 @@ class Busyverse.Person
   send: (cmd, city, world) => 
     console.log "updating #{@name}'s active task to #{cmd}" if Busyverse.debug
 
-    if cmd == "wander" or cmd == "idle" or cmd == "build"
+    if cmd == "wander" or cmd == "idle" or cmd == "build" or cmd == "explore"
       @destination = null
 
       if cmd == "build" # pick destination (and maybe building type?)
@@ -42,6 +42,9 @@ class Busyverse.Person
 
     if @activeTask == "wander"
       @wander(world, city)
+
+    else if @activeTask == "explore"
+      @explore(world, city)
 
     else if @activeTask == "build"
       @build(world, city)
@@ -71,26 +74,36 @@ class Busyverse.Person
     nearestUnexploredFromCityCenter = world.nearestUnexploredCell(city.center()) 
     nearestUnexploredFromPerson     = world.nearestUnexploredCell(@mapPosition(world))
 
-    @random.valueFromList [
-      world.mapToCanvasCoordinates(nearestUnexploredFromCityCenter),
-      world.mapToCanvasCoordinates(nearestUnexploredFromPerson),
-      world.mapToCanvasCoordinates(nearestUnexploredFromPerson),
-      world.mapToCanvasCoordinates(nearestUnexploredFromPerson),
-      world.mapToCanvasCoordinates(nearestUnexploredFromPerson),
-      world.mapToCanvasCoordinates(nearestUnexploredFromPerson),
-      world.mapToCanvasCoordinates(nearestUnexploredFromPerson),
-      world.mapToCanvasCoordinates(nearestUnexploredFromPerson),
-      world.mapToCanvasCoordinates(nearestUnexploredFromPerson)
-    ]
+    @random.valueFromPercentageMap
+      5: world.mapToCanvasCoordinates(nearestUnexploredFromCityCenter)
+      95: world.mapToCanvasCoordinates(nearestUnexploredFromPerson)
+    
+  pickExploreDestination: (world, city) ->
+    nearestUnexploredFromCityCenter = world.nearestUnexploredCell(city.center()) 
+    nearestUnexploredFromPerson     = world.nearestUnexploredCell(@mapPosition(world))
+
+    @random.valueFromPercentageMap
+      60: world.mapToCanvasCoordinates(nearestUnexploredFromCityCenter)
+      40: world.mapToCanvasCoordinates(nearestUnexploredFromPerson)
 
   wander: (world, city) =>
     @destination ?= @pickWanderDestination(world, city)
     @velocity    = [0,0]
 
-    console.log "#{@name} heading to #{@destination}" if Busyverse.verbose
+    console.log "#{@name} wandering to #{@destination}" if Busyverse.verbose
     @seek()
     if @atSoughtLocation()
       @destination = @pickWanderDestination(world, city)
+
+  explore: (world, city) =>
+    @destination ?= @pickExploreDestination(world, city)
+    @velocity    = [0,0]
+
+    console.log "#{@name} exploring #{@destination}" if Busyverse.verbose
+    @seek()
+    if @atSoughtLocation()
+      @destination = @pickExploreDestination(world, city)
+
 
   atSoughtLocation: () =>
     return false unless @destination

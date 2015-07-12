@@ -23,10 +23,13 @@ class Busyverse.City
     name     = @random.valueFromList [
       "Bob", "Amy", "John", "Kevin", "Tom", "Alex", "Brad", "Carrie",
       "Alain", "Ferris", "Orff", "Enoch", "Carol", "Sam", "Deborah",
-      "George", "Gina", "Dean", "Sarah", "Cindy", "Terrence", "Clark"
+      "George", "Gina", "Dean", "Sarah", "Cindy", "Terrence", "Clark",
+      "Ana", "Amelie", "Augustine", "Aaron", "Anton", "Andre", "Anders",
+      "Allard", "Artemis", "Stephanie", "Estrella", "Simon", "Paul", "Gilles",
+      "Felix", "Jean-Paul", "Michel", "Antoine"
     ]
     position = if world then world.mapToCanvasCoordinates(@center()) else [0,0]
-    task     = "wander"
+    task     = @random.valueFromList [ "wander", "explore" ]
 
     person = new Busyverse.Person(name, position, task)
 

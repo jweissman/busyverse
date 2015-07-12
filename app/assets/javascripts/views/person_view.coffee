@@ -15,12 +15,42 @@ class Busyverse.Views.PersonView extends Busyverse.View
 
     # write name and current task
     console.log ("rendering name etc") if Busyverse.verbose
+    @renderName()
 
-    @context.fillStyle = "blue"
+  renderName: =>
+    person = @model
+
+    x = person.position[0]
+    y = person.position[1]
+
+    @context.beginPath()
+    @context.rect x + 30, y - 15, 100, 35
+    @context.fillStyle = 'lightblue'
+    @context.fill()
+    @context.lineWidth = 2
+    @context.strokeStyle = 'black'
+    @context.stroke()
+
+    @context.fillStyle = "black"
     @context.font = "bold 16px Arial"
-    @context.fillText person.name, person.position[0] + 10, person.position[1] + 10
-    @context.fillText person.activeTask, person.position[0] + 20, person.position[1] + 40
+    @context.fillText person.name, x + 35, y # person.position[0] + 10, person.position[1] + 10
 
+    @context.beginPath()
+    @context.rect x + 34, y + 3, 92, 13
+    @context.fillStyle = 'lightgreen'
+    @context.fill()
+    @context.lineWidth = 1
+    @context.strokeStyle = 'black'
+    @context.stroke()
+
+    @context.fillStyle = "black"
+    @context.font = "bold 10px Arial"
+    @context.fillText person.activeTask, x + 38, y + 13 #person.position[0] + 20, person.position[1] + 40
+
+    # @renderDestination()
+
+  renderDestination: =>
+    person = @model
     if typeof(person.destination) != 'undefined' && person.destination != null
       @context.fillStyle="red"
       @context.fillRect(

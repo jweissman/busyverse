@@ -3,12 +3,6 @@
 #= require game
 
 describe "Game", ->
-  beforeEach ->
-    # @player = new Busyverse.Player()
-    # @city   = new Busyverse.City()
-    # @game   = new Busyverse.Game(@city, @player)
-    # @game.setup()
-
   describe '.world', ->
     it 'should have a name', ->
       world = new Busyverse.World()
@@ -25,30 +19,25 @@ describe "Game", ->
       game.player.should.equal(player)
       game.player.score.should.equal(0)
 
-  # describe '.world.city', ->
-  #   it 'should have  city', ->
-  #     city = new Busyverse.City()
-  #     game = new Busyverse.Game(city)
-  #     game.world.city.should.equal(city)
-
   describe "#setup", ->
     beforeEach -> 
       @world   = new Busyverse.World()
-      @game   = new Busyverse.Game(@world, @player)
-      # @game.setup()
+      @game    = new Busyverse.Game(@world, @player)
 
     it 'should place a farm at the center', ->
-      # @game.setup()
-      # expect(@world.city.population.length).to.equal(1)
       firstStructure = @game.world.city.buildings[0]
+
       expect(firstStructure.name).to.equal("Small Farm")
       expect(firstStructure.position).to.eql(@game.world.center())
 
     it 'should create some people at the center', ->
-      expect(@game.world.city.population.length).to.equal(2)
+      expect(@game.world.city.population.length).to.equal(4)
+
       center = @world.mapToCanvasCoordinates( @world.center())
       expect(@game.world.city.population[0].position).to.eql(center)
       expect(@game.world.city.population[1].position).to.eql(center)
+      expect(@game.world.city.population[2].position).to.eql(center)
+      expect(@game.world.city.population[3].position).to.eql(center)
 
   describe "#place", ->
     it 'should create structures', ->

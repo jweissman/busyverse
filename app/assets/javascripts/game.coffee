@@ -23,7 +23,7 @@ class Busyverse.Game
     farm = new Busyverse.Buildings.Farm(@world.center())
     @place(farm) 
 
-    for i in [1..2]
+    for i in [1..4]
       @world.city.grow(@world)
 
   play: (ui) =>
