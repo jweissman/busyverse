@@ -13,16 +13,15 @@ class Busyverse.Views.WorldView extends Busyverse.View
     location = cell.location
 
     console.log "is #{location} explored?" if Busyverse.trace
-    explored = world.isCellExplored(cell) #location)
+    explored = world.isCellExplored(cell)
     console.log "explored? #{explored}" if Busyverse.trace
 
-    color    = if explored then cell.color else 'black' #return #'black'
-    if color == 'black'
-      return
+    return unless explored
+    color    = cell.color 
     console.log "chosen color: #{color}" if Busyverse.trace
     @context.fillStyle = color
 
-    console.log "rendering world cell at #{cell.location} in color #{cell.color}" if Busyverse.trace # && cell.color != 'black'
+    console.log "rendering world cell at #{cell.location} in color #{cell.color}" if Busyverse.trace
     console.log cell if Busyverse.trace
 
     x = world.cellSize * cell.location[0]

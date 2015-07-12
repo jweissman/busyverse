@@ -8,12 +8,13 @@ class Busyverse.GridCell
   distanceFrom: (otherLocation) =>
     @geometry.euclideanDistance @location, otherLocation
 
-
 class Busyverse.Grid
   constructor: (@width, @height) ->
     @cells = []
     @random = new Busyverse.Support.Randomness()
+    console.log "GENERATING GRID PLEASE WAIT :)"
     @build()
+    @evolve()
 
   build: =>
     for x in [0..@width]
@@ -23,13 +24,50 @@ class Busyverse.Grid
 
   createCellAt: (location) =>
     color = @random.valueFromPercentageMap
-      10: 'lightgreen'
-      60: 'green'
-      15: 'darkgreen'
-      3:  'darkgrey'
-      1:  'white'
-      5:  'lightbrown'
+      # 1:  'darkgrey'
+      # 2:  'grey'
+      # 3:  'white'
+      # 4:  'lightgrey'
+      # 8:  'grey'
+      10:  'blue'
+      15: 'lightblue'
+      20: 'lightgreen'
+      25: 'darkgreen'
+      20: 'darkblue'
+      30: 'green'
     new Busyverse.GridCell(location, color)
+
+  randomColor: => @random.valueFromList [
+    # 'darkgrey', 'grey', 'white', 'lightgrey', 
+    'blue', 'lightblue', 'lightgreen', 'darkblue', 'green', 'darkgreen'
+  ]
+
+  evolve: (depth=4) =>
+    return if depth <= 0
+    console.log "evolve depth=#{depth}"
+    @eachCell (cell) => 
+      cell.color = @random.valueFromPercentageMap
+        10: @randomColor()
+        100: cell.color
+        200: @mostCommonNeighborColor(cell)
+    @evolve(depth-1)
+
+  mostCommonNeighborColor: (cell) =>
+    neighbors = @getCellsAround(cell.location)
+    colors = []
+    for neighbor in neighbors
+      colors.push(neighbor.color)
+
+    # find mode...
+    most_common_color = null
+    color_counts = {}
+    for color in colors
+      color_counts[color] ?= 0
+      color_counts[color] = color_counts[color] + 1
+      if most_common_color == null || color_counts[color] > color_counts[most_common_color]
+        most_common_color = color
+
+    most_common_color
 
   eachCell: (callbackFn) =>
     for x in [0..@width]
@@ -55,5 +93,3 @@ class Busyverse.Grid
       @getCellToEastOf(location),
       @getCellToWestOf(location),
       @getCellToSouthOf(location) ].filter (elem) -> elem != null #'undefined'
-
-

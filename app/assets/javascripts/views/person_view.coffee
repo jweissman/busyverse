@@ -5,13 +5,26 @@ class Busyverse.Views.PersonView extends Busyverse.View
     person = @model
 
     console.log "rendering person at #{person.position}" if Busyverse.verbose
-    @context.fillStyle='darkblue'
-    @context.fillRect(
-      parseInt( person.position[0] ),
-      parseInt( person.position[1] ),
-      parseInt( person.size[0]     ),
-      parseInt( person.size[1]     ) 
-    )
+
+    @rect 
+      position: @position(),
+      size: @size(),
+      fill: 'white',
+      stroke: 'black'
+
+    x = person.position[0]
+    y = person.position[1]
+    w = person.size[0]
+    h = person.size[1]
+
+    @context.beginPath()
+    @context.rect @x() + 30, @y() - 15, 100, 35
+    @context.fillStyle = 'lightblue'
+    @context.fill()
+    @context.lineWidth = 2
+    @context.strokeStyle = 'black'
+    @context.stroke()
+
 
     # write name and current task
     console.log ("rendering name etc") if Busyverse.verbose

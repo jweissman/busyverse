@@ -11,7 +11,7 @@
 class Busyverse.Game
   width: 80
   height: 60
-  stepLength: 30
+  stepLength: 20
 
   constructor: (@world, @player) ->
     @world  ?= new Busyverse.World(@width, @height)

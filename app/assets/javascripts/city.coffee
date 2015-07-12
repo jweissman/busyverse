@@ -45,13 +45,14 @@ class Busyverse.City
 
   explore:    (location) => 
     console.log "City#explore [location=#{location}]" if Busyverse.debug and Busyverse.verbose
-    @explored.push(location)
+    @explored[location[0]] ?= []
+    @explored[location[0]][location[1]] = true
 
   isExplored: (location) => 
-    for [x, y] in @explored
-      if location[0] == x && location[1] == y
-        return true
-    false
+    if @explored[location[0]] && @explored[location[0]][location[1]]
+      true
+    else
+      false
     
   isAreaFullyExplored: (location, size) => 
     console.log "City#isAreaFullyExplored [location=#{location}, size=#{size}]" if Busyverse.debug and Busyverse.verbose

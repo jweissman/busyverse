@@ -3,7 +3,7 @@
 #= require buildings/farm
 
 class Busyverse.Person
-  size: [10,10]
+  size: [8,8]
   speed: 5
   velocity: [0,0]
 
@@ -71,20 +71,24 @@ class Busyverse.Person
   mapPosition: (world) => world.canvasToMapCoordinates(@position)
 
   pickWanderDestination: (world, city) ->
+    return world.randomLocation() unless world.anyUnexplored()
     nearestUnexploredFromCityCenter = world.nearestUnexploredCell(city.center()) 
     nearestUnexploredFromPerson     = world.nearestUnexploredCell(@mapPosition(world))
 
     @random.valueFromPercentageMap
       5: world.mapToCanvasCoordinates(nearestUnexploredFromCityCenter)
-      95: world.mapToCanvasCoordinates(nearestUnexploredFromPerson)
+      10: world.randomLocation()
+      85: world.mapToCanvasCoordinates(nearestUnexploredFromPerson)
     
   pickExploreDestination: (world, city) ->
+    return world.randomLocation() unless world.anyUnexplored()
     nearestUnexploredFromCityCenter = world.nearestUnexploredCell(city.center()) 
     nearestUnexploredFromPerson     = world.nearestUnexploredCell(@mapPosition(world))
 
     @random.valueFromPercentageMap
+      10: world.randomLocation()
+      30: world.mapToCanvasCoordinates(nearestUnexploredFromPerson)
       60: world.mapToCanvasCoordinates(nearestUnexploredFromCityCenter)
-      40: world.mapToCanvasCoordinates(nearestUnexploredFromPerson)
 
   wander: (world, city) =>
     @destination ?= @pickWanderDestination(world, city)

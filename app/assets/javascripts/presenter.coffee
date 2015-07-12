@@ -1,4 +1,6 @@
 class Busyverse.Presenter
+  peopleViews: {}
+  #@peopleViews ?= {}
   constructor: () ->
     @views = {}
     console.log 'New presenter created!' if Busyverse.debug
@@ -55,8 +57,11 @@ class Busyverse.Presenter
   renderPeople: (world) =>
     people = world.city.population
     for person in people
-      @views[person] = new Busyverse.Views.PersonView(person, @context)
-      @renderModel(model: person, world: world)
+      personView = new Busyverse.Views.PersonView(person, @context)
+      # personView = @peopleViews[person]
+      personView.render(world)
+
+      # @renderModel(model: person, world: world)
 
   renderModel: (model: model, world: world) ->
     # @views[model] ?= new view_class(model, @context)

@@ -28,9 +28,11 @@ context "Person", ->
     it 'should advance towards a randomly selected destination', ->
       somewhere = [10,10]
       world = { 
-        nearestUnexploredCell: => somewhere,
+        nearestUnexploredCell: => somewhere
         canvasToMapCoordinates: (xy) => xy
         mapToCanvasCoordinates: (xy) => xy
+        anyUnexplored: -> true
+        randomLocation: -> somewhere
       }
       city = center: -> 
       @person.wander(world, city)

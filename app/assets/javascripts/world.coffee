@@ -63,7 +63,7 @@ class Busyverse.World
 
   markExplored: (cellCoords) => 
     console.log "World#markExplored [coords=#{cellCoords}]" if Busyverse.debug
-    @city.explore(cellCoords)
+    @city.explore(cellCoords) unless @isLocationExplored(cellCoords)
 
   isCellExplored: (cell) => @city.isExplored(cell.location)
   isLocationExplored: (location) => @city.isExplored(location)
@@ -73,6 +73,13 @@ class Busyverse.World
     return if depth <= 0
     for cell in @map.getCellsAround(cellCoords)
       @markExploredSurrounding(cell.location, depth-1) if cell
+
+  anyUnexplored: =>
+    unexplored = false
+    @map.eachCell (cell) =>
+      unexplored = true if !@isCellExplored(cell)
+    unexplored
+
 
   nearestUnexploredCell: (cellCoords) =>
     closest = null
