@@ -12,4 +12,9 @@ var Busyverse = {
   Views: {},
   Support: {},
 
+  // config
+  width: 800,
+  height: 600,
+  cellSize: 20
+
 };

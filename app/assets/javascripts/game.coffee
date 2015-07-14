@@ -9,12 +9,15 @@
 #= require player
 
 class Busyverse.Game
-  width: 80
-  height: 60
-  stepLength: 20
+  width:  Math.floor Busyverse.width / Busyverse.cellSize 
+  height: Math.floor Busyverse.height / Busyverse.cellSize 
+  cellSize: Busyverse.cellSize
+
+  stepLength: 50
+  initialPopulation: 1
 
   constructor: (@world, @player) ->
-    @world  ?= new Busyverse.World(@width, @height)
+    @world  ?= new Busyverse.World(@width, @height, @cellSize)
     @player ?= new Busyverse.Player()
     @setup()
     console.log "New game created for world #{@world.name}!" if Busyverse.debug
@@ -23,7 +26,7 @@ class Busyverse.Game
     farm = new Busyverse.Buildings.Farm(@world.center())
     @place(farm) 
 
-    for i in [1..4]
+    for i in [1..@initialPopulation]
       @world.city.grow(@world)
 
   play: (ui) =>

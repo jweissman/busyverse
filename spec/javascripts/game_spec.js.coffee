@@ -31,13 +31,11 @@ describe "Game", ->
       expect(firstStructure.position).to.eql(@game.world.center())
 
     it 'should create some people at the center', ->
-      expect(@game.world.city.population.length).to.equal(4)
+      expect(@game.world.city.population.length).to.equal(@game.initialPopulation)
 
       center = @world.mapToCanvasCoordinates( @world.center())
-      expect(@game.world.city.population[0].position).to.eql(center)
-      expect(@game.world.city.population[1].position).to.eql(center)
-      expect(@game.world.city.population[2].position).to.eql(center)
-      expect(@game.world.city.population[3].position).to.eql(center)
+      for i in [0..(@game.initialPopulation-1)]
+        expect(@game.world.city.population[i].position).to.eql(center)
 
   describe "#place", ->
     it 'should create structures', ->

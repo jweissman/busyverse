@@ -12,22 +12,10 @@ class Busyverse.Views.PersonView extends Busyverse.View
       fill: 'white',
       stroke: 'black'
 
-    x = person.position[0]
-    y = person.position[1]
-    w = person.size[0]
-    h = person.size[1]
-
-    @context.beginPath()
-    @context.rect @x() + 30, @y() - 15, 100, 35
-    @context.fillStyle = 'lightblue'
-    @context.fill()
-    @context.lineWidth = 2
-    @context.strokeStyle = 'black'
-    @context.stroke()
-
-
     # write name and current task
     console.log ("rendering name etc") if Busyverse.verbose
+
+    @renderDestination()
     @renderName()
 
   renderName: =>
@@ -36,45 +24,63 @@ class Busyverse.Views.PersonView extends Busyverse.View
     x = person.position[0]
     y = person.position[1]
 
-    @context.beginPath()
-    @context.rect x + 30, y - 15, 100, 35
-    @context.fillStyle = 'lightblue'
-    @context.fill()
-    @context.lineWidth = 2
-    @context.strokeStyle = 'black'
-    @context.stroke()
+    @rect
+      position: [x+30, y-15]
+      size: [100, 38]
+      fill: 'lightblue'
+      stroke: 'black'
 
-    @context.fillStyle = "black"
-    @context.font = "bold 16px Arial"
-    @context.fillText person.name, x + 35, y # person.position[0] + 10, person.position[1] + 10
+    @text
+      position: [x+35, y+2]
+      size: '18px'
+      msg: person.name
 
-    @context.beginPath()
-    @context.rect x + 34, y + 3, 92, 13
-    @context.fillStyle = 'lightgreen'
-    @context.fill()
-    @context.lineWidth = 1
-    @context.strokeStyle = 'black'
-    @context.stroke()
+    @rect
+      position: [x+34, y+6]
+      size: [92, 14]
+      fill: 'lightgreen'
+      stroke: 'black'
 
-    @context.fillStyle = "black"
-    @context.font = "bold 10px Arial"
-    @context.fillText person.activeTask, x + 38, y + 13 #person.position[0] + 20, person.position[1] + 40
-
-    # @renderDestination()
+    @text
+      position: [x+38, y+17]
+      size: '12px'
+      msg: person.activeTask
 
   renderDestination: =>
     person = @model
-    if typeof(person.destination) != 'undefined' && person.destination != null
-      @context.fillStyle="red"
-      @context.fillRect(
-        parseInt( person.destination[0] ),
-        parseInt( person.destination[1] ),
-        parseInt( person.size[0]     ),
-        parseInt( person.size[1]     ) 
-      )
+    if typeof(person.path) != 'undefined' && person.path != null && person.path.length > 0
+      for cell in person.path
+        target = [ cell[0] * Busyverse.cellSize, cell[1] * Busyverse.cellSize ]
+        @rect
+          position: target
+          size: person.size
+          fill: 'darkred'
+          stroke: 'black'
 
-      @context.fillStyle = "red"
-      @context.font = "bold 18px Sans Serif"
-      @context.fillText "#{person.name}'s destination", person.destination[0] + 10, person.destination[1] + 10
+    if typeof(person.destinationCell) != 'undefined' && person.destinationCell != null
+      target = [ person.destinationCell[0] * Busyverse.cellSize, person.destinationCell[1] * Busyverse.cellSize ]
+      
+      @rect
+        position: target #person.destination
+        size: person.size
+        fill: 'red'
+        stroke: 'black'
+
+      msg = "Target for #{person.name}"
+      width = @textWidth
+        msg: msg
+        size: '14px'
+
+      @rect
+        position: [target[0] + 12, target[1] - 4]
+        size: [width + 8, 20]
+        fill: 'darkred'
+    
+      @text
+        position: [target[0] + 15, target[1] + 10]
+        msg: msg
+        size: '14px'
+        fill: 'red'
+
 
 

@@ -1,16 +1,19 @@
 #= require support/randomness
+#= require support/pathfinding
 #= require grid
 #= require city
 
 class Busyverse.World
   name: 'Busylandia'
-  cellSize: 10
 
-  constructor: (@width, @height) ->
+  constructor: (@width, @height, @cellSize) ->
     @width   ?= 200
     @height  ?= 200
-    @city     = new Busyverse.City()
-    @map      = new Busyverse.Grid(@width, @height)
+
+    @city       = new Busyverse.City()
+    @map        = new Busyverse.Grid(@width, @height)
+    @pathfinder = new Busyverse.Support.Pathfinding(@map)
+
     @random   = new Busyverse.Support.Randomness()
     @geometry = new Busyverse.Support.Geometry()
 
@@ -53,8 +56,13 @@ class Busyverse.World
       console.log open_areas if Busyverse.debug
 
     open_areas
+
+  # TODO place starting farm in passable region...
+  # findPassablesAreaOfSize: (size) =>
+  #   passable_areas = []
+  #   @map.eachCell (cell) =>
   
-  allCellsWithin: (maxDistance, center, callbackFn) =>
+  allCellsWithin: (maxDistance, center) =>
     cellsInRadius = []
     @map.eachCell (cell) =>
       if cell.distanceFrom(center) <= maxDistance
@@ -62,24 +70,20 @@ class Busyverse.World
     cellsInRadius
 
   markExplored: (cellCoords) => 
-    console.log "World#markExplored [coords=#{cellCoords}]" if Busyverse.debug
     @city.explore(cellCoords) unless @isLocationExplored(cellCoords)
 
   isCellExplored: (cell) => @city.isExplored(cell.location)
   isLocationExplored: (location) => @city.isExplored(location)
 
-  markExploredSurrounding: (cellCoords, depth=4) =>
-    @markExplored(cellCoords) unless @isLocationExplored(cellCoords)
-    return if depth <= 0
-    for cell in @map.getCellsAround(cellCoords)
-      @markExploredSurrounding(cell.location, depth-1) if cell
-
+  markExploredSurrounding: (cellCoords, depth) =>
+    for cell in @allCellsWithin(depth, cellCoords)
+      @markExplored(cell.location)
+    
   anyUnexplored: =>
     unexplored = false
     @map.eachCell (cell) =>
       unexplored = true if !@isCellExplored(cell)
     unexplored
-
 
   nearestUnexploredCell: (cellCoords) =>
     closest = null
@@ -93,16 +97,28 @@ class Busyverse.World
         closest = cell
 
     closest.location
-    
-  randomCell: ->
-    console.log("Finding random location")
-    location = [ @random.valueInRange(@width), @random.valueInRange(@height) ]
-    console.log "Using random location #{location}"
+
+  getPath: (source, target) => 
+    @pathfinder.shortestPath source, target
+
+  getCellAtCanvasCoords: (coords) =>
+    @map.getCellAt(@canvasToMapCoordinates(coords))
+
+  randomCell: => [ @random.valueInRange(@width), @random.valueInRange(@height) ]
+
+  randomPassableCell: ->
+    location = null
+    until location && @map.getCellAt(location).isPassable()
+      location = @randomCell()
     location
 
+  # randomPassableCellAccessibleFrom: (source) ->
+  #   location = null
+  #   until location && @shortestPath(source, location).length > 0
+  #     location = @randomPassableCell()
+  #   location
+
   randomLocation: ->
-    console.log("Finding random location")
     location = [ Math.round(@random.valueInRange(@width)) * @cellSize,
                  Math.round(@random.valueInRange(@height)) * @cellSize ]
-    console.log "Using random location #{location}"
     location

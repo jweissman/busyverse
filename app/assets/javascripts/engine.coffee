@@ -9,7 +9,7 @@ class Busyverse.Engine
     if typeof(jQuery) == 'undefined'
       console.log "--- jQuery is undefined!" if Busyverse.debug
     else
-      $('#terminal').submit (event), @handleCommand
+      $('#terminal').submit @handleCommand
     
     # Turn the lights on
     @ui.attach(@canvas)

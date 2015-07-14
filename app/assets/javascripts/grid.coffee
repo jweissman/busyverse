@@ -8,6 +8,11 @@ class Busyverse.GridCell
   distanceFrom: (otherLocation) =>
     @geometry.euclideanDistance @location, otherLocation
 
+  isPassable: =>
+    passable = @color == 'green' || @color == 'lightgreen' || @color == 'darkgreen'
+    #console.log "is #{@color} passable? #{passable}"
+    passable
+
 class Busyverse.Grid
   constructor: (@width, @height) ->
     @cells = []
@@ -29,31 +34,32 @@ class Busyverse.Grid
       # 3:  'white'
       # 4:  'lightgrey'
       # 8:  'grey'
-      10:  'blue'
-      15: 'lightblue'
-      20: 'lightgreen'
-      25: 'darkgreen'
-      20: 'darkblue'
-      30: 'green'
+      4:  'blue'
+      5: 'lightblue'
+      1: 'darkblue'
+      2: 'lightgreen'
+      3: 'green'
+      10: 'darkgreen'
     new Busyverse.GridCell(location, color)
 
   randomColor: => @random.valueFromList [
     # 'darkgrey', 'grey', 'white', 'lightgrey', 
     'blue', 'lightblue', 'lightgreen', 'darkblue', 'green', 'darkgreen'
+    #'darkblue', 'lightgreen'
   ]
 
-  evolve: (depth=4) =>
+  evolve: (depth=5) =>
     return if depth <= 0
     console.log "evolve depth=#{depth}"
     @eachCell (cell) => 
       cell.color = @random.valueFromPercentageMap
-        10: @randomColor()
-        100: cell.color
-        200: @mostCommonNeighborColor(cell)
+        1: @randomColor()
+        20: cell.color
+        80: @mostCommonNeighborColor(cell)
     @evolve(depth-1)
 
   mostCommonNeighborColor: (cell) =>
-    neighbors = @getCellsAround(cell.location)
+    neighbors = @getAllNeighbors(cell.location)
     colors = []
     for neighbor in neighbors
       colors.push(neighbor.color)
@@ -84,12 +90,44 @@ class Busyverse.Grid
 
   getCellToNorthOf: (location) => @getCellAt([location[0], location[1] - 1])
   getCellToSouthOf: (location) => @getCellAt([location[0], location[1] + 1])
+  getCellToEastOf:  (location) => @getCellAt([location[0] + 1, location[1]])
+  getCellToWestOf:  (location) => @getCellAt([location[0] - 1, location[1]])
 
-  getCellToEastOf: (location) => @getCellAt([location[0] + 1, location[1]])
-  getCellToWestOf: (location) => @getCellAt([location[0] - 1, location[1]])
+  getCellToNorthwestOf: (location) => @getCellAt([location[0] - 1, location[1] - 1])
+  getCellToNortheastOf: (location) => @getCellAt([location[0] + 1, location[1] - 1])
+
+  getCellToSouthwestOf: (location) => @getCellAt([location[0] - 1, location[1] + 1])
+  getCellToSoutheastOf: (location) => @getCellAt([location[0] + 1, location[1] + 1])
   
   getCellsAround: (location) =>
-    [ @getCellToNorthOf(location),
+    [ 
+      @getCellToNorthOf(location),
       @getCellToEastOf(location),
       @getCellToWestOf(location),
-      @getCellToSouthOf(location) ].filter (elem) -> elem != null #'undefined'
+      @getCellToSouthOf(location),
+    ].filter (elem) -> elem != null
+
+  getLocationsAround: (loc) =>
+    # console.log "getting cells around #{loc}"
+    around = []
+    neighbors = # @getCellsAround(loc) 
+      @getAllNeighbors(loc)
+    for cell in neighbors
+      if cell.isPassable()
+        around.push(cell.location)
+    
+    around
+
+  getAllNeighbors: (location) =>
+    [ 
+      @getCellToNorthOf(location)
+      @getCellToNorthwestOf(location)
+      @getCellToNortheastOf(location)
+
+      @getCellToEastOf(location)
+      @getCellToWestOf(location)
+
+      @getCellToSouthOf(location)
+      @getCellToSoutheastOf(location)
+      @getCellToSouthwestOf(location)
+    ].filter (elem) -> elem != null
