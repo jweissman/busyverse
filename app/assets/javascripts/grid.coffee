@@ -5,21 +5,22 @@ class Busyverse.GridCell
   constructor: (@location, @color) ->
     @geometry = new Busyverse.Support.Geometry()
 
-  distanceFrom: (otherLocation) =>
-    @geometry.euclideanDistance @location, otherLocation
+  # distanceFrom: (otherLocation) =>
+  #   @geometry.euclideanDistance @location, otherLocation
 
-  isPassable: =>
-    passable = @color == 'green' || @color == 'lightgreen' || @color == 'darkgreen'
-    #console.log "is #{@color} passable? #{passable}"
-    passable
+  # isPassable: =>
+  #   passable = @color == 'green' || @color == 'lightgreen' || @color == 'darkgreen'
+  #   # console.log "is #{@color} passable? #{passable}"
+  #   passable
 
 class Busyverse.Grid
-  constructor: (@width, @height) ->
-    @cells = []
+  constructor: (@width, @height, @cells) ->
+    @cells ?= []
     @random = new Busyverse.Support.Randomness()
-    console.log "GENERATING GRID PLEASE WAIT :)"
-    @build()
-    @evolve()
+    if @cells.length == 0
+      console.log "GENERATING GRID PLEASE WAIT :)"
+      @build()
+      @evolve()
 
   build: =>
     for x in [0..@width]
@@ -34,18 +35,19 @@ class Busyverse.Grid
       # 3:  'white'
       # 4:  'lightgrey'
       # 8:  'grey'
-      4:  'blue'
-      5: 'lightblue'
-      1: 'darkblue'
-      2: 'lightgreen'
-      3: 'green'
-      10: 'darkgreen'
+      5:  'blue'
+      # 10: 'darkblue'
+      15: 'darkgreen'
+      20: 'green'
+      # 8: 'lightblue'
+      30: 'lightgreen'
     new Busyverse.GridCell(location, color)
 
   randomColor: => @random.valueFromList [
     # 'darkgrey', 'grey', 'white', 'lightgrey', 
-    'blue', 'lightblue', 'lightgreen', 'darkblue', 'green', 'darkgreen'
+    # 'blue', 'lightblue', 'lightgreen', 'darkblue', 'green', 'darkgreen'
     #'darkblue', 'lightgreen'
+    'green', 'darkgreen', 'blue', 'lightblue'
   ]
 
   evolve: (depth=5) =>
@@ -80,6 +82,13 @@ class Busyverse.Grid
       for y in [0..@height]
         callbackFn(@cells[x][y])
 
+  allCells: =>
+    allCells = []
+    for x in [0..@width]
+      for y in [0..@height]
+        allCells.push(@cells[x][y])
+    allCells
+
   getCellAt: (location) =>
     x = location[0]
     y = location[1]
@@ -107,13 +116,18 @@ class Busyverse.Grid
       @getCellToSouthOf(location),
     ].filter (elem) -> elem != null
 
+  isLocationPassable: (loc) =>
+    cell = @getCellAt loc
+    cell.color == 'green' || cell.color == 'lightgreen' 
+
+
   getLocationsAround: (loc) =>
     # console.log "getting cells around #{loc}"
     around = []
     neighbors = # @getCellsAround(loc) 
       @getAllNeighbors(loc)
     for cell in neighbors
-      if cell.isPassable()
+      if @isLocationPassable(cell.location)
         around.push(cell.location)
     
     around

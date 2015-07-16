@@ -1,7 +1,6 @@
 var Busyverse = {
 
   version: '0.0.1',
-  canvas: null, 
 
   trace:   false,
   debug:   false,
@@ -11,10 +10,11 @@ var Busyverse = {
   Buildings: {},
   Views: {},
   Support: {},
+  Worker: {},
 
   // config
   width: 800,
   height: 600,
-  cellSize: 20
+  cellSize: 10
 
 };

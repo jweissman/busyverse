@@ -40,32 +40,55 @@ class Busyverse.World
 
     [ Math.round(x), Math.round(y) ]
 
-  findOpenAreasOfSizeInCity: (city, size, max_distance_from_center) =>
+  randomPassableAreaOfSize: (sz) =>
+    console.log "World#randomPassableAreaOfSize size=#{sz}"
+    #location = null
+    # passable_area = false
+    # until passable_area
+    #  location = @randomCell()
+
+    location = null
+    cells = @map.allCells()
+    # @map.eachCell (cell) =>
+    for cell in cells
+      console.log "consider location #{cell.location}"
+      passable_area = @isAreaPassable(cell.location, sz) 
+      console.log "passable? #{passable_area}"
+      if passable_area 
+        return cell.location
+    null
+
+  isAreaPassable: (loc, sz) =>
+    console.log "World#isAreaPassable loc=#{loc} sz=#{sz}"
+    for x in [0..sz]
+      for y in [0..sz]
+        if !@map.isLocationPassable([x,y]) #getCellAt([x,y]).isPassable()
+          return false
+    true
+
+  findOpenAreaOfSizeInCity: (city, size, max_distance_from_center, current_location) =>
+    console.log "World#findOpenAreasOfSizeInCity"
     open_areas = []
-    max_distance_from_center ?= 3*city.population.length
+    # max_distance_from_center ?= 3*city.population.length
     console.log "attempting to find open areas of size #{size}" if Busyverse.debug and Busyverse.verbose
 
     nearby_cells = @allCellsWithin(max_distance_from_center, city.center())
 
     for cell in nearby_cells
-      if city.availableForBuilding(cell.location, size)
-        open_areas.push(cell.location)
+      passable   = @isAreaPassable(cell.location.size) 
+      if passable
+        available  = city.availableForBuilding(cell.location, size) 
+        if available
+          accessible = @pathfinder.shortestPath(current_location, cell.location).length > 0
+          console.log "Is cell #{cell.location}... accessible? #{accessible} --...passable? #{passable} --...available? #{available}"
+          if accessible
+            return cell.location
+    return null
 
-    if Busyverse.debug and Busyverse.verbose
-      console.log "Found open areas: " if Busyverse.debug
-      console.log open_areas if Busyverse.debug
-
-    open_areas
-
-  # TODO place starting farm in passable region...
-  # findPassablesAreaOfSize: (size) =>
-  #   passable_areas = []
-  #   @map.eachCell (cell) =>
-  
   allCellsWithin: (maxDistance, center) =>
     cellsInRadius = []
     @map.eachCell (cell) =>
-      if cell.distanceFrom(center) <= maxDistance
+      if @geometry.euclideanDistance(cell.location, center) <= maxDistance
         cellsInRadius.push(cell)
     cellsInRadius
 
@@ -107,16 +130,26 @@ class Busyverse.World
   randomCell: => [ @random.valueInRange(@width), @random.valueInRange(@height) ]
 
   randomPassableCell: ->
+    console.log "World#randomPassableCell"
     location = null
-    until location && @map.getCellAt(location).isPassable()
+    until location && @map.isLocationPassable location #getCellAt(location).isPassable()
       location = @randomCell()
     location
+  
+  randomPassableCellAccessibleFrom: (source) ->
+    console.log "World#randomPassableCellAccessibleFrom source=#{source}"
+    location = null
+    accessible = false 
+    tries = 0
+    until (location && accessible) || tries > 10
+      location = @random.valueFromList(@allCellsWithin(10, source)).location # @randomPassableCell()
+      accessible = @pathfinder.shortestPath(source, location).length > 0
+      tries = tries + 1
 
-  # randomPassableCellAccessibleFrom: (source) ->
-  #   location = null
-  #   until location && @shortestPath(source, location).length > 0
-  #     location = @randomPassableCell()
-  #   location
+    if tries > 10
+      return null
+
+    location
 
   randomLocation: ->
     location = [ Math.round(@random.valueInRange(@width)) * @cellSize,

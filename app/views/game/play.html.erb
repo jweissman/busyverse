@@ -15,4 +15,11 @@
 
 <script language="javascript">
   Busyverse.kickstart();
+  Busyverse.worker = new Worker("<%= javascript_path 'worker_manifest.js' %>")
+
+  Busyverse.worker.onmessage = function(result) {
+    console.log("WORKER ON MESSAGE");
+    console.log(result);
+    Busyverse.engine.handleCommand(result);
+  };
 </script>

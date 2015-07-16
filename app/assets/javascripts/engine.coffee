@@ -1,13 +1,13 @@
 class Busyverse.Engine
-  constructor: ->
-    @game = new Busyverse.Game()
+  constructor: (@game) ->
+    @game ?= new Busyverse.Game()
     @ui   = new Busyverse.Presenter()
 
   run: ->
     @canvas = document.getElementById('busyverse')
 
     if typeof(jQuery) == 'undefined'
-      console.log "--- jQuery is undefined!" if Busyverse.debug
+      console.log "--- warning: jQuery is undefined!" if Busyverse.debug
     else
       $('#terminal').submit @handleCommand
     
@@ -21,7 +21,10 @@ class Busyverse.Engine
   handleCommand: (event) =>
     command = $("input:first").val()
 
-    result = @game.send(command)
+    result = @game.send
+      type: 'user_command'
+      operation: command
+
     console.log "Sent command #{command} to game with result #{result}" if Busyverse.debug
 
     event.preventDefault()

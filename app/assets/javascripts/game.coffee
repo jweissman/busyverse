@@ -20,10 +20,15 @@ class Busyverse.Game
     @world  ?= new Busyverse.World(@width, @height, @cellSize)
     @player ?= new Busyverse.Player()
     @setup()
-    console.log "New game created for world #{@world.name}!" if Busyverse.debug
+    console.log "Game#new world=#{@world.name}" if Busyverse.debug
 
   setup: =>
-    farm = new Busyverse.Buildings.Farm(@world.center())
+    console.log "Game#setup"
+    origin = #@world.center() 
+      # @world.mapToCanvasCoordinates(
+      @world.randomPassableAreaOfSize(2)
+    console.log "Using origin #{origin}"
+    farm = new Busyverse.Buildings.Farm(origin)
     @place(farm) 
 
     for i in [1..@initialPopulation]
@@ -62,5 +67,6 @@ class Busyverse.Game
 
 # kickstart fn
 Busyverse.kickstart = ->
-  engine = Busyverse.engine = new Busyverse.Engine()
+  #Busyverse.game = new Busyverse.Game() 
+  engine = Busyverse.engine = new Busyverse.Engine( Busyverse.game)
   window.onload = -> engine.run()
