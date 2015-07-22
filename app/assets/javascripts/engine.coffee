@@ -18,10 +18,16 @@ class Busyverse.Engine
     console.log "Playing game!" if Busyverse.debug
     @game.play(@ui)
 
+  handleWorkerResult: (result) =>
+    console.log "GOT WORKER RESULT"
+    @game.send #result
+      type: 'worker_result'
+      data: result
+
   handleCommand: (event) =>
     command = $("input:first").val()
 
-    result = @game.send
+    result = @game.send command
       type: 'user_command'
       operation: command
 

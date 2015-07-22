@@ -40,9 +40,24 @@ class Busyverse.Game
     true
 
   send: (command) =>
+    console.log "Game#send command=#{command}"
+
+    console.log command
+
     person = @world.city.population[0]
-    console.log "Sending command #{command} to citizen #{person.name}..." if Busyverse.debug
-    person.send(command, @world.city, @world)
+    if command.type == 'user_command'
+      op = command.operation
+      person = @world.city.population[0]
+      console.log "Sending command #{op} to citizen #{person.name}..." if Busyverse.debug
+      person.send(op, @world.city, @world)
+    else if command.type == 'worker_result'
+      console.log "game handling worker result!!!"
+      console.log command
+      #path = command.path.data
+      # console.log "path: "
+      # console.log path
+
+      person.handlePathResponse(command.data)
 
   launch: (ui) =>
     console.log 'Launching!' if Busyverse.verbose

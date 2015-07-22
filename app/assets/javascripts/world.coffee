@@ -62,7 +62,7 @@ class Busyverse.World
     console.log "World#isAreaPassable loc=#{loc} sz=#{sz}"
     for x in [0..sz]
       for y in [0..sz]
-        if !@map.isLocationPassable([x,y]) #getCellAt([x,y]).isPassable()
+        if !@map.isLocationPassable([loc[0]+x,loc[1]+y]) 
           return false
     true
 

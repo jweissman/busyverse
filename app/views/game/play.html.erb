@@ -20,6 +20,6 @@
   Busyverse.worker.onmessage = function(result) {
     console.log("WORKER ON MESSAGE");
     console.log(result);
-    Busyverse.engine.handleCommand(result);
+    Busyverse.engine.handleWorkerResult(result.data);
   };
 </script>

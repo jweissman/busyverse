@@ -2,11 +2,8 @@ onmessage = function(message) {
   console.log("worker.js #onmessage message: ");
   console.log(message);
 
-  postMessage({
-    'type': 'worker_result',
-    'result': Busyverse.findPath( message.data)
-  });
-}
+  postMessage(Busyverse.findPath( message.data));
+};
 
 //class Busyverse.Worker
 //  done: false
