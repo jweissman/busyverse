@@ -8,15 +8,12 @@ Array::equals = (b) ->
 
 class Busyverse.Pathfinder
   constructor: (@map, @source, @target) ->
-    console.log "Pathfinder#new src=#{@source} tgt=#{@target}"
-    # console.log @map
     @geometry = new Busyverse.Support.Geometry()
     @dist = {}
     @prev = {}
     @unvisited = []
 
     @map.eachCell (cell) =>
-      # console.log cell
       @dist[cell.location] = Infinity
       @prev[cell.location] = null
       @unvisited.push(cell.location)
@@ -48,8 +45,13 @@ class Busyverse.Pathfinder
   foundTarget: -> 
     @current && @current.equals @target 
 
+  shouldTerminate: ->
+    @unvisited.length == 0 || 
+    @foundTarget() # || 
+    # @dist[@current] > 2 * @geometry.euclidean
+
   detectShortestPath: =>
-    until @unvisited.length == 0 || @foundTarget()
+    until @shouldTerminate() # @unvisited.length == 0 || @foundTarget() || @dist[@current] > 2 * @geometry.euclidean
       nextCell = @closestUnvisited()
       return [] if nextCell == null
       @visit nextCell
@@ -71,24 +73,23 @@ class Busyverse.Pathfinder
 
 class Busyverse.Support.Pathfinding
   constructor: (@map) ->
-    console.log "Pathfinding#new map -->"
-    console.log @map
 
   shortestPath: (source, target) =>
-    console.log "Pathfinding#shortestPath src=#{source}, tgt=#{target}"
-    console.log @map
-
     pathfinder = new Busyverse.Pathfinder(@map, source, target)
 
     pathfinder.detectShortestPath()
     pathfinder.assemblePath()
 
 Busyverse.findPath = (data) ->
-  console.log "Busyverse.findPath"
-  console.log data
   map = JSON.parse data.map
-  console.log map
-  grid = new Busyverse.Grid(Busyverse.width / Busyverse.cellSize, Busyverse.height / Busyverse.cellSize, map)
 
-  (new Busyverse.Support.Pathfinding(grid)).shortestPath data.src, data.tgt
+  grid = new Busyverse.Grid(Busyverse.width / Busyverse.cellSize, Busyverse.height / Busyverse.cellSize, map)
+  path = (new Busyverse.Support.Pathfinding(grid)).shortestPath data.src, data.tgt
+
+  msg = {
+    personId: data.personId
+    path: path
+  }
+
+  msg
 

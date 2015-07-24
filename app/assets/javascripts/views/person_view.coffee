@@ -47,40 +47,56 @@ class Busyverse.Views.PersonView extends Busyverse.View
       msg: person.activeTask
 
   renderDestination: =>
+    #console.log "PersonView#renderDestination"
+    world = Busyverse.engine.game.world
     person = @model
+    halfsize = [person.size[0] / 2, person.size[1]/2]
+    offset = [ (Busyverse.cellSize / 2) - halfsize[0] / 2, (Busyverse.cellSize / 2) - halfsize[1] / 2 ]
+
     if typeof(person.path) != 'undefined' && person.path != null && person.path.length > 0
       for cell in person.path
-        target = [ cell[0] * Busyverse.cellSize, cell[1] * Busyverse.cellSize ]
+        target = world.mapToCanvasCoordinates(cell, offset)
+        # console.log "RENDERING PATH ELEMENT at target=#{target} (cell=#{cell}, offset=#{offset})"
+
         @rect
           position: target
-          size: person.size
-          fill: 'darkred'
+          size: halfsize #person.size / 2
+          fill: 'lightyellow'
           stroke: 'black'
 
     if typeof(person.destinationCell) != 'undefined' && person.destinationCell != null
-      target = [ person.destinationCell[0] * Busyverse.cellSize, person.destinationCell[1] * Busyverse.cellSize ]
+      target = world.mapToCanvasCoordinates(person.destinationCell, offset)
       
       @rect
-        position: target #person.destination
-        size: person.size
-        fill: 'red'
+        position: target 
+        size: halfsize #person.size
+        fill: 'darkorange'
         stroke: 'black'
 
-      msg = "Target for #{person.name}"
-      width = @textWidth
-        msg: msg
-        size: '14px'
+    # if typeof(person.destination) != 'undefined' && person.destination != null
+    #   target = person.destination #world.mapToCanvasCoordinates(person.destinationCell, offset)
+    #   
+    #   @rect
+    #     position: target 
+    #     size: person.size
+    #     fill: 'darkred'
+    #     stroke: 'black'
 
-      @rect
-        position: [target[0] + 12, target[1] - 4]
-        size: [width + 8, 20]
-        fill: 'darkred'
+      # msg = "Target for #{person.name}"
+      # width = @textWidth
+      #   msg: msg
+      #   size: '14px'
+
+      # @rect
+      #   position: [target[0] + 12, target[1] - 4]
+      #   size: [width + 8, 20]
+      #   fill: 'darkred'
     
-      @text
-        position: [target[0] + 15, target[1] + 10]
-        msg: msg
-        size: '14px'
-        fill: 'red'
+      # @text
+      #   position: [target[0] + 15, target[1] + 10]
+      #   msg: msg
+      #   size: '14px'
+      #   fill: 'red'
 
 
 

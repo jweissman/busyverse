@@ -1,25 +1,34 @@
 <div content="game">
-  <h2>
-    BUSYVERSE
-    <small>v0.0.1</small>
-  </h2>
+  <div>
+    <table>
+      <tr>
+        <td>
+          <h2>
+            BUSYVERSE
+            <small>v0.0.1</small>
+          </h2>
+        </td>
+        <td style="padding: 5px">
+          <form id="terminal">
+            <p>Enter commands here:</p>
+            <input type="text" id="prompt" value="Welcome"></input>
+            <input type="submit" value="SEND">
+          </form>
+        </td>
+        <td>
+          <span id="response">
+          </span>
+        </td>
+      </tr>
+    </table>
+  </div>
 
-  <canvas id="busyverse" width="800" height="600"></canvas>
-  
-  <form id="terminal">
-    <p>Enter commands here:</p>
-    <input type="text" id="prompt" value="Welcome"></input>
-    <input type="submit" value="SEND">
-  </form>
+  <canvas id="busyverse" width="1080" height="720"></canvas>
 </div>
 
 <script language="javascript">
   Busyverse.kickstart();
-  Busyverse.worker = new Worker("<%= javascript_path 'worker_manifest.js' %>")
-
-  Busyverse.worker.onmessage = function(result) {
-    console.log("WORKER ON MESSAGE");
-    console.log(result);
-    Busyverse.engine.handleWorkerResult(result.data);
+  Busyverse.createWorker = function() {
+    return new Worker("<%= javascript_path 'worker_manifest.js' %>");
   };
 </script>

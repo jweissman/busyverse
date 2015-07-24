@@ -19,26 +19,34 @@ describe "Game", ->
       game.player.should.equal(player)
       game.player.score.should.equal(0)
 
-  describe "#setup", ->
-    beforeEach -> 
-      @world   = new Busyverse.World()
-      @game    = new Busyverse.Game(@world, @player)
+  # describe #play
+  # describe #launch
+  # describe #send
+  # describe #step
+  # describe #update
+  # describe #render
 
-    it 'should place a farm at the center', ->
-      firstStructure = @game.world.city.buildings[0]
+  # move to World#setup
+  # describe "#setup", ->
+  #   beforeEach -> 
+  #     @world   = new Busyverse.World()
+  #     @game    = new Busyverse.Game(@world, @player)
 
-      expect(firstStructure.name).to.equal("Small Farm")
-      expect(firstStructure.position).to.eql(@game.world.center())
+  #   it 'should place a farm at the center', ->
+  #     firstStructure = @game.world.city.buildings[0]
 
-    it 'should create some people at the center', ->
-      expect(@game.world.city.population.length).to.equal(@game.initialPopulation)
+  #     expect(firstStructure.name).to.equal("Small Farm")
+  #     expect(firstStructure.position).to.eql(@game.world.center())
 
-      center = @world.mapToCanvasCoordinates( @world.center())
-      for i in [0..(@game.initialPopulation-1)]
-        expect(@game.world.city.population[i].position).to.eql(center)
+  #   it 'should create some people at the center', ->
+  #     expect(@game.world.city.population.length).to.equal(@game.initialPopulation)
 
-  describe "#place", ->
-    it 'should create structures', ->
-      tower = new Busyverse.Buildings.Tower([5,5])
-      @game.place(tower)
-      expect(@game.world.city.buildings).to.include(tower)
+  #     center = @world.mapToCanvasCoordinates( @world.center())
+  #     for i in [0..(@game.initialPopulation-1)]
+  #       expect(@game.world.city.population[i].position).to.eql(center)
+
+  # describe "#place", ->
+  #   it 'should create structures', ->
+  #     tower = new Busyverse.Buildings.Tower([5,5])
+  #     @game.place(tower)
+  #     expect(@game.world.city.buildings).to.include(tower)

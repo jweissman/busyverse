@@ -34,8 +34,8 @@ class Busyverse.Presenter
 
   renderWorld: (world) =>
     console.log "RENDERING WORLD" if Busyverse.debug and Busyverse.verbose
-    @views[world] = new Busyverse.Views.WorldView(world, @context)
-    @renderModel(model: world, world: world) # weird
+    (new Busyverse.Views.WorldView(world, @context)).render(world)
+    # @renderModel(model: world, world: world) # weird
 
   renderBuildings: (world) =>
     console.log "Presenter#renderBuildings [world={name: #{world.name}}]" if Busyverse.trace

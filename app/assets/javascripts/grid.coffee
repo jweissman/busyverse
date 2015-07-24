@@ -5,60 +5,82 @@ class Busyverse.GridCell
   constructor: (@location, @color) ->
     @geometry = new Busyverse.Support.Geometry()
 
-  # distanceFrom: (otherLocation) =>
-  #   @geometry.euclideanDistance @location, otherLocation
-
-  # isPassable: =>
-  #   passable = @color == 'green' || @color == 'lightgreen' || @color == 'darkgreen'
-  #   # console.log "is #{@color} passable? #{passable}"
-  #   passable
-
 class Busyverse.Grid
-  constructor: (@width, @height, @cells) ->
+  constructor: (@width, @height, @cells, distribution) ->
     @cells ?= []
     @random = new Busyverse.Support.Randomness()
+    
+  setup: (distribution, evolve=true) =>
     if @cells.length == 0
-      console.log "GENERATING GRID PLEASE WAIT :)"
-      @build()
-      @evolve()
+      @build(distribution)
+    console.log "GENERATING GRID PLEASE WAIT :)"
+    @evolve()
+    @decorate()
 
-  build: =>
+  build: (distribution) =>
     for x in [0..@width]
       @cells[x] = []
       for y in [0..@height]
-        @cells[x][y] = @createCellAt([x,y])
+        @cells[x][y] = @createCellAt([x,y], distribution)
 
-  createCellAt: (location) =>
-    color = @random.valueFromPercentageMap
-      # 1:  'darkgrey'
-      # 2:  'grey'
-      # 3:  'white'
-      # 4:  'lightgrey'
-      # 8:  'grey'
-      5:  'blue'
-      # 10: 'darkblue'
-      15: 'darkgreen'
-      20: 'green'
-      # 8: 'lightblue'
-      30: 'lightgreen'
+  createCellAt: (location, distribution) =>
+    color = @random.valueFromPercentageMap distribution
     new Busyverse.GridCell(location, color)
 
-  randomColor: => @random.valueFromList [
-    # 'darkgrey', 'grey', 'white', 'lightgrey', 
-    # 'blue', 'lightblue', 'lightgreen', 'darkblue', 'green', 'darkgreen'
-    #'darkblue', 'lightgreen'
-    'green', 'darkgreen', 'blue', 'lightblue'
-  ]
-
-  evolve: (depth=5) =>
+  # start moving all this to world?
+  evolve: (depth=6, noise=true) =>
     return if depth <= 0
     console.log "evolve depth=#{depth}"
     @eachCell (cell) => 
       cell.color = @random.valueFromPercentageMap
-        1: @randomColor()
-        20: cell.color
-        80: @mostCommonNeighborColor(cell)
-    @evolve(depth-1)
+        25: if noise then @random.valueFromList(['darkgreen']) else @mostCommonNeighborColor(cell)
+        30: @mostCommonNeighborColor(cell)
+        35: cell.color
+    # @decorate() if noise
+    @evolve(depth-1, !noise)
+
+  decorate: =>
+    @eachCell (cell) => 
+      land  = @countNeighborsWithColor(cell, 'darkgreen') +
+              @countNeighborsWithColor(cell, 'green') +
+              #@countNeighborsWithColor(cell, 'lightgreen') +
+              @countNeighborsWithColor(cell, 'lightyellow') +
+              @countNeighborsWithColor(cell, 'grey') +
+              @countNeighborsWithColor(cell, 'darkgrey')
+
+      if land > 5
+        cell.color = @random.valueFromPercentageMap
+          80: 'green'
+          20: cell.color
+          # 15: 'lightgreen'
+          4: 'lightyellow'
+          3: 'grey'
+          2: 'darkgrey'
+          1: 'pink'
+
+      blue = @countNeighborsWithColor(cell, 'darkblue') +
+             @countNeighborsWithColor(cell, 'midnightblue') +
+             @countNeighborsWithColor(cell, 'lightyellow')
+             # @countNeighborsWithColor(cell, 'lightblue')
+
+      if blue > 4
+        cell.color = @random.valueFromPercentageMap
+          80: 'darkblue'
+          20: cell.color
+          5: 'midnightblue'
+          3: 'lightyellow'
+          2: 'grey'
+
+      # surroundingColor = @mostCommonNeighborColor(cell)
+      # if surroundingColor 
+      #cell.color = @random.valueFromPercentageMap
+      #  15: if noise then 'green' else @mostCommonNeighborColor(cell)
+      #  45: cell.color
+      #  40: @mostCommonNeighborColor(cell)
+
+  countNeighborsWithColor: (cell, color) =>
+    matching = @getAllNeighbors(cell.location).filter (n) => n.color == color
+    matching.length
 
   mostCommonNeighborColor: (cell) =>
     neighbors = @getAllNeighbors(cell.location)
@@ -118,8 +140,8 @@ class Busyverse.Grid
 
   isLocationPassable: (loc) =>
     cell = @getCellAt loc
-    cell.color == 'green' || cell.color == 'lightgreen' 
-
+    return false unless cell
+    cell.color == 'green' || cell.color == 'lightgreen' || cell.color == 'darkgreen' || cell.color == 'lightyellow'
 
   getLocationsAround: (loc) =>
     # console.log "getting cells around #{loc}"

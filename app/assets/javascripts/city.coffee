@@ -12,26 +12,33 @@ class Busyverse.City
     console.log "New city created with population #{@population}!" if Busyverse.verbose
 
   center: =>
+    console.log "City#center -- finding center of #{@buildings.length} buildings"
     xs = 0
     ys = 0
     for building in @buildings
+      console.log "considering building at #{building.position}"
       xs = xs + building.position[0]
       ys = ys + building.position[1]
-    return([( xs / @buildings.length), (ys / @buildings.length )])
+    center = ([( xs / @buildings.length), (ys / @buildings.length )])
+    console.log "-----> center: "
+    console.log center
+    center
 
   grow: (world) =>
     name     = @random.valueFromList [
-      "Bob", "Amy", "John", "Kevin", "Tom", "Alex", "Brad", "Carrie",
-      "Alain", "Ferris", "Orff", "Enoch", "Carol", "Sam", "Deborah",
-      "George", "Gina", "Dean", "Sarah", "Cindy", "Terrence", "Clark",
-      "Ana", "Amelie", "Augustine", "Aaron", "Anton", "Andre", "Anders",
-      "Allard", "Artemis", "Stephanie", "Estrella", "Simon", "Paul", "Gilles",
-      "Felix", "Jean-Paul", "Michel", "Antoine"
+      "Bob", "Amy", "John", "Kevin", "Tom", "Alex", "Brad", "Carrie", "Sofia", "Elisabeth", "Luka", "Gabriel",
+      "Alain", "Ferris", "Orff", "Enoch", "Carol", "Sam", "Deborah", "Liam", "Thiago", "Elias", "Sem",
+      "George", "Gina", "Dean", "Sarah", "Cindy", "Terrence", "Clark", "Karim", "Isabel", "William", "Aya",
+      "Ana", "Amelie", "Augustine", "Aaron", "Anton", "Andre", "Anders", "Ahmed", "Emma", "Lucas",
+      "Allard", "Artemis", "Stephanie", "Estrella", "Simon", "Paul", "Gilles", "Mia", "Anya", "Jen",
+      "Felix", "Jean-Paul", "Michel", "Antoine", "Mohamed", "Fatima", "Juan", "Ali", "Hiroto", "Eden", "Maria"
     ]
+    
     position = if world then world.mapToCanvasCoordinates(@center()) else [0,0]
     task     = "wander" #@random.valueFromList [ "wander", "explore" ]
+    id = @population.length
 
-    person = new Busyverse.Person(name, position, task)
+    person = new Busyverse.Person(id, name, position, task)
 
     @population.push(person)
 
@@ -42,6 +49,18 @@ class Busyverse.City
   create: (structure) =>
     console.log "creating new building [name=#{structure.name}]" if Busyverse.debug and Busyverse.verbose
     @buildings.push(structure)
+
+  indicateAccessible: (location) =>
+    console.log "City#indicateAccessible [location=#{location}]" if Busyverse.debug and Busyverse.verbose
+
+    @accessible[location[0]] ?= []
+    @accessible[location[0]][location[1]] = true
+  
+  isAccessible: (location) =>
+    if @accessible[location[0]] && @accessible[location[0]][location[1]]
+      true
+    else
+      false
 
   explore:    (location) => 
     console.log "City#explore [location=#{location}]" if Busyverse.debug and Busyverse.verbose

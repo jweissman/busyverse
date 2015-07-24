@@ -3,7 +3,11 @@
 
 context "Person", ->
   beforeEach ->
-    @person = new Busyverse.Person("Alice")
+    @person = new Busyverse.Person(1, "Alice", [0,0])
+
+  describe '.id', ->
+    it 'should be 1', ->
+      expect(@person.id).to.equal(1)
 
   describe ".name", ->
     it 'should be "Alice"', ->
@@ -19,24 +23,25 @@ context "Person", ->
 
   describe "#send", ->
     it 'should adopt a new active task', ->
-      @person.send("wander")
+      world = {}
+      @person.send('wander', world) #{type: 'user_command', operation: "wander"}, world)
       expect(@person.activeTask).to.equal("wander")
       # @person.send("build")
       # expect(@person.activeTask).to.equal("build")
 
-  describe "#wander", ->
-    it 'should advance towards a randomly selected destination', ->
-      somewhere = [10,10]
-      world = { 
-        nearestUnexploredCell: => somewhere
-        canvasToMapCoordinates: (xy) => xy
-        mapToCanvasCoordinates: (xy) => xy
-        anyUnexplored: -> true
-        randomLocation: -> somewhere
-      }
-      city = center: -> 
-      @person.wander(world, city)
-      expect(@person.destination).to.equal(somewhere)
+  # describe "#wander", ->
+  #   it 'should advance towards a randomly selected destination', ->
+  #     somewhere = [10,10]
+  #     world = { 
+  #       # nearestUnexploredCell: => somewhere
+  #       # canvasToMapCoordinates: (xy) => xy
+  #       # mapToCanvasCoordinates: (xy) => xy
+  #       # anyUnexplored: -> true
+  #       # randomLocation: -> somewhere
+  #     }
+  #     city = center: -> 
+  #     @person.wander(world, city)
+  #     expect(@person.destination).to.equal(somewhere)
 
   describe "#move", ->
     it 'should advance position by velocity', ->
@@ -49,4 +54,7 @@ context "Person", ->
       @person.move(world)
       expect(@person.position).to.deep.equal([1, 1])
 
+  # describe 'update'
+  # describe 'build'
+  # describe 'updatePath'
 

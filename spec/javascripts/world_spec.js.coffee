@@ -9,6 +9,8 @@ context "World", ->
     @height = 5
 
     @world = new Busyverse.World(@width, @height)
+    
+    @world.setup({ 100: 'darkgreen' }, false, false)
 
   describe ".width", ->
     it 'should be as assigned', ->
@@ -31,7 +33,6 @@ context "World", ->
       @random_mock = sinon.mock(@random_api)
 
       @world.random = @random_api 
-
       @random_mock.expects("valueInRange").once().withArgs(@height)
       @random_mock.expects("valueInRange").once().withArgs(@width)
 
@@ -54,11 +55,13 @@ context "World", ->
       city = 
         availableForBuilding: -> true
         center: -> [3,3]
-      open_regions = @world.findOpenAreasOfSizeInCity(city, [1,1], 4)
-      expect(open_regions.length).to.equal(35)
+
+      open_regions = @world.findOpenAreaOfSizeInCity(city, [1,1], 4)
+      expect(open_regions.length).to.equal(2)
 
   describe "#getPath", ->
     it 'should find shortest path', ->
+      
       path = @world.getPath([0,2],[3,5])
       expect(path.length).to.equal(4)
       expect(path[0]).to.eql([0,2])

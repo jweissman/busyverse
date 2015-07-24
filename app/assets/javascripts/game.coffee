@@ -13,26 +13,13 @@ class Busyverse.Game
   height: Math.floor Busyverse.height / Busyverse.cellSize 
   cellSize: Busyverse.cellSize
 
-  stepLength: 50
-  initialPopulation: 1
+  stepLength: 25
 
   constructor: (@world, @player) ->
-    @world  ?= new Busyverse.World(@width, @height, @cellSize)
     @player ?= new Busyverse.Player()
-    @setup()
+    @world  ?= new Busyverse.World(@width, @height, @cellSize)
+    @world.setup()
     console.log "Game#new world=#{@world.name}" if Busyverse.debug
-
-  setup: =>
-    console.log "Game#setup"
-    origin = #@world.center() 
-      # @world.mapToCanvasCoordinates(
-      @world.randomPassableAreaOfSize(2)
-    console.log "Using origin #{origin}"
-    farm = new Busyverse.Buildings.Farm(origin)
-    @place(farm) 
-
-    for i in [1..@initialPopulation]
-      @world.city.grow(@world)
 
   play: (ui) =>
     console.log 'Playing!'
@@ -41,24 +28,12 @@ class Busyverse.Game
 
   send: (command) =>
     console.log "Game#send command=#{command}"
-
     console.log command
-
+    op = command
     person = @world.city.population[0]
-    if command.type == 'user_command'
-      op = command.operation
-      person = @world.city.population[0]
-      console.log "Sending command #{op} to citizen #{person.name}..." if Busyverse.debug
-      person.send(op, @world.city, @world)
-    else if command.type == 'worker_result'
-      console.log "game handling worker result!!!"
-      console.log command
-      #path = command.path.data
-      # console.log "path: "
-      # console.log path
-
-      person.handlePathResponse(command.data)
-
+    console.log "Sending command #{op} to citizen #{person.name}..." if Busyverse.debug
+    person.send(op)
+    
   launch: (ui) =>
     console.log 'Launching!' if Busyverse.verbose
     @ui = ui
@@ -70,10 +45,6 @@ class Busyverse.Game
     @render()
     setTimeout @step, @stepLength
 
-  place: (building) => 
-    console.log "Game#place [building=#{building.name}] at #{building.position}"
-    @world.city.create(building)
-
   update: () => @world.update() 
 
   render: () =>
@@ -82,6 +53,5 @@ class Busyverse.Game
 
 # kickstart fn
 Busyverse.kickstart = ->
-  #Busyverse.game = new Busyverse.Game() 
-  engine = Busyverse.engine = new Busyverse.Engine( Busyverse.game)
+  engine = Busyverse.engine = new Busyverse.Engine(Busyverse.game)
   window.onload = -> engine.run()
