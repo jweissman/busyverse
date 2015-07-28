@@ -20,7 +20,6 @@ class Busyverse.Pathfinder
 
     @dist[@source] = 0
     @current = null
-    @measured = [@source]
 
   closestUnvisited: =>
     smallestUnivisitedDistance = Infinity
@@ -32,11 +31,17 @@ class Busyverse.Pathfinder
       if unvisitedWeight < smallestUnivisitedDistance 
         smallestUnivisitedDistance = unvisitedWeight 
         closest = u
+
     closest
 
   visit: (cell) =>
     @current = cell
     @unvisited.remove(@unvisited.indexOf(@current))
+    for neighbor in @unvisitedNeighbors()
+      alt = @dist[@current] + @geometry.euclideanDistance(@current, neighbor)
+      if alt < @dist[neighbor]
+        @dist[neighbor] = alt
+        @prev[neighbor] = @current
 
   unvisitedNeighbors: =>
     neighbors = @map.getLocationsAround(@current)
@@ -46,22 +51,8 @@ class Busyverse.Pathfinder
     @current && @current.equals @target 
 
   shouldTerminate: ->
-    @unvisited.length == 0 || 
-    @foundTarget() # || 
-    # @dist[@current] > 2 * @geometry.euclidean
+    @unvisited.length == 0 || @foundTarget() 
 
-  detectShortestPath: =>
-    until @shouldTerminate() # @unvisited.length == 0 || @foundTarget() || @dist[@current] > 2 * @geometry.euclidean
-      nextCell = @closestUnvisited()
-      return [] if nextCell == null
-      @visit nextCell
-      for neighbor in @unvisitedNeighbors()
-        alt = @dist[@current] + @geometry.euclideanDistance(@current, neighbor)
-        if alt < @dist[neighbor]
-          @dist[neighbor] = alt
-          @prev[neighbor] = @current
-          @measured.push neighbor
-    
   assemblePath: =>
     sequence = []
     curr = @target
@@ -71,14 +62,19 @@ class Busyverse.Pathfinder
     sequence.push(curr)
     sequence.reverse()
 
+  detectShortestPath: =>
+    until @shouldTerminate() 
+      nextCell = @closestUnvisited()
+      return [] if nextCell == null
+      @visit nextCell
+    @assemblePath()
+ 
 class Busyverse.Support.Pathfinding
   constructor: (@map) ->
 
   shortestPath: (source, target) =>
     pathfinder = new Busyverse.Pathfinder(@map, source, target)
-
     pathfinder.detectShortestPath()
-    pathfinder.assemblePath()
 
 Busyverse.findPath = (data) ->
   map = JSON.parse data.map

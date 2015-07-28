@@ -138,7 +138,7 @@ class Busyverse.World
     @random.valueFromList(nearby_cells).location
     
   getPath: (source, target) => 
-    @pathfinder.shortestPath source, target
+    @pathfinder.shortestPath(source, target)
 
   getCellAtCanvasCoords: (coords) =>
     @map.getCellAt(@canvasToMapCoordinates(coords))
