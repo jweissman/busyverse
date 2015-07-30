@@ -29,7 +29,7 @@ class Busyverse.Presenter
       @renderPeople(world)
 
       console.log 'rendering city' if Busyverse.trace
-      @renderCity(world.city)
+      @renderCity(world.city, world)
     else
       console.log "WARNING: @canvas is undefined in Presenter#render" if Busyverse.debug and Busyverse.verbose
 

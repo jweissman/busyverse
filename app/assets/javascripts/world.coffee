@@ -40,6 +40,8 @@ class Busyverse.World
     @width     ?= 200
     @height    ?= 200
 
+    @age        = 0
+
     @city       = new Busyverse.City()
     @map        = new Busyverse.Grid(@width, @height)
     @resources  = [] #new Busyverse.Resources.Wood()]
@@ -80,6 +82,29 @@ class Busyverse.World
 
   update: =>
     @city.update(@)
+    @age = @age + 1
+
+  dayStart: 6
+  dayEnd: 20
+
+  getMinute: -> @age % 60
+  getHour:   -> Math.floor(@age / 60) % 24
+  getDay:    -> Math.floor(@age / (60 * 24))
+  isDay: -> @getHour() >= @dayStart && @getHour() < @dayEnd 
+
+  percentOfDay: ->
+    (@getHour() - @dayStart) / (@dayEnd - @dayStart)
+      # normalize night too somehow... hmmm
+
+  pad: (num, size) ->
+    s = '000000000' + num
+    s.substr s.length - size
+
+  describeTime: ->
+    time = "#{if @getHour()%12 == 0 then '12' else @getHour()%12}:#{@pad(@getMinute(),2)}#{if @getHour() >= 12 then 'PM' else 'AM'}"
+    date = "Day #{@getDay()}"
+    # daytime = if @isDay() then "daytime (#{@percentOfDay()*100}%)" else 'nighttime'
+    "#{date} (#{time})"
 
   center: => 
     [ @width / 2, @height / 2 ]

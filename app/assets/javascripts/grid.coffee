@@ -50,9 +50,10 @@ class Busyverse.Grid
 
       if land > 5
         cell.color = @random.valueFromPercentageMap
-          80: 'green'
           20: cell.color
           15: 'forestgreen'
+          10: 'green'
+          5: 'darkgreen'
           # 4: 'lightyellow'
           # 3: 'grey'
           # 2: 'darkgrey'
@@ -66,10 +67,10 @@ class Busyverse.Grid
 
       if blue > 4
         cell.color = @random.valueFromPercentageMap
-          80: 'darkblue'
           20: cell.color
+          15: 'darkblue'
           10: 'navy'
-          9: 'midnightblue'
+          5: 'midnightblue'
           # 4: 'mediumblue'
           # 3: 'lightyellow'
           # 2: 'grey'
@@ -144,7 +145,7 @@ class Busyverse.Grid
   isLocationPassable: (loc) =>
     cell = @getCellAt loc
     return false unless cell
-    cell.color == 'green' || cell.color == 'lightgreen' || cell.color == 'darkgreen' || cell.color == 'lightyellow'
+    cell.color == 'green' || cell.color == 'forestgreen' || cell.color == 'darkgreen'
 
   getLocationsAround: (loc) =>
     # console.log "getting cells around #{loc}"
