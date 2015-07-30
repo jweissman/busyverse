@@ -3,7 +3,26 @@ class Busyverse.Views.WorldView extends Busyverse.View
     console.log "rendering world!" if Busyverse.debug
     world = @model
 
-    world.map.eachCell (cell) => @renderCell(world, cell)
+    world.map.eachCell (cell) => 
+      @renderCell(world, cell)
+
+    for resource in world.resources
+      if world.isLocationExplored(resource.position)
+        @renderResource(world, resource)
+
+  renderResource: (world, resource) =>
+    # console.log "render resource #{resource.name} at #{resource.position} in #{resource.color}"
+
+    w = resource.size[0] # Busyverse.cellSize # - 1
+    h = resource.size[1] # Busyverse.cellSize # - 1
+    x = (Busyverse.cellSize * resource.position[0]) + (Busyverse.cellSize/2 - w/2)
+    y = (Busyverse.cellSize * resource.position[1]) + (Busyverse.cellSize/2 - h/2)
+
+
+    @rect 
+      position: [x,y]
+      size: [w,h]
+      fill: resource.color
 
   renderCell: (world, cell) =>
     console.log "render cell" if Busyverse.debug

@@ -8,13 +8,15 @@ var Busyverse = {
   
   // namespaces
   Buildings: {},
+  Resources: {},
+
   Views: {},
   Support: {},
   Worker: {},
 
   // config
   width: 1080,
-  height: 720,
-  cellSize: 20
+  height: 520,
+  cellSize: 16
 
 };

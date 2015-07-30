@@ -5,41 +5,66 @@
 class Busyverse.Person
   size: [5,9]
   speed: 2.0
-  visionRadius: 7
+  visionRadius: 4
   velocity: [0,0]
 
-  constructor: (@id, @name, @position, @activeTask) ->
+  constructor: (@id, @name, @position) ->
     @position   ?= [0,0]
     @random     ?= new Busyverse.Support.Randomness()
     @geometry   ?= new Busyverse.Support.Geometry()
 
-    @activeTask ?= "idle"
+    @activeTask = "idle"
 
     console.log "new person (#{@id} -- #{@name}) created at #{@position} with task #{@activeTask}" # if Busyverse.debug
 
+    # @send @activeTask
+
   send: (msg, world=Busyverse.engine.game.world) =>
+    @activeTask = "idle"
     console.log "Person#send msg=#{msg}"
     city = world.city
-    # if msg.type == 'user_command'
     console.log "updating #{@name}'s active task to #{cmd}" if Busyverse.debug
-    cmd = msg #.operation
-    if cmd == "wander" or cmd == "idle" or cmd == "build"
+    cmd = msg
+
+    if cmd == "wander" or cmd == "idle" or cmd == "build" or cmd == "gather"
       if cmd == "build" 
-        console.log "BUILD COMMAND RECEIVED"
+        if city.resources['wood'] < 2
+          return "A NEW FARM REQUIRES 2 WOOD"
+
         @buildingToCreate = new Busyverse.Buildings.Farm()
-        console.log "Finding open areas..."
-        openArea = world.findOpenAreaOfSizeInCity(city, @buildingToCreate.size, 2*city.population.length) #, @mapPosition(world))
-        console.log "Got open areas: "
-        console.log openArea
+        openArea = world.findOpenAreaOfSizeInCity(city, @buildingToCreate.size, 2*city.population.length)
         if typeof(openArea) == 'undefined' || openArea == null
+          
           return "NO OPEN AREAS FOR BUILDING"
         @destinationCell = openArea
-        console.log "---> setting destination cell to #{@destinationCell}"
         @buildingToCreate.position = @destinationCell #.location
+
         console.log "BUILDING #{@buildingToCreate.name} AT #{@buildingToCreate.position}" if Busyverse.debug and Busyverse.verbose
 
+      else if cmd == "gather"
+        console.log "GATHER COMMAND RECEIVED"
+        resources = world.resources.filter (resource) =>
+          world.isLocationExplored(resource.position)
+
+        # world.resources.filter (resource) =>
+        #   @geometry.euclideanDistance(resource.position, @position)
+        if resources.length == 0
+          return "NO VISIBLE RESOURCES TO GATHER"
+        closest_resource = null
+        min_dist = Infinity
+        # console.log "finding resource closest to #{@position}"
+        for resource in resources
+          dist = @geometry.euclideanDistance(resource.position, city.center()) # @position) 
+          if dist < min_dist
+            min_dist = dist
+            closest_resource = resource
+
+        @resourceToGather = closest_resource #@random.valueFromList resources
+        @destinationCell  = @resourceToGather.position
+        console.log "Gathering #{@resourceToGather.name} at #{@destinationCell}"
+
       @activeTask  = cmd
-      return "Now doing #{@activeTask}"
+      return "#{@name} now performing '#{@activeTask}'"
 
     else
       return "Unknown command #{cmd}"
@@ -55,6 +80,9 @@ class Busyverse.Person
 
     else if @activeTask == "build"
       @build(world, city)
+
+    else if @activeTask == "gather"
+      @gather(world, city)
 
     if @activeTask != "idle"
       @move(world, city) 
@@ -73,7 +101,16 @@ class Busyverse.Person
     if @atSoughtLocation(world)
       console.log "CREATING BUILDING #{@buildingToCreate.name} at #{@buildingToCreate.position}" if Busyverse.debug
       city.create(@buildingToCreate)
-      @activeTask  = "idle" 
+      @send 'build'
+
+  gather: (world, city) =>
+    @seek(world)
+    if @atSoughtLocation(world)
+      console.log "GATHERING RESOURCE #{@resourceToGather.name}"
+      world.resources.remove(world.resources.indexOf(@resourceToGather))
+      city.addResource @resourceToGather
+      @send 'gather'
+      # @activeTask = "idle"
 
   mapPosition: (world) => world.canvasToMapCoordinates(@position)
 

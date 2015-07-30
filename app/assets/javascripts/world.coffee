@@ -1,11 +1,40 @@
+#= require busyverse
 #= require support/randomness
 #= require support/pathfinding
 #= require grid
 #= require city
 
+# class Busyverse.Resource
+#   constructor: (@position) ->
+
+class Busyverse.Resources.Food
+  name: 'food'
+  color: 'cornsilk'
+  size: [9,9]
+  constructor: (@position) ->
+
+class Busyverse.Resources.Wood #extends Busyverse.Resource
+  name: 'wood'
+  color: 'darkgoldenrod'
+  size: [10,10]
+  constructor: (@position) ->
+
+class Busyverse.Resources.Iron #extends Busyverse.Resource
+  name: 'iron'
+  color: 'slategray'
+  size: [11,11]
+  constructor: (@position) ->
+
+class Busyverse.Resources.Gold
+  name: 'gold'
+  color: 'gold'
+  size: [7,7]
+  constructor: (@position) ->
+
 class Busyverse.World
   name: 'Busylandia'
-  initialPopulation: 3
+  initialPopulation: 5
+  startingResources: 150
 
   constructor: (@width, @height, @cellSize) ->
     @width     ?= 200
@@ -13,7 +42,7 @@ class Busyverse.World
 
     @city       = new Busyverse.City()
     @map        = new Busyverse.Grid(@width, @height)
-    # @resources  = [new Busyverse.Resources.Wood()]
+    @resources  = [] #new Busyverse.Resources.Wood()]
 
     @pathfinder = new Busyverse.Support.Pathfinding(@map)
 
@@ -24,16 +53,30 @@ class Busyverse.World
 
   setup: (distribution={20: 'darkgreen', 80: 'darkblue'}, evolve=true, build=true) =>
     console.log "World#setup"
-    @map.setup(distribution, evolve)
+    origin = null
+    until origin
+      @map.setup(distribution, evolve)
+      origin = @randomPassableAreaOfSize [3,3]
+
+    for j in [1..@startingResources]
+      position = @randomPassableCell()
+      resource = @random.valueFromPercentageMap 
+        50: new Busyverse.Resources.Wood(position)
+        40: new Busyverse.Resources.Food(position)
+        9: new Busyverse.Resources.Iron(position)
+        1: new Busyverse.Resources.Gold(position)
+      console.log "distribute resource #{resource.name} at #{position}!"
+      @resources.push resource
 
     if build
-      origin = @randomPassableAreaOfSize [5,5]
+      # origin = @randomPassableAreaOfSize [3,3]
       farm = new Busyverse.Buildings.Farm(origin)
 
       @city.create farm
 
       for i in [1..@initialPopulation]
         @city.grow @
+
 
   update: =>
     @city.update(@)

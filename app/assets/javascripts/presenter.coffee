@@ -21,11 +21,15 @@ class Busyverse.Presenter
       console.log 'rendering world' if Busyverse.trace
       @renderWorld(world)
 
+
       console.log 'rendering buildings' if Busyverse.verbose
       @renderBuildings(world) 
 
       console.log 'rendering people' if Busyverse.verbose
       @renderPeople(world)
+
+      console.log 'rendering city' if Busyverse.trace
+      @renderCity(world.city)
     else
       console.log "WARNING: @canvas is undefined in Presenter#render" if Busyverse.debug and Busyverse.verbose
 
@@ -36,6 +40,10 @@ class Busyverse.Presenter
     console.log "RENDERING WORLD" if Busyverse.debug and Busyverse.verbose
     (new Busyverse.Views.WorldView(world, @context)).render(world)
     # @renderModel(model: world, world: world) # weird
+    #
+  renderCity: (city, world) ->
+    console.log "----> Rendering city" if Busyverse.verbose
+    (new Busyverse.Views.CityView(city, @context)).render(world)
 
   renderBuildings: (world) =>
     console.log "Presenter#renderBuildings [world={name: #{world.name}}]" if Busyverse.trace

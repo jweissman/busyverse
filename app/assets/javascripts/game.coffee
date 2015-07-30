@@ -18,10 +18,12 @@ class Busyverse.Game
   constructor: (@world, @player) ->
     @player ?= new Busyverse.Player()
     @world  ?= new Busyverse.World(@width, @height, @cellSize)
+
+  setup: ->
     @world.setup()
     console.log "Game#new world=#{@world.name}" if Busyverse.debug
 
-  play: (ui) =>
+  play: (ui) ->
     console.log 'Playing!'
     @launch(ui)
     true
@@ -54,4 +56,5 @@ class Busyverse.Game
 # kickstart fn
 Busyverse.kickstart = ->
   engine = Busyverse.engine = new Busyverse.Engine(Busyverse.game)
+  engine.setup()
   window.onload = -> engine.run()

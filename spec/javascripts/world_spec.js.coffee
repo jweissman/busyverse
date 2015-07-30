@@ -27,6 +27,14 @@ context "World", ->
         @world.height / 2
       ])
 
+  describe "#setup", ->
+    it 'should distribute resources', ->
+      expect(@world.resources.length).to.eql(@world.startingResources)
+      # expect(@world.resources[0].name).to.eql('wood')
+      
+
+
+
   describe "#randomCell", ->
     it 'should be within the world', ->
       @random_api = valueInRange: (range) => 0

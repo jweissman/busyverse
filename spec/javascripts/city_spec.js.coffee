@@ -15,12 +15,12 @@ context "City", ->
       expect(@city.buildings).to.include(@farm)
 
   describe "#grow", ->
-    beforeEach ->
-      @city = new Busyverse.City()
+    # beforeEach ->
+    #   @city = new Busyverse.City()
   
     it 'should increase population size', ->
       old_population = @city.population.length
-      @city.grow(mapToCanvasCoordinates: -> )
+      @city.grow(mapToCanvasCoordinates: ->)
       new_population = @city.population.length
       new_population.should.equal(old_population+1)
 

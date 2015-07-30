@@ -3,6 +3,8 @@ class Busyverse.Engine
     @game ?= new Busyverse.Game()
     @ui   = new Busyverse.Presenter()
 
+  setup: -> @game.setup()
+
   run: ->
     @canvas = document.getElementById('busyverse')
 

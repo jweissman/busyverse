@@ -3,7 +3,7 @@
 
 class Busyverse.GridCell
   constructor: (@location, @color) ->
-    @geometry = new Busyverse.Support.Geometry()
+    # @geometry = new Busyverse.Support.Geometry()
 
 class Busyverse.Grid
   constructor: (@width, @height, @cells, distribution) ->
@@ -11,8 +11,8 @@ class Busyverse.Grid
     @random = new Busyverse.Support.Randomness()
     
   setup: (distribution, evolve=true) =>
-    if @cells.length == 0
-      @build(distribution)
+    # if @cells.length == 0
+    @build(distribution)
     console.log "GENERATING GRID PLEASE WAIT :)"
     @evolve()
     @decorate()
@@ -33,9 +33,9 @@ class Busyverse.Grid
     console.log "evolve depth=#{depth}"
     @eachCell (cell) => 
       cell.color = @random.valueFromPercentageMap
-        25: if noise then @random.valueFromList(['darkgreen']) else @mostCommonNeighborColor(cell)
-        30: @mostCommonNeighborColor(cell)
-        35: cell.color
+        25: if noise then 'darkgreen' else @mostCommonNeighborColor(cell)
+        30: cell.color
+        35: @mostCommonNeighborColor(cell)
     # @decorate() if noise
     @evolve(depth-1, !noise)
 
@@ -43,33 +43,36 @@ class Busyverse.Grid
     @eachCell (cell) => 
       land  = @countNeighborsWithColor(cell, 'darkgreen') +
               @countNeighborsWithColor(cell, 'green') +
-              #@countNeighborsWithColor(cell, 'lightgreen') +
-              @countNeighborsWithColor(cell, 'lightyellow') +
-              @countNeighborsWithColor(cell, 'grey') +
-              @countNeighborsWithColor(cell, 'darkgrey')
+              @countNeighborsWithColor(cell, 'forestgreen')
+              # @countNeighborsWithColor(cell, 'lightyellow') +
+              # @countNeighborsWithColor(cell, 'grey') +
+              # @countNeighborsWithColor(cell, 'darkgrey')
 
       if land > 5
         cell.color = @random.valueFromPercentageMap
           80: 'green'
           20: cell.color
-          # 15: 'lightgreen'
-          4: 'lightyellow'
-          3: 'grey'
-          2: 'darkgrey'
-          1: 'pink'
+          15: 'forestgreen'
+          # 4: 'lightyellow'
+          # 3: 'grey'
+          # 2: 'darkgrey'
+          # 1: 'pink'
 
       blue = @countNeighborsWithColor(cell, 'darkblue') +
              @countNeighborsWithColor(cell, 'midnightblue') +
              @countNeighborsWithColor(cell, 'lightyellow')
-             # @countNeighborsWithColor(cell, 'lightblue')
+             @countNeighborsWithColor(cell, 'navy') +
+             @countNeighborsWithColor(cell, 'mediumblue')
 
       if blue > 4
         cell.color = @random.valueFromPercentageMap
           80: 'darkblue'
           20: cell.color
-          5: 'midnightblue'
-          3: 'lightyellow'
-          2: 'grey'
+          10: 'navy'
+          9: 'midnightblue'
+          # 4: 'mediumblue'
+          # 3: 'lightyellow'
+          # 2: 'grey'
 
       # surroundingColor = @mostCommonNeighborColor(cell)
       # if surroundingColor 

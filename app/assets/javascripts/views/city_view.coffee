@@ -1,18 +1,28 @@
 #= require views/view
 class Busyverse.Views.CityView extends Busyverse.View
-  personViews: {}
-
-  renderPeople: =>
-    console.log "render city pop" if Busyverse.verbose
+  render: (world) =>
     city = @model
+    @rect 
+      position: [10,10],
+      size: [160, 100],
+      fill: 'ivory'
 
-    for person in city.population
-      @personViews[person] ?= new Busyverse.Views.PersonView(person, @context)
-      person_view = @personViews[person]
-      person_view.render()
+    @text 
+      msg: "#{city.name}"
+      position: [12,33]
+      size: '24px'
 
-    @context.fillStyle = "white"
-    @context.font = "bold 20px Helvetica"
-    @context.fillText "#{city.name} (#{city.buildings.length} buildings)", 570, 500
+    @rect
+      position: [15, 40]
+      size: [150, 65]
+      fill: 'goldenrod'
 
+    row = 0
+    for resource of city.resources
+      quantity = city.resources[resource]
+      @text 
+        msg: "#{resource}: #{quantity}"
+        position: [17, 55 + (15 * row)]
+        size: '14px'
+      row = row + 1
 
