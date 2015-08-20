@@ -20,7 +20,7 @@ class Busyverse.Views.CityView extends Busyverse.View
       @rect
         position: [0,0]
         size: cover
-        fill: "rgba(0,0,192,0.25)"
+        fill: "rgba(0,0,192,0.125)"
 
     @rect 
       position: [10,10]

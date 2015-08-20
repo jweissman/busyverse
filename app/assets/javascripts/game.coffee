@@ -13,7 +13,7 @@ class Busyverse.Game
   height: Math.floor Busyverse.height / Busyverse.cellSize 
   cellSize: Busyverse.cellSize
 
-  stepLength: 25
+  stepLength: Busyverse.stepLength 
 
   constructor: (@world, @player) ->
     @player ?= new Busyverse.Player()
@@ -32,9 +32,14 @@ class Busyverse.Game
     console.log "Game#send command=#{command}"
     console.log command
     op = command
-    person = @world.city.population[0]
-    console.log "Sending command #{op} to citizen #{person.name}..." if Busyverse.debug
-    person.send(op)
+    person = @world.city.detectIdleOrWanderingPerson() # population[0]
+    if person
+      console.log "Sending command #{op} to citizen #{person.name}..." if Busyverse.debug
+      person.send(op)
+    else
+      console.log "NO IDLE CIVILIAN AVAILABLE, SENDING TO #{firstCivilian}"
+      firstCivilian = @world.city.population[0]
+      firstCivilian.send(op)
     
   launch: (ui) =>
     console.log 'Launching!' if Busyverse.verbose

@@ -52,14 +52,21 @@ class Busyverse.Person
           return "NO VISIBLE RESOURCES TO GATHER"
         closest_resource = null
         min_dist = Infinity
-        # console.log "finding resource closest to #{@position}"
-        for resource in resources
-          dist = @geometry.euclideanDistance(resource.position, city.center()) # @position) 
-          if dist < min_dist
-            min_dist = dist
-            closest_resource = resource
+        target = @random.valueFromPercentageMap
+          20: city.center()
+          80: @position
+        console.log "finding resources closest to #{target}"
 
-        @resourceToGather = closest_resource #@random.valueFromList resources
+        sortedResources = resources.sort (a, b) =>
+          return if @geometry.euclideanDistance(a.position, target) <= @geometry.euclideanDistance(b.position, target) then 1 else -1
+
+        # for resource in resources
+        #   dist = @geometry.euclideanDistance(resource.position, target)
+        #   if dist < min_dist
+        #     min_dist = dist
+        #     closest_resource = resource
+
+        @resourceToGather = @random.valueFromList(sortedResources[..4])
         @destinationCell  = @resourceToGather.position
         console.log "Gathering #{@resourceToGather.name} at #{@destinationCell}"
 

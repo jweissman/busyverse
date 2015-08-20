@@ -33,21 +33,15 @@ class Busyverse.Resources.Gold
 
 class Busyverse.World
   name: 'Busylandia'
-  initialPopulation: 5
-  startingResources: 150
+  initialPopulation: Busyverse.initialPopulation
+  startingResources: Busyverse.startingResources
 
   constructor: (@width, @height, @cellSize) ->
-    @width     ?= 200
-    @height    ?= 200
-
     @age        = 0
-
     @city       = new Busyverse.City()
     @map        = new Busyverse.Grid(@width, @height)
-    @resources  = [] #new Busyverse.Resources.Wood()]
-
+    @resources  = []
     @pathfinder = new Busyverse.Support.Pathfinding(@map)
-
     @random     = new Busyverse.Support.Randomness()
     @geometry   = new Busyverse.Support.Geometry()
 
@@ -62,13 +56,17 @@ class Busyverse.World
 
     for j in [1..@startingResources]
       position = @randomPassableCell()
-      resource = @random.valueFromPercentageMap 
-        50: new Busyverse.Resources.Wood(position)
-        40: new Busyverse.Resources.Food(position)
-        9: new Busyverse.Resources.Iron(position)
-        1: new Busyverse.Resources.Gold(position)
-      console.log "distribute resource #{resource.name} at #{position}!"
-      @resources.push resource
+      if position
+        resource = new Busyverse.Resources.Wood(position)
+          #@random.valueFromPercentageMap 
+          #50: 
+          # 40: new Busyverse.Resources.Food(position)
+          # 9: new Busyverse.Resources.Iron(position)
+          # 1: new Busyverse.Resources.Gold(position)
+        console.log "distribute resource #{resource.name} at #{position}!"
+        @resources.push resource
+      else
+        console.log "WARNING -- could not distribute resource"
 
     if build
       # origin = @randomPassableAreaOfSize [3,3]
@@ -213,16 +211,19 @@ class Busyverse.World
 
   randomCell: => [ @random.valueInRange(@width), @random.valueInRange(@height) ]
 
-  randomPassableCell: ->
+  randomPassableCell: =>
     console.log "World#randomPassableCell"
-    location = null
-    tries = 100
-    until location || tries < 0
-      tries = tries - 1
-      location = @randomCell()
-      if @map.isLocationPassable location
-        return location
-    null
+    passableCells = @map.allCells().filter (cell) => 
+      @map.isLocationPassable(cell.location)
+    @random.valueFromList(passableCells).location
+    # location = null
+    # tries = 100
+    # until location || tries < 0
+    #   tries = tries - 1
+    #   location = @randomCell()
+    #   if @map.isLocationPassable location
+    #     return location
+    # null
   
 
   randomLocation: ->

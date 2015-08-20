@@ -15,8 +15,13 @@ var Busyverse = {
   Worker: {},
 
   // config
-  width: 1080,
-  height: 520,
-  cellSize: 16
+  width: 800,
+  height: 800,
+
+  cellSize: 20,
+  stepLength: 60,
+    
+  initialPopulation: 5,
+  startingResources: 35
 
 };

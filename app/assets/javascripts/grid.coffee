@@ -41,9 +41,9 @@ class Busyverse.Grid
 
   decorate: =>
     @eachCell (cell) => 
-      land  = @countNeighborsWithColor(cell, 'darkgreen') +
-              @countNeighborsWithColor(cell, 'green') +
-              @countNeighborsWithColor(cell, 'forestgreen')
+      land  = #@countNeighborsWithColor(cell, 'darkgreen') +
+              @countNeighborsWithColor(cell, 'darkgreen') 
+              #@countNeighborsWithColor(cell, 'forestgreen')
               # @countNeighborsWithColor(cell, 'lightyellow') +
               # @countNeighborsWithColor(cell, 'grey') +
               # @countNeighborsWithColor(cell, 'darkgrey')
@@ -51,26 +51,26 @@ class Busyverse.Grid
       if land > 5
         cell.color = @random.valueFromPercentageMap
           20: cell.color
-          15: 'forestgreen'
-          10: 'green'
-          5: 'darkgreen'
+          # 15: 'forestgreen'
+          15: 'darkgreen'
+          # 5: 'darkgreen'
           # 4: 'lightyellow'
           # 3: 'grey'
           # 2: 'darkgrey'
           # 1: 'pink'
 
-      blue = @countNeighborsWithColor(cell, 'darkblue') +
-             @countNeighborsWithColor(cell, 'midnightblue') +
-             @countNeighborsWithColor(cell, 'lightyellow')
-             @countNeighborsWithColor(cell, 'navy') +
-             @countNeighborsWithColor(cell, 'mediumblue')
+      blue = @countNeighborsWithColor(cell, 'darkblue') #+
+             # @countNeighborsWithColor(cell, 'midnightblue') +
+             # @countNeighborsWithColor(cell, 'lightyellow')
+             # @countNeighborsWithColor(cell, 'navy') +
+             # @countNeighborsWithColor(cell, 'mediumblue')
 
       if blue > 4
         cell.color = @random.valueFromPercentageMap
           20: cell.color
           15: 'darkblue'
-          10: 'navy'
-          5: 'midnightblue'
+          # 10: 'navy'
+          # 5: 'midnightblue'
           # 4: 'mediumblue'
           # 3: 'lightyellow'
           # 2: 'grey'
@@ -104,8 +104,8 @@ class Busyverse.Grid
     most_common_color
 
   eachCell: (callbackFn) =>
-    for x in [0..@width]
-      for y in [0..@height]
+    for y in [0..@height]
+      for x in [0..@width]
         callbackFn(@cells[x][y])
 
   allCells: =>

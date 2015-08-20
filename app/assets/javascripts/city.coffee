@@ -13,6 +13,11 @@ class Busyverse.City
     @random = new Busyverse.Support.Randomness()
     console.log "New city created with population #{@population}!" if Busyverse.verbose
 
+  detectIdleOrWanderingPerson: =>
+    for person in @population
+      if person.activeTask == 'idle' || person.activeTask == 'wander'
+        return person
+
   center: =>
     console.log "City#center -- finding center of #{@buildings.length} buildings"
     xs = 0

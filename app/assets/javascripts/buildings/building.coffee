@@ -1,7 +1,7 @@
 #= require busyverse
 
 class Busyverse.Building
-  size: [1,1]
+  size: [1,1,1]
   constructor: (@position) ->
     console.log "--- creating new building at #{@position}" if Busyverse.debug
 

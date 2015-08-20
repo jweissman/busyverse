@@ -9,17 +9,17 @@
 #= require spec_helper
 
 context "Presenter", ->
-  describe "#attach", ->
-    it 'should get the canvas context', ->
-      presenter = new Busyverse.Presenter()
+  # describe "#attach", ->
+  #   it 'should get the canvas context', ->
+  #     presenter = new Busyverse.Presenter()
 
-      canvas_api = getContext: ->
-      canvas_mock = sinon.mock(canvas_api)
-      canvas_mock.expects("getContext").once()
+  #     canvas_api = getContext: ->
+  #     canvas_mock = sinon.mock(canvas_api)
+  #     canvas_mock.expects("getContext").once()
 
-      presenter.attach(canvas_api)
+  #     presenter.attach(canvas_api)
 
-      canvas_mock.verify()
+  #     canvas_mock.verify()
 
   describe "#render", ->
     beforeEach ->
