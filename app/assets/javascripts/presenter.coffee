@@ -13,8 +13,8 @@ class Tree
     @y = xy[1]
 
 class Busyverse.IsoView
-  scale: 0.3
-  constructor: (@iso, @world) ->
+  scale: Busyverse.scale
+  constructor: (@world) ->
     @red  = new Color(160, 60, 50)
     @blue = new Color(50, 60, 160)
     @green = new Color(60, 150, 50)
@@ -26,6 +26,7 @@ class Busyverse.IsoView
 
   assembleModels: =>
     models = []
+
 
     for resource in @world.resources
       if @world.isLocationExplored resource.position
@@ -60,12 +61,14 @@ class Busyverse.IsoView
     return -1 if more_than_condition
     return 0
 
-  render: =>
-    @world.map.eachCell (cell) => 
-      @renderCell(cell) if @world.isCellExplored(cell)
-    @models = @assembleModels()
-    for model in @models
-      @iso.add(model.shape, model.color)
+  # render: =>
+  #   @world.map.eachCell (cell) => 
+  #     @renderCell(cell) if @world.isCellExplored(cell)
+  #   @models = @assembleModels()
+  #   for model in @models
+  #     @iso.add(model.shape, model.color)
+  #   for person in @world.city.population
+
 
   constructResourceShape: (resource) =>
     tree = new Tree(resource.position)
@@ -82,13 +85,15 @@ class Busyverse.IsoView
     #Prism(Point(x, y, 1), 1,1,10)
 
 
-
-  renderCell: (cell) =>
+  assembleCellModel: (cell) =>
     cell_shape = @prism(cell.location[0], cell.location[1], 1,1,0.05) 
     color = @blue
     if cell.color == 'darkgreen'
       color = @green
-    @iso.add cell_shape, color
+    else if cell.color == 'red'
+      color = @red
+    { shape: cell_shape, color: color }
+
 
   point: (x,y,z=0) -> Point(x * @scale, y * @scale, z * @scale)
 
@@ -102,17 +107,80 @@ class Busyverse.IsoView
     height = size[2] * @scale
     return Pyramid( location, length, width, height )
 
+
 class Busyverse.IsoRenderer
   constructor: (@canvasElement) ->
     console.log "!!!! created new iso renderer!"
     console.log "canvas => "
     console.log @canvasElement
+    @context  = @canvasElement.getContext('2d')
     #console.log @iso
     @iso = new Isomer(@canvasElement) #@canvas)
 
+    @mousePos = {}
+    @canvasElement.addEventListener 'mousemove', ((evt) =>
+      @mousePos = @getMousePos(@canvasElement, evt)
+      console.log 'Mouse position: ' + @mousePos.x + ',' + @mousePos.y
+      return
+    ), false
+
+  getMousePos: (canvas, evt) ->
+    rect = canvas.getBoundingClientRect()
+    {
+      x: evt.clientX - (rect.left)
+      y: evt.clientY - (rect.top)
+    }
+
   draw: (world) =>
-    view = new Busyverse.IsoView(@iso, world)
-    view.render()
+    view = new Busyverse.IsoView(world)
+
+    world.map.eachCell (cell) => 
+      if world.isCellExplored(cell)
+        cell_model = view.assembleCellModel(cell)
+        @iso.add cell_model.shape, cell_model.color
+
+    for model in view.assembleModels()
+      @iso.add(model.shape, model.color)
+
+    
+    @context.fillStyle = "#FFFFFF"
+    @context.font = "Bold 30px Helvetica" ##{style} #{size} #{font}"
+
+    if @mousePos.x && @mousePos.y
+      pos = @projectCoordinate([@mousePos.x, @mousePos.y])
+      console.log "PROJECTING COORDINATE #{pos} from" # #{@mousePos}"
+      console.log @mousePos
+      cursor = view.prism(pos[0] , pos[1] , 1, 1, 4)
+      #   [ pos[0] / Busyverse.cellSize, pos[1] / Busyverse.cellSize ]
+      # } )
+      
+      @iso.add cursor, @red
+      
+      # @context.fillText "hi", 
+
+    for person in world.city.population 
+      pos = @iso._translatePoint(Point(person.position[0] / Busyverse.cellSize, person.position[1] / Busyverse.cellSize))
+        #   @projectCoordinate([
+        #   person.position[0] / Busyverse.cellSize,
+        #   person.position[1] / Busyverse.cellSize
+        #   
+      # console.log "writing person name at #{pos} (projected from #{person.position})"
+      @context.fillText person.name, pos.x, pos.y #[0], pos[1] # * Busyverse.cellSize, -pos[1] * Busyverse.cellSize
+
+  projectCoordinate: (xy) =>
+    x = xy[0] 
+    y = xy[1] 
+    tx = @iso.transformation
+    ox = @iso.originX
+    oy = @iso.originY
+
+    console.log "Projecting #{xy} using transformation #{tx} and origin #{ox}, #{oy}"
+    det = (tx[0][1] * tx[1][0]) - (tx[0][0] * tx[1][1])
+    px =   ((ox * tx[1][1])  + (oy * tx[1][0]) - (tx[1][0] * y) - (tx[1][1] * x)) / det
+    py = ((-(ox * tx[0][1])) - (ox * tx[0][0]) + (tx[0][0] * y) + (tx[0][1] * x)) / det
+    offsetX = -2.0
+    offsetY = 2.0
+    [ px + offsetX, py + offsetY ] 
 
 class Busyverse.Presenter
   constructor: () ->

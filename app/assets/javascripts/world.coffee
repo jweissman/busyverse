@@ -4,32 +4,32 @@
 #= require grid
 #= require city
 
-# class Busyverse.Resource
-#   constructor: (@position) ->
+class Busyverse.Resource
+  constructor: (@position) ->
 
-class Busyverse.Resources.Food
+class Busyverse.Resources.Food extends Busyverse.Resource
   name: 'food'
   color: 'cornsilk'
   size: [9,9]
-  constructor: (@position) ->
+  # constructor: (@position) ->
 
-class Busyverse.Resources.Wood #extends Busyverse.Resource
+class Busyverse.Resources.Wood extends Busyverse.Resource
   name: 'wood'
   color: 'darkgoldenrod'
   size: [10,10]
-  constructor: (@position) ->
+  # constructor: (@position) ->
 
-class Busyverse.Resources.Iron #extends Busyverse.Resource
+class Busyverse.Resources.Iron extends Busyverse.Resource
   name: 'iron'
   color: 'slategray'
   size: [11,11]
-  constructor: (@position) ->
+  # constructor: (@position) ->
 
-class Busyverse.Resources.Gold
+class Busyverse.Resources.Gold extends Busyverse.Resource
   name: 'gold'
   color: 'gold'
   size: [7,7]
-  constructor: (@position) ->
+  # constructor: (@position) ->
 
 class Busyverse.World
   name: 'Busylandia'
