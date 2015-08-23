@@ -18,12 +18,12 @@ var Busyverse = {
   width: 300,
   height: 300,
 
-  cellSize: 20,
-  stepLength: 18,
+  cellSize: 5,
+  stepLength: 28,
     
   initialPopulation: 5,
   startingResources: 35,
 
-  scale: 1.0
+  scale: 0.25
 
 };

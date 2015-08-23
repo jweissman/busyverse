@@ -137,7 +137,7 @@ class Busyverse.World
     @random.valueFromList @randomPassableAreasOfSize(sz)
     
   isAreaPassable: (loc, sz=[0,0]) =>
-    console.log "World#isAreaPassable loc=#{loc} sz=#{sz}"
+    console.log "World#isAreaPassable loc=#{loc} sz=#{sz}" if Busyverse.debug
     for x in [0..sz[0]-1]
       for y in [0..sz[1]-1]
         if !@map.isLocationPassable([loc[0]+x,loc[1]+y]) 
@@ -191,7 +191,7 @@ class Busyverse.World
     unexplored
 
   nearbyUnexploredCell: (cellCoords, distance=15) =>
-    console.log "World#nearbyUnexploredCell coords=#{cellCoords}"
+    console.log "World#nearbyUnexploredCell coords=#{cellCoords}" if Busyverse.verbose
     closest = null
     min_dist = 10000
 

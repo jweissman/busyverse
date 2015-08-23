@@ -28,6 +28,14 @@ class Busyverse.Game
     @launch(ui)
     true
 
+  placeBuilding: (location) =>
+    building = new Busyverse.Buildings.Farm(location)
+    console.log "---> Creating building at location #{location}"
+    console.log building
+    @world.city.create(building)
+
+
+
   send: (command) =>
     console.log "Game#send command=#{command}"
     console.log command

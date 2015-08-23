@@ -75,7 +75,6 @@ class Busyverse.IsoView
     @pyramid(tree.x, tree.y, tree.size)
 
   constructBuildingShape: (building) =>
-    #console.log "--- adding #{building.name} at #{building.position} with size #{building.size}"
     @prism(building.position[0], building.position[1], building.size[0], building.size[1], building.size[2])
 
   constructPersonShape: (person) =>
@@ -110,9 +109,6 @@ class Busyverse.IsoView
 
 class Busyverse.IsoRenderer
   constructor: (@canvasElement) ->
-    console.log "!!!! created new iso renderer!"
-    console.log "canvas => "
-    console.log @canvasElement
     @context  = @canvasElement.getContext('2d')
     #console.log @iso
     @iso = new Isomer(@canvasElement) #@canvas)
@@ -120,7 +116,7 @@ class Busyverse.IsoRenderer
     @mousePos = {}
     @canvasElement.addEventListener 'mousemove', ((evt) =>
       @mousePos = @getMousePos(@canvasElement, evt)
-      console.log 'Mouse position: ' + @mousePos.x + ',' + @mousePos.y
+      console.log('Mouse position: ' + @mousePos.x + ',' + @mousePos.y) if Busyverse.debug
       return
     ), false
 
@@ -131,7 +127,7 @@ class Busyverse.IsoRenderer
       y: evt.clientY - (rect.top)
     }
 
-  draw: (world) =>
+  draw: (world, scale=Busyverse.scale) =>
     view = new Busyverse.IsoView(world)
 
     world.map.eachCell (cell) => 
@@ -144,43 +140,33 @@ class Busyverse.IsoRenderer
 
     
     @context.fillStyle = "#FFFFFF"
-    @context.font = "Bold 30px Helvetica" ##{style} #{size} #{font}"
+    @context.font = "Bold 30px Helvetica"
 
     if @mousePos.x && @mousePos.y
       pos = @projectCoordinate([@mousePos.x, @mousePos.y])
-      console.log "PROJECTING COORDINATE #{pos} from" # #{@mousePos}"
-      console.log @mousePos
-      cursor = view.prism(pos[0] , pos[1] , 1, 1, 4)
-      #   [ pos[0] / Busyverse.cellSize, pos[1] / Busyverse.cellSize ]
-      # } )
-      
-      @iso.add cursor, @red
-      
-      # @context.fillText "hi", 
+      @projectedMousePos = pos
+      farm = new Busyverse.Buildings.Farm(pos)
+      cursor = view.constructBuildingShape(farm)
+      @iso.add cursor, view.red
 
     for person in world.city.population 
-      pos = @iso._translatePoint(Point(person.position[0] / Busyverse.cellSize, person.position[1] / Busyverse.cellSize))
-        #   @projectCoordinate([
-        #   person.position[0] / Busyverse.cellSize,
-        #   person.position[1] / Busyverse.cellSize
-        #   
-      # console.log "writing person name at #{pos} (projected from #{person.position})"
-      @context.fillText person.name, pos.x, pos.y #[0], pos[1] # * Busyverse.cellSize, -pos[1] * Busyverse.cellSize
+      pos = @iso._translatePoint(Point(person.position[0]*scale / Busyverse.cellSize, person.position[1]*scale / Busyverse.cellSize))
+      @context.fillText person.name, pos.x, pos.y
 
-  projectCoordinate: (xy) =>
+  projectCoordinate: (xy, scale=Busyverse.scale) =>
     x = xy[0] 
     y = xy[1] 
     tx = @iso.transformation
     ox = @iso.originX
     oy = @iso.originY
 
-    console.log "Projecting #{xy} using transformation #{tx} and origin #{ox}, #{oy}"
+    console.log "Projecting #{xy} using transformation #{tx} and origin #{ox}, #{oy}" if Busyverse.debug
     det = (tx[0][1] * tx[1][0]) - (tx[0][0] * tx[1][1])
     px =   ((ox * tx[1][1])  + (oy * tx[1][0]) - (tx[1][0] * y) - (tx[1][1] * x)) / det
     py = ((-(ox * tx[0][1])) - (ox * tx[0][0]) + (tx[0][0] * y) + (tx[0][1] * x)) / det
-    offsetX = -2.0
-    offsetY = 2.0
-    [ px + offsetX, py + offsetY ] 
+    offsetX = -0.0 / scale
+    offsetY = 4.0 / scale
+    [ Math.floor(px/scale + offsetX), Math.floor(py/scale + offsetY) ] 
 
 class Busyverse.Presenter
   constructor: () ->

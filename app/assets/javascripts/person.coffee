@@ -113,7 +113,7 @@ class Busyverse.Person
   gather: (world, city) =>
     @seek(world)
     if @atSoughtLocation(world)
-      console.log "GATHERING RESOURCE #{@resourceToGather.name}"
+      console.log "GATHERING RESOURCE #{@resourceToGather.name}" if Busyverse.debug
       world.resources.remove(world.resources.indexOf(@resourceToGather))
       city.addResource @resourceToGather
       @send 'gather'
@@ -184,7 +184,7 @@ class Busyverse.Person
     if recompute && !@recomputing
       @recomputing = true
      
-      console.log "POST MESSAGE -- RECOMPUTE"
+      console.log "POST MESSAGE -- RECOMPUTE" if Busyverse.verbose
       msg = {
         map: JSON.stringify world.map.cells
         src: srcCell.location
