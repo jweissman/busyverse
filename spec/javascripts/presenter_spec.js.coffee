@@ -9,90 +9,39 @@
 #= require spec_helper
 
 context "Presenter", ->
-  # describe "#attach", ->
-  #   it 'should get the canvas context', ->
-  #     presenter = new Busyverse.Presenter()
+  beforeEach ->
+    @rect = sinon.spy()
+    @fillText = sinon.spy()
 
-  #     canvas_api = getContext: ->
-  #     canvas_mock = sinon.mock(canvas_api)
-  #     canvas_mock.expects("getContext").once()
+    @context  = 
+      beginPath: ->
+      rect: @rect
+      clearRect: ->
+      fill: ->
+      fillText: @fillText  
+      stroke: ->
 
-  #     presenter.attach(canvas_api)
+    @canvas    = 
+      getContext: => @context
+      addEventListener: ->
 
-  #     canvas_mock.verify()
+    @world     = { 
+      resources: [], 
+      city: { buildings: [], population: [] },
+      map: { eachCell: -> },
+      isDay: -> false,
+      describeTime: -> "midnight"
+    }
+
+    @presenter = new Busyverse.Presenter()
+    @presenter.attach @canvas
+
+  describe '#attach', ->
+    it 'should capture the current canvas context', ->
+      expect(@presenter.canvas).to.eql(@canvas)
 
   describe "#render", ->
-    beforeEach ->
-      @rect = sinon.spy()
-      @context  = 
-        beginPath: ->
-        rect: @rect
-        fill: ->
-        stroke: ->
-
-      @canvas    = getContext: => @context
-      @world     = new Busyverse.World(3,3) 
-      @world.setup({100: 'darkgreen'}, false, false)
-
-      @presenter = new Busyverse.Presenter()
-      @presenter.attach @canvas
+    it 'should render the world', ->
+      @presenter.render @world
+      @fillText.should.have.been.called.twice
       
-    it 'should draw the world as it is being explored', ->
-      @world.markExplored([0,0])
-      
-      @presenter.renderWorld @world
-
-      sz = Busyverse.cellSize
-      expect(@rect).to.have.been.calledWith(0,0,sz,sz)
-
-      # n.b., actually drawing resources now too, so...
-      #       maybe should split that apart...
-      # cell = @world.map.getCellAt([0,0])
-      # color = cell.color
-      # expect(@context.fillStyle).to.eql(color)
-
-    # it 'should draw buildings', ->
-    #   farm = new Busyverse.Buildings.Farm([0,0])
-    #   @world.city.create(farm)
-
-    #   @presenter.renderBuildings(@world)
-
-    #   sz = @world.mapToCanvasCoordinates(farm.size) # * world.cellSize
-    #   expect(@rect).to.have.been.calledWith(0,0,sz[0]-1,sz[1]-1)
-
-    # it 'should draw people', ->
-    #   person = new Busyverse.Person()
-
-    # it 'should draw buildings', ->
-    #   farm = new Busyverse.Buildings.Farm([0,0])
-    #   world = new Busyverse.World()
-    #   world.city.create(farm)
-    #   console.log "Created new world for spec"
-
-    #   console.log world
-    #   scale  = world.cellSize
-
-    #   @context_mock.expects("fillRect").once().withArgs(
-    #     0, 0,
-    #     (farm.size[0] * scale) - 1,
-    #     (farm.size[1] * scale) - 1
-    #   )
-
-    #   presenter = new Busyverse.Presenter()
-    #   presenter.attach(@canvas_api)
-    #   presenter.renderBuildings(world)
-
-    #   expect(farm.color).to.eql('darkgreen')
-    #   expect(@context_api.fillStyle).to.equal(farm.color)
-
-    # it 'should draw people', ->
-    #   world = new Busyverse.World()
-    #   @context_mock.expects("fillRect").once().withArgs(400,300,10,10)
-    #   @context_mock.expects("fillText").thrice()
-    #   
-    #   presenter = new Busyverse.Presenter()
-    #   presenter.attach(@canvas_api)
-    #   presenter.renderPeople(world)
-
-    #   expect(@context_api.fillStyle).to.equal('white')
-    #   expect(@context_api.font).to.eql("bold 20px Helvetica")

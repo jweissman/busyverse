@@ -18,7 +18,7 @@ var Busyverse = {
   width: 300,
   height: 300,
 
-  cellSize: 5,
+  cellSize: 10,
   stepLength: 28,
     
   initialPopulation: 5,

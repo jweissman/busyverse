@@ -23,9 +23,10 @@ class Busyverse.Game
     @world.setup()
     console.log "Game#new world=#{@world.name}" if Busyverse.debug
 
-  play: (ui) ->
+  play: (ui) =>
+    @ui = ui
     console.log 'Playing!'
-    @launch(ui)
+    @launch()
     true
 
   placeBuilding: (location) =>
@@ -49,9 +50,8 @@ class Busyverse.Game
       firstCivilian = @world.city.population[0]
       firstCivilian.send(op)
     
-  launch: (ui) =>
+  launch: ->
     console.log 'Launching!' if Busyverse.verbose
-    @ui = ui
     @step()
 
   step: =>
