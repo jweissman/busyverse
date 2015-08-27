@@ -24,6 +24,6 @@ var Busyverse = {
   initialPopulation: 5,
   startingResources: 35,
 
-  scale: 0.25
+  scale: 0.5
 
 };

@@ -27,13 +27,19 @@ class Busyverse.Engine
 
   handleClick: (event) =>
     console.log "Handling click event!"
-    # scalingFactor = Busyverse.cellSize / Busyverse.scale
     mouseLocation = @ui.renderer.projectedMousePos
-    # [ 
-    #   Math.floor(@ui.renderer.projectedMousePos[0]), # / scalingFactor), 
-    #   Math.floor(@ui.renderer.projectedMousePos[1]) # / scalingFactor) 
-    # ]
-    @game.placeBuilding(mouseLocation) #@ui.renderer.mousePos)
+
+    building = new Busyverse.Buildings.Farm(mouseLocation)
+    city = @game.world.city
+
+    passable = @game.world.isAreaPassable(mouseLocation, building.size)
+    available = city.availableForBuilding(mouseLocation, building.size)
+
+    if passable && available
+      console.log "Available for building!"
+      city.create(building)
+    else
+      console.log "Not available for building!"
 
   handleCommand: (event) =>
     command = $("input:first").val()

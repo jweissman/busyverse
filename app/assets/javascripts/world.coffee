@@ -4,35 +4,9 @@
 #= require grid
 #= require city
 
-class Busyverse.Resource
-  constructor: (@position) ->
-
-class Busyverse.Resources.Food extends Busyverse.Resource
-  name: 'food'
-  color: 'cornsilk'
-  size: [9,9]
-  # constructor: (@position) ->
-
-class Busyverse.Resources.Wood extends Busyverse.Resource
-  name: 'wood'
-  color: 'darkgoldenrod'
-  size: [10,10]
-  # constructor: (@position) ->
-
-class Busyverse.Resources.Iron extends Busyverse.Resource
-  name: 'iron'
-  color: 'slategray'
-  size: [11,11]
-  # constructor: (@position) ->
-
-class Busyverse.Resources.Gold extends Busyverse.Resource
-  name: 'gold'
-  color: 'gold'
-  size: [7,7]
-  # constructor: (@position) ->
-
 class Busyverse.World
   name: 'Busylandia'
+
   initialPopulation: Busyverse.initialPopulation
   startingResources: Busyverse.startingResources
 
@@ -142,6 +116,9 @@ class Busyverse.World
       for y in [0..sz[1]-1]
         if !@map.isLocationPassable([loc[0]+x,loc[1]+y]) 
           return false
+        for resource in @resources
+          if loc[0]+x == resource.position[0] && loc[1]+y == resource.position[1]
+            return false
     true
 
   findOpenAreaOfSizeInCity: (city, size, max_distance_from_center) => 
@@ -216,15 +193,6 @@ class Busyverse.World
     passableCells = @map.allCells().filter (cell) => 
       @map.isLocationPassable(cell.location)
     @random.valueFromList(passableCells).location
-    # location = null
-    # tries = 100
-    # until location || tries < 0
-    #   tries = tries - 1
-    #   location = @randomCell()
-    #   if @map.isLocationPassable location
-    #     return location
-    # null
-  
 
   randomLocation: ->
     location = [ Math.round(@random.valueInRange(@width)) * @cellSize,

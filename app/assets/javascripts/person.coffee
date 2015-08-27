@@ -45,9 +45,6 @@ class Busyverse.Person
         console.log "GATHER COMMAND RECEIVED"
         resources = world.resources.filter (resource) =>
           world.isLocationExplored(resource.position)
-
-        # world.resources.filter (resource) =>
-        #   @geometry.euclideanDistance(resource.position, @position)
         if resources.length == 0
           return "NO VISIBLE RESOURCES TO GATHER"
         closest_resource = null
@@ -59,12 +56,6 @@ class Busyverse.Person
 
         sortedResources = resources.sort (a, b) =>
           return if @geometry.euclideanDistance(a.position, target) <= @geometry.euclideanDistance(b.position, target) then 1 else -1
-
-        # for resource in resources
-        #   dist = @geometry.euclideanDistance(resource.position, target)
-        #   if dist < min_dist
-        #     min_dist = dist
-        #     closest_resource = resource
 
         @resourceToGather = @random.valueFromList(sortedResources[..4])
         @destinationCell  = @resourceToGather.position
@@ -81,16 +72,10 @@ class Busyverse.Person
 
     if @activeTask == "wander"
       @wander(world, city)
-
-    # else if @activeTask == "explore"
-    #   @explore(world, city)
-
     else if @activeTask == "build"
       @build(world, city)
-
     else if @activeTask == "gather"
       @gather(world, city)
-
     if @activeTask != "idle"
       @move(world, city) 
 
@@ -107,7 +92,10 @@ class Busyverse.Person
     @seek(world)
     if @atSoughtLocation(world)
       console.log "CREATING BUILDING #{@buildingToCreate.name} at #{@buildingToCreate.position}" if Busyverse.debug
+
       city.create(@buildingToCreate)
+
+      # TODO fire another build command, but... now this won't necessarily route to me :(
       @send 'build'
 
   gather: (world, city) =>
@@ -116,8 +104,9 @@ class Busyverse.Person
       console.log "GATHERING RESOURCE #{@resourceToGather.name}" if Busyverse.debug
       world.resources.remove(world.resources.indexOf(@resourceToGather))
       city.addResource @resourceToGather
+
+      # TODO same as above (no longer routes to me, need to provide a sim id?)
       @send 'gather'
-      # @activeTask = "idle"
 
   mapPosition: (world) => world.canvasToMapCoordinates(@position)
 
@@ -159,13 +148,11 @@ class Busyverse.Person
     recompute = false
 
     if @path && @path.length > 0 && @arrayEqual(@path[@path.length-1], @destinationCell)
-
       offset = [ (Busyverse.cellSize / 2) - @size[0] / 2, (Busyverse.cellSize / 2) - @size[1] / 2 ]
       nextTarget = world.mapToCanvasCoordinates(@path[0], offset)
       distance = @geometry.euclideanDistance(nextTarget, @position)
-      if distance <= @speed * 2  # @size[1] #Busyverse.cellSize - @speed #@arrayEqual(@path[0], srcCell.location) && distance < 10 # @speed # * 2
-        # console.log " ----> splicing path"
-        # console.log # @speed
+
+      if distance <= @speed * 2  
         matches   = @path.filter (n) => @arrayEqual(n, srcCell.location)
         src_index = @path.indexOf(matches[0])
         @path.splice(0, src_index+1)
@@ -202,6 +189,7 @@ class Busyverse.Person
     console.log "Person#handlePathResponse" if Busyverse.debug and Busyverse.verbose
     @recomputing = false
     @path = pathData
+
     if @path && @path.length > 1
       console.log "GOT PATH! Setting destination..." if Busyverse.verbose
       world = Busyverse.engine.game.world
@@ -210,7 +198,6 @@ class Busyverse.Person
       console.log "new destination = #{@destination}" if Busyverse.verbose
     else
       console.log "WARNING! @path was empty, setting path, destinationCell and destination to null..." if Busyverse.debug
-      # try to reset?
       @path = null
       @destinationCell = null
 
