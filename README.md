@@ -1,13 +1,15 @@
-= Busyverse
+# Busyverse
+
+[ ![Codeship Status for jweissman/busyverse](https://www.codeship.io/projects/9c8a5150-0a08-0133-3248-521d3b82cdba/status)](https://codeship.com/projects/90649)
 
 A city-building game. You control workers by giving them programmatic
 commands. 
 
-== Requirements
+## Requirements
 
 Ruby 2.2.2. No system dependencies so far. Configuration is currently all in code. No databse functionality needed yet (the game engine is entirely in JS.)
 
-== Getting Started
+## Getting Started
 
 This is a Coffeescript game running inside a Ruby on Rails project. 
 

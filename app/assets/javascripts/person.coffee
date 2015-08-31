@@ -17,8 +17,6 @@ class Busyverse.Person
 
     console.log "new person (#{@id} -- #{@name}) created at #{@position} with task #{@activeTask}" if Busyverse.debug
 
-    # @send @activeTask
-
   send: (msg, world=Busyverse.engine.game.world) =>
     @activeTask = "idle"
     console.log "Person#send msg=#{msg}"
@@ -43,10 +41,13 @@ class Busyverse.Person
 
       else if cmd == "gather"
         console.log "GATHER COMMAND RECEIVED" if Busyverse.debug
+        return "no resources to gather!" unless world.resources.length > 0
         resources = world.resources.filter (resource) =>
           world.isLocationExplored(resource.position)
+
         if resources.length == 0
           return "NO VISIBLE RESOURCES TO GATHER"
+
         closest_resource = null
         min_dist = Infinity
         target = @random.valueFromPercentageMap
@@ -93,19 +94,23 @@ class Busyverse.Person
     @seek(world)
     if @atSoughtLocation(world)
       console.log "CREATING BUILDING #{@buildingToCreate.name} at #{@buildingToCreate.position}" if Busyverse.debug
-
-      city.create(@buildingToCreate)
-
+      world.tryToBuild @buildingToCreate
       @send 'build'
 
   gather: (world, city) =>
+    if world.resources.length == 0
+      @send('idle') 
+      return
     @seek(world)
     if @atSoughtLocation(world)
       console.log "GATHERING RESOURCE #{@resourceToGather.name}" if Busyverse.debug
-      world.resources.remove(world.resources.indexOf(@resourceToGather))
-      city.addResource @resourceToGather
-
-      @send 'gather'
+      if world.resources.indexOf(@resourceToGather)
+        world.resources.remove(world.resources.indexOf(@resourceToGather))
+        city.addResource @resourceToGather
+      if world.resources.length > 0
+        @send 'gather'
+      else
+        @send 'idle'
 
   mapPosition: (world) => world.canvasToMapCoordinates(@position)
 

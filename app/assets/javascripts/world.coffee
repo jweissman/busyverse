@@ -13,7 +13,7 @@ class Busyverse.World
   startingResources: Busyverse.startingResources
 
   constructor: (@width, @height, @cellSize) ->
-    @age        = 0
+    @age        = 480
     @city       = new Busyverse.City()
     @map        = new Busyverse.Grid(@width, @height)
     @resources  = []
@@ -35,10 +35,10 @@ class Busyverse.World
       position = @randomPassableCell()
       if position
         resource = new Busyverse.Resources.Wood(position)
-        console.log "distribute resource #{resource.name} at #{position}!"
+        console.log "distribute resource #{resource.name} at #{position}!" if Busyverse.trace
         @resources.push resource
       else
-        console.log "WARNING -- could not distribute resource"
+        console.log "WARNING -- could not distribute resource" if Busyverse.debug
 
     if build
       farm = new Busyverse.Buildings.Farm(origin)
@@ -46,6 +46,12 @@ class Busyverse.World
 
       for i in [1..@initialPopulation]
         @city.grow @
+
+  tryToBuild: (building) =>
+    passable  = @isAreaPassable(building.position, building.size)
+    available = @city.availableForBuilding(building.position, building.size)
+    if passable && available
+      @city.create(building)
 
   update: =>
     @city.update(@)

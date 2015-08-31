@@ -19,16 +19,13 @@ class Busyverse.City
         return person
 
   center: =>
-    console.log "City#center -- finding center of #{@buildings.length} buildings"
+    console.log "City#center -- finding center of #{@buildings.length} buildings" if Busyverse.debug
     xs = 0
     ys = 0
     for building in @buildings
-      console.log "considering building at #{building.position}"
       xs = xs + building.position[0]
       ys = ys + building.position[1]
     center = ([( xs / @buildings.length), (ys / @buildings.length )])
-    console.log "-----> center: "
-    console.log center
     center
 
   addResource: (resource) =>

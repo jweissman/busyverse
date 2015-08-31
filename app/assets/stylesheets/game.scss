@@ -3,11 +3,29 @@
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
 body {
-  background-color: #000000;
+  background-color: #000;
   color: #efefef;
 }
 
+#header {
+  font-family: helvetica;
+  background-color: #445;
+  color: #010;
+}
+
+td { margin: 5px; padding: 5px; }
+
+.command {
+  color: #3a4
+}
+
+#response {
+  font-family: courier;
+  font-size: 7pt;
+  max-width: 80px;
+}
+
 #busyverse {
-  // width: 800px;
-  // height: 600px;
+  width: 800px;
+  height: 600px;
 }

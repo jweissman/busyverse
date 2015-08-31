@@ -26,16 +26,12 @@ class Busyverse.IsoRenderer
       if world.isCellExplored(cell)
         cell_model = view.assembleCellModel(cell)
         @iso.add cell_model.shape, cell_model.color
-        #models.push cell_model
 
 
     if @mousePos && @mousePos.x && @mousePos.y
       @projectedMousePos = @projectCoordinate([@mousePos.x, @mousePos.y])
 
-      # farm = new Busyverse.Buildings.Farm(pos)
-      # cursor = view.constructBuildingShape(farm)
-      # @iso.add cursor, view.red
-    for model in view.assembleModels(@projectedMousePos) #@mousePos)
+    for model in view.assembleModels(@projectedMousePos)
       @iso.add(model.shape, model.color)
     
     @context.fillStyle = "#FFFFFF"
@@ -45,11 +41,10 @@ class Busyverse.IsoRenderer
       pos = @iso._translatePoint(Point(person.position[0]*scale / Busyverse.cellSize, person.position[1]*scale / Busyverse.cellSize))
       view = new Busyverse.Views.PersonView(person, @context)
       view.render(pos.x, pos.y)
-      # @context.fillText person.name, pos.x, pos.y
 
   projectCoordinate: (xy, scale=Busyverse.scale) =>
-    x = xy[0] 
-    y = xy[1] 
+    x = xy[0] * 2
+    y = xy[1] * 2
     tx = @iso.transformation
     ox = @iso.originX
     oy = @iso.originY

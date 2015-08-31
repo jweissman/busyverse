@@ -22,7 +22,9 @@ class Busyverse.Engine
 
     people = @game.world.city.population
     options = $('#target')
+    options.append $('<option />').val(-1).text('all')
     $.each people, -> options.append $('<option />').val(@id).text(@name)
+
 
     console.log "Playing game!" if Busyverse.debug
 

@@ -1,5 +1,5 @@
 <div content="game">
-  <div>
+  <div id="header">
     <table>
       <tr>
         <td>
@@ -8,25 +8,32 @@
             <small>v0.0.1</small>
           </h2>
         </td>
-        <td style="padding: 5px">
-          <form id="terminal">
-            <input type="text" id="prompt" value="Welcome"></input>
-            <select id="target"></select>
-            <input type="submit" value="SEND">
-          </form>
-          
-        </td>
+        
         <td>
-          <span id="response">
-          </span>
+          <ul>
+            <li class="command">gather</li>
+            <li class="command">build</li>
+          </ul>
         </td>
         <td>
           <ul>
-            <li>gather</li>
-            <li>build</li>
-            <li>wander</li>
-            <li>idle</li>
+            <li class="command">wander</li>
+            <li class="command">idle</li>
           </ul>
+        </td>
+
+        <td style="border-left: 1px dotted grey; padding: 10px">
+          <form id="terminal">
+            tell
+            <select id="target"></select>
+            to
+            <input type="text" id="prompt" value="gather"></input>
+            <input type="submit" value="now">
+          </form>
+        </td>
+        <td style="background-color: #666; max-width: 400px">
+          <span id="response">
+          </span>
         </td>
       </tr>
     </table>

@@ -47,12 +47,12 @@ class Busyverse.IsoView
     models.sort(@isCloserThan) #.reverse()
 
   isCloserThan: (model_a,model_b) =>
-    @camera = [-1.0,-1.0]
+    @camera = [-10,-10,30]
     a = model_a.shape.paths[0].points[0]
     b = model_b.shape.paths[0].points[0]
 
-    a_pos = [a.x, a.y]
-    b_pos = [b.x, b.y]
+    a_pos = [a.x + model_a.size[0]/2, a.y + model_a.size[1]/2, 0]
+    b_pos = [b.x + model_a.size[0]/2, b.y + model_b.size[1]/2, 0]
 
     delta_a = @geometry.euclideanDistance(a_pos, @camera)
     delta_b = @geometry.euclideanDistance(b_pos, @camera)

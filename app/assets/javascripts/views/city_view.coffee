@@ -8,9 +8,9 @@ class Busyverse.Views.CityView extends Busyverse.View
 
     if world.isDay() 
       percentOfDay = world.percentOfDay()
-      alpha = percentOfDay
+      alpha = percentOfDay/2
       if percentOfDay >= 0.5
-        alpha = 1.0 - percentOfDay
+        alpha = 0.5 - percentOfDay/2
 
       @rect
         position: [0,0]

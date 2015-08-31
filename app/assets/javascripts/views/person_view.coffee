@@ -2,9 +2,9 @@
 
 class Busyverse.Views.PersonView extends Busyverse.View
   render: (x,y) =>
-    console.log "rendering person details at #{x}, #{y}" #if Busyverse.verbose
+    console.log "rendering person details at #{x}, #{y}" if Busyverse.verbose
     # write name and current task
-    @renderName(x,y) #projectedPosition[0], projectedPosition[1])
+    @renderName(x,y)
 
   renderName: (x, y) =>
     person = @model

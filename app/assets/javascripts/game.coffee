@@ -51,23 +51,32 @@ class Busyverse.Game
 
   attemptToConstructBuilding: (mouseLocation) =>
     building = new Busyverse.Buildings.Farm(mouseLocation)
+    @world.tryToBuild(building)
 
-    passable  = @world.isAreaPassable(mouseLocation, building.size)
-    available = @world.city.availableForBuilding(mouseLocation, building.size)
+    # passable  = @world.isAreaPassable(mouseLocation, building.size)
+    # available = @world.city.availableForBuilding(mouseLocation, building.size)
 
-    if passable && available
-      console.log "Available for building!"
-      @world.city.create(building)
-    else
-      console.log "Not available for building! (passable=#{passable}, available=#{available})"
+    # if passable && available
+    #   console.log "Available for building!"
+    #   @world.city.create(building)
+    # else
+    #   console.log "Not available for building! (passable=#{passable}, available=#{available})"
 
   send: (command, person_id) =>
-    console.log "Game#send command=#{command}"
+    console.log "Game#send command=#{command} person_id=#{person_id}"
     console.log command
     op = command
     console.log "WARNING: NO TARGET ID person_id PROVIDED FOR COMMAND" unless person_id
-    person = @world.city.population[person_id]
-    person.send op
+
+    if person_id < 0 # 'all'
+      responses = "" 
+      for person in @world.city.population
+        responses += person.send(op) + ". "
+      responses
+    else # not 'all'
+      person = @world.city.population[person_id]
+      person.send op
+      
 
 # kickstart fn
 Busyverse.kickstart = ->

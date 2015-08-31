@@ -27,7 +27,7 @@ class Busyverse.Grid
   # start moving all this to world?
   evolve: (depth=6, noise=true) =>
     return if depth <= 0
-    console.log "evolve depth=#{depth}"
+    console.log "evolve depth=#{depth}" if Busyverse.debug
     @eachCell (cell) => 
       cell.color = @random.valueFromPercentageMap
         25: if noise then 'darkgreen' else @mostCommonNeighborColor(cell)
