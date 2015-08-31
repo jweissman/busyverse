@@ -20,6 +20,10 @@ class Busyverse.Engine
     # Kick game engine
     @game.play(@ui)
 
+    people = @game.world.city.population
+    options = $('#target')
+    $.each people, -> options.append $('<option />').val(@id).text(@name)
+
     console.log "Playing game!" if Busyverse.debug
 
   handleClick: (event) => @game.click(@ui.renderer.projectedMousePos)
@@ -27,7 +31,7 @@ class Busyverse.Engine
   handleCommand: (event) =>
     command = $("input:first").val()
 
-    result = @game.send command
+    result = @game.send command, $('#target').val()
 
     console.log "Sent command #{command} to game with result #{result}" if Busyverse.debug
     $("span#response").text(result)

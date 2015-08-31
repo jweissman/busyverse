@@ -61,19 +61,13 @@ class Busyverse.Game
     else
       console.log "Not available for building! (passable=#{passable}, available=#{available})"
 
-  send: (command) =>
+  send: (command, person_id) =>
     console.log "Game#send command=#{command}"
     console.log command
     op = command
-    person = @world.city.detectIdleOrWanderingPerson() # population[0]
-    if person
-      console.log "Sending command #{op} to citizen #{person.name}..." if Busyverse.debug
-      person.send(op)
-    else
-      console.log "NO IDLE CIVILIAN AVAILABLE, SENDING TO #{firstCivilian}"
-      firstCivilian = @world.city.population[0]
-      firstCivilian.send(op)
-
+    console.log "WARNING: NO TARGET ID person_id PROVIDED FOR COMMAND" unless person_id
+    person = @world.city.population[person_id]
+    person.send op
 
 # kickstart fn
 Busyverse.kickstart = ->

@@ -37,7 +37,7 @@ class Busyverse.Person
           
           return "NO OPEN AREAS FOR BUILDING"
         @destinationCell = openArea
-        @buildingToCreate.position = @destinationCell #.location
+        @buildingToCreate.position = @destinationCell
 
         console.log "BUILDING #{@buildingToCreate.name} AT #{@buildingToCreate.position}" if Busyverse.debug and Busyverse.verbose
 
@@ -96,7 +96,6 @@ class Busyverse.Person
 
       city.create(@buildingToCreate)
 
-      # TODO fire another build command, but... now this won't necessarily route to me :(
       @send 'build'
 
   gather: (world, city) =>
@@ -106,7 +105,6 @@ class Busyverse.Person
       world.resources.remove(world.resources.indexOf(@resourceToGather))
       city.addResource @resourceToGather
 
-      # TODO same as above (no longer routes to me, need to provide a sim id?)
       @send 'gather'
 
   mapPosition: (world) => world.canvasToMapCoordinates(@position)
