@@ -41,10 +41,11 @@ class Busyverse.IsoRenderer
     @context.fillStyle = "#FFFFFF"
     @context.font = "Bold 30px Helvetica"
 
-
     for person in world.city.population 
       pos = @iso._translatePoint(Point(person.position[0]*scale / Busyverse.cellSize, person.position[1]*scale / Busyverse.cellSize))
-      @context.fillText person.name, pos.x, pos.y
+      view = new Busyverse.Views.PersonView(person, @context)
+      view.render(pos.x, pos.y)
+      # @context.fillText person.name, pos.x, pos.y
 
   projectCoordinate: (xy, scale=Busyverse.scale) =>
     x = xy[0] 
