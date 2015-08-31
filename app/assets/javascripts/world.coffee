@@ -1,6 +1,8 @@
 #= require busyverse
 #= require support/randomness
 #= require support/pathfinding
+#= require resource
+#= require resources/wood
 #= require grid
 #= require city
 
@@ -24,6 +26,7 @@ class Busyverse.World
   setup: (distribution={20: 'darkgreen', 80: 'darkblue'}, evolve=true, build=true) =>
     console.log "World#setup"
     origin = null
+
     until origin
       @map.setup(distribution, evolve)
       origin = @randomPassableAreaOfSize [3,3]
@@ -32,25 +35,17 @@ class Busyverse.World
       position = @randomPassableCell()
       if position
         resource = new Busyverse.Resources.Wood(position)
-          #@random.valueFromPercentageMap 
-          #50: 
-          # 40: new Busyverse.Resources.Food(position)
-          # 9: new Busyverse.Resources.Iron(position)
-          # 1: new Busyverse.Resources.Gold(position)
         console.log "distribute resource #{resource.name} at #{position}!"
         @resources.push resource
       else
         console.log "WARNING -- could not distribute resource"
 
     if build
-      # origin = @randomPassableAreaOfSize [3,3]
       farm = new Busyverse.Buildings.Farm(origin)
-
       @city.create farm
 
       for i in [1..@initialPopulation]
         @city.grow @
-
 
   update: =>
     @city.update(@)
@@ -62,7 +57,7 @@ class Busyverse.World
   getMinute: -> @age % 60
   getHour:   -> Math.floor(@age / 60) % 24
   getDay:    -> Math.floor(@age / (60 * 24))
-  isDay: -> @getHour() >= @dayStart && @getHour() < @dayEnd 
+  isDay:     -> @getHour() >= @dayStart && @getHour() < @dayEnd 
 
   percentOfDay: ->
     (@getHour() - @dayStart) / (@dayEnd - @dayStart)
@@ -114,33 +109,33 @@ class Busyverse.World
     console.log "World#isAreaPassable loc=#{loc} sz=#{sz}" if Busyverse.debug
     for x in [0..sz[0]-1]
       for y in [0..sz[1]-1]
-        if !@map.isLocationPassable([loc[0]+x,loc[1]+y]) 
-          return false
+        lx = loc[0] + x
+        ly = loc[1] + y
+
+        return false unless @map.isLocationPassable([lx,ly]) 
         for resource in @resources
-          if loc[0]+x == resource.position[0] && loc[1]+y == resource.position[1]
+          if lx == resource.position[0] && ly == resource.position[1]
             return false
     true
 
   findOpenAreaOfSizeInCity: (city, size, max_distance_from_center) => 
-    @random.valueFromList @findOpenAreasOfSizeInCity(city, size, max_distance_from_center)
+    areas = @findOpenAreasOfSizeInCity(city, size, max_distance_from_center)
+
+    @random.valueFromList(areas) 
 
   findOpenAreasOfSizeInCity: (city, size, max_distance_from_center) =>
-    console.log "World#findOpenAreasOfSizeInCity"
-    console.log "attempting to find open areas of size #{size}" if Busyverse.debug and Busyverse.verbose
+    console.log "World#findOpenAreasOfSizeInCity" if Busyverse.debug
     center = city.center()
-    console.log "----> city center is at #{center}"
-                                                                                                         
     nearby_cells = @allCellsWithin(max_distance_from_center, center)
-    console.log "---> nearby cells: "
-    console.log nearby_cells
-                                                                                                         
     areas = []
+
     for cell in nearby_cells
       passable = @isAreaPassable(cell.location,size) 
       if passable
         available = city.availableForBuilding(cell.location, size) 
         if available
           areas.push cell.location
+
     return areas
     
 
@@ -189,7 +184,7 @@ class Busyverse.World
   randomCell: => [ @random.valueInRange(@width), @random.valueInRange(@height) ]
 
   randomPassableCell: =>
-    console.log "World#randomPassableCell"
+    console.log "World#randomPassableCell" if Busyverse.trace
     passableCells = @map.allCells().filter (cell) => 
       @map.isLocationPassable(cell.location)
     @random.valueFromList(passableCells).location

@@ -63,9 +63,15 @@ class Busyverse.City
   update: (world) =>
     for person in @population
       person.update(world, @)
+
+  canAfford: (structure) =>
+    for resource of structure.costs
+      return false if @resources[resource] < structure.costs[resource]
+    true
     
   create: (structure) =>
     console.log "creating new building [name=#{structure.name}]" if Busyverse.debug and Busyverse.verbose
+    return false unless @canAfford(structure)
 
     for resource of structure.costs
       @resources[resource] -= structure.costs[resource]

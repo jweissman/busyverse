@@ -3,7 +3,6 @@
 
 class Busyverse.GridCell
   constructor: (@location, @color) ->
-    # @geometry = new Busyverse.Support.Geometry()
 
 class Busyverse.Grid
   constructor: (@width, @height, @cells, distribution) ->
@@ -11,9 +10,7 @@ class Busyverse.Grid
     @random = new Busyverse.Support.Randomness()
     
   setup: (distribution, evolve=true) =>
-    # if @cells.length == 0
     @build(distribution)
-    console.log "GENERATING GRID PLEASE WAIT :)"
     @evolve()
     @decorate()
 
@@ -41,29 +38,14 @@ class Busyverse.Grid
 
   decorate: =>
     @eachCell (cell) => 
-      land  = #@countNeighborsWithColor(cell, 'darkgreen') +
-              @countNeighborsWithColor(cell, 'darkgreen') 
-              #@countNeighborsWithColor(cell, 'forestgreen')
-              # @countNeighborsWithColor(cell, 'lightyellow') +
-              # @countNeighborsWithColor(cell, 'grey') +
-              # @countNeighborsWithColor(cell, 'darkgrey')
+      land  = @countNeighborsWithColor(cell, 'darkgreen') 
 
       if land > 5
         cell.color = @random.valueFromPercentageMap
           20: cell.color
-          # 15: 'forestgreen'
           15: 'darkgreen'
-          # 5: 'darkgreen'
-          # 4: 'lightyellow'
-          # 3: 'grey'
-          # 2: 'darkgrey'
-          # 1: 'pink'
 
-      blue = @countNeighborsWithColor(cell, 'darkblue') #+
-             # @countNeighborsWithColor(cell, 'midnightblue') +
-             # @countNeighborsWithColor(cell, 'lightyellow')
-             # @countNeighborsWithColor(cell, 'navy') +
-             # @countNeighborsWithColor(cell, 'mediumblue')
+      blue = @countNeighborsWithColor(cell, 'darkblue')
 
       if blue > 4
         cell.color = @random.valueFromPercentageMap

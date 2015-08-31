@@ -29,18 +29,6 @@ class Busyverse.Game
     @launch()
     true
 
-  send: (command) =>
-    console.log "Game#send command=#{command}"
-    console.log command
-    op = command
-    person = @world.city.detectIdleOrWanderingPerson() # population[0]
-    if person
-      console.log "Sending command #{op} to citizen #{person.name}..." if Busyverse.debug
-      person.send(op)
-    else
-      console.log "NO IDLE CIVILIAN AVAILABLE, SENDING TO #{firstCivilian}"
-      firstCivilian = @world.city.population[0]
-      firstCivilian.send(op)
     
   launch: ->
     console.log 'Launching!' if Busyverse.verbose
@@ -57,6 +45,35 @@ class Busyverse.Game
   render: () =>
     console.log "Rendering to UI" if Busyverse.verbose
     @ui.render(@world)
+
+  click: (position) => 
+    @attemptToConstructBuilding(position)
+
+  attemptToConstructBuilding: (mouseLocation) =>
+    building = new Busyverse.Buildings.Farm(mouseLocation)
+
+    passable  = @world.isAreaPassable(mouseLocation, building.size)
+    available = @world.city.availableForBuilding(mouseLocation, building.size)
+
+    if passable && available
+      console.log "Available for building!"
+      @world.city.create(building)
+    else
+      console.log "Not available for building! (passable=#{passable}, available=#{available})"
+
+  send: (command) =>
+    console.log "Game#send command=#{command}"
+    console.log command
+    op = command
+    person = @world.city.detectIdleOrWanderingPerson() # population[0]
+    if person
+      console.log "Sending command #{op} to citizen #{person.name}..." if Busyverse.debug
+      person.send(op)
+    else
+      console.log "NO IDLE CIVILIAN AVAILABLE, SENDING TO #{firstCivilian}"
+      firstCivilian = @world.city.population[0]
+      firstCivilian.send(op)
+
 
 # kickstart fn
 Busyverse.kickstart = ->

@@ -15,7 +15,7 @@ class Busyverse.Person
 
     @activeTask = "idle"
 
-    console.log "new person (#{@id} -- #{@name}) created at #{@position} with task #{@activeTask}" # if Busyverse.debug
+    console.log "new person (#{@id} -- #{@name}) created at #{@position} with task #{@activeTask}" if Busyverse.debug
 
     # @send @activeTask
 
@@ -42,7 +42,7 @@ class Busyverse.Person
         console.log "BUILDING #{@buildingToCreate.name} AT #{@buildingToCreate.position}" if Busyverse.debug and Busyverse.verbose
 
       else if cmd == "gather"
-        console.log "GATHER COMMAND RECEIVED"
+        console.log "GATHER COMMAND RECEIVED" if Busyverse.debug
         resources = world.resources.filter (resource) =>
           world.isLocationExplored(resource.position)
         if resources.length == 0
@@ -52,14 +52,15 @@ class Busyverse.Person
         target = @random.valueFromPercentageMap
           20: city.center()
           80: @position
-        console.log "finding resources closest to #{target}"
+        console.log "finding resources closest to #{target}" if Busyverse.debug
 
         sortedResources = resources.sort (a, b) =>
           return if @geometry.euclideanDistance(a.position, target) <= @geometry.euclideanDistance(b.position, target) then 1 else -1
 
         @resourceToGather = @random.valueFromList(sortedResources[..4])
         @destinationCell  = @resourceToGather.position
-        console.log "Gathering #{@resourceToGather.name} at #{@destinationCell}"
+        console.log "Gathering #{@resourceToGather.name} at #{@destinationCell}" if Busyverse.debug
+
 
       @activeTask  = cmd
       return "#{@name} now performing '#{@activeTask}'"
@@ -178,7 +179,7 @@ class Busyverse.Person
         tgt: destCell.location
         personId: @id
       }
-      console.log msg
+      console.log msg if Busyverse.trace
 
       @background_worker = Busyverse.createWorker()
       @background_worker.onmessage = (result) =>

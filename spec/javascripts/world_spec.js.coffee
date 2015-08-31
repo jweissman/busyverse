@@ -1,5 +1,7 @@
 #= require busyverse
 #= require grid
+#= require resource
+#= require resources/wood
 #= require world
 #= require sinon
 
@@ -30,9 +32,6 @@ context "World", ->
   describe "#setup", ->
     it 'should distribute resources', ->
       expect(@world.resources.length).to.eql(@world.startingResources)
-      # expect(@world.resources[0].name).to.eql('wood')
-      
-
 
 
   describe "#randomCell", ->
