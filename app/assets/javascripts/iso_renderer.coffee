@@ -54,7 +54,7 @@ class Busyverse.IsoRenderer
     px =   ((ox * tx[1][1])  + (oy * tx[1][0]) - (tx[1][0] * y) - (tx[1][1] * x)) / det
     py = ((-(ox * tx[0][1])) - (ox * tx[0][0]) + (tx[0][0] * y) + (tx[0][1] * x)) / det
     offsetX = -0.0 / scale
-    offsetY = 4.0 / scale
+    offsetY = 3.0 / scale
     [ Math.floor(px/scale + offsetX), Math.floor(py/scale + offsetY) ] 
 
 

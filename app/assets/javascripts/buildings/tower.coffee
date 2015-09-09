@@ -3,5 +3,5 @@
 
 class Busyverse.Buildings.Tower extends Busyverse.Building
   name: 'Large Tower'
-  size: [4,4]
+  size: [4,4,6]
   color: 'grey'

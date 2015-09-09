@@ -51,7 +51,7 @@ class Busyverse.Game
 
   attemptToConstructBuilding: (mouseLocation) =>
     building = new Busyverse.Buildings.Farm(mouseLocation)
-    @world.tryToBuild(building)
+    @world.tryToBuild(building, true)
 
     # passable  = @world.isAreaPassable(mouseLocation, building.size)
     # available = @world.city.availableForBuilding(mouseLocation, building.size)

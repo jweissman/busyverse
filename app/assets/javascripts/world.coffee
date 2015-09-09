@@ -23,7 +23,7 @@ class Busyverse.World
 
     console.log("Created new world, '#{@name}'! (Dimensions: #{@width}x#{@height})") if Busyverse.debug
 
-  setup: (distribution={20: 'darkgreen', 80: 'darkblue'}, evolve=true, build=true) =>
+  setup: (distribution={20: 'darkgreen', 80: 'darkblue'}, evolve=true, resources=true, build=true) =>
     console.log "World#setup"
     origin = null
 
@@ -31,14 +31,15 @@ class Busyverse.World
       @map.setup(distribution, evolve)
       origin = @randomPassableAreaOfSize [3,3]
 
-    for j in [1..@startingResources]
-      position = @randomPassableCell()
-      if position
-        resource = new Busyverse.Resources.Wood(position)
-        console.log "distribute resource #{resource.name} at #{position}!" if Busyverse.trace
-        @resources.push resource
-      else
-        console.log "WARNING -- could not distribute resource" if Busyverse.debug
+    if resources
+      for j in [1..@startingResources]
+        position = @randomPassableCell()
+        if position
+          resource = new Busyverse.Resources.Wood(position)
+          console.log "distribute resource #{resource.name} at #{position}!" if Busyverse.trace
+          @resources.push resource
+        else
+          console.log "WARNING -- could not distribute resource" if Busyverse.debug
 
     if build
       farm = new Busyverse.Buildings.Farm(origin)
@@ -47,11 +48,14 @@ class Busyverse.World
       for i in [1..@initialPopulation]
         @city.grow @
 
-  tryToBuild: (building) =>
+  tryToBuild: (building, create=false) =>
     passable  = @isAreaPassable(building.position, building.size)
     available = @city.availableForBuilding(building.position, building.size)
-    if passable && available
-      @city.create(building)
+    if passable && available 
+      @city.create(building) if create
+      true
+    else
+      false
 
   update: =>
     @city.update(@)
@@ -101,9 +105,9 @@ class Busyverse.World
     cells = @map.allCells()
     areas = []
     for cell in cells
-      # console.log "consider location #{cell.location}" if Busyverse.trace
+      console.log "consider location #{cell.location}" if Busyverse.trace
       passable_area = @isAreaPassable(cell.location, sz) 
-      # console.log "passable? #{passable_area}" if Busyverse.trace
+      console.log "passable? #{passable_area}" if Busyverse.trace
       if passable_area 
         areas.push cell.location
     areas
@@ -112,38 +116,46 @@ class Busyverse.World
     @random.valueFromList @randomPassableAreasOfSize(sz)
     
   isAreaPassable: (loc, sz=[0,0]) =>
-    console.log "World#isAreaPassable loc=#{loc} sz=#{sz}" if Busyverse.debug
+    console.log "World#isAreaPassable loc=#{loc} sz=#{sz}" #if Busyverse.debug
     for x in [0..sz[0]-1]
       for y in [0..sz[1]-1]
         lx = loc[0] + x
         ly = loc[1] + y
+        # console.log "considering #{lx}, #{ly}..."
+        # console.log "--- passable? #{@map.isLocationPassable([lx,ly])}"
 
         return false unless @map.isLocationPassable([lx,ly]) 
+
         for resource in @resources
           if lx == resource.position[0] && ly == resource.position[1]
+            #console.log "--- blocked by a resource!"
             return false
     true
 
   findOpenAreaOfSizeInCity: (city, size, max_distance_from_center) => 
     areas = @findOpenAreasOfSizeInCity(city, size, max_distance_from_center)
-
     @random.valueFromList(areas) 
 
   findOpenAreasOfSizeInCity: (city, size, max_distance_from_center) =>
-    console.log "World#findOpenAreasOfSizeInCity" if Busyverse.debug
+    console.log "World#findOpenAreasOfSizeInCity size=#{size} dist_from_center=#{max_distance_from_center}" # if Busyverse.debug
+
     center = city.center()
     nearby_cells = @allCellsWithin(max_distance_from_center, center)
     areas = []
 
+    console.log "considering nearby cells: "
     for cell in nearby_cells
-      passable = @isAreaPassable(cell.location,size) 
+      console.log cell.location
+      passable = @isAreaPassable(cell.location, size) 
       if passable
+        console.log "passable!"
         available = city.availableForBuilding(cell.location, size) 
         if available
+          console.log "available!"
           areas.push cell.location
 
+    console.log "found #{areas.length} areas"
     return areas
-    
 
   allCellsWithin: (maxDistance, center) =>
     cellsInRadius = []

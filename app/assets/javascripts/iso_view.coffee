@@ -39,10 +39,12 @@ class Busyverse.IsoView
       models.push {shape: shape, color: @white, size: [1,1]}
 
     if mousePosition
-      farm = new Busyverse.Buildings.Farm(mousePosition)
-      cursor = @constructBuildingShape farm
-      models.push({shape: cursor, color: @red, size: farm.size})
-
+      building = new Busyverse.Buildings.Farm(mousePosition)
+      cursor = @constructBuildingShape building
+      color = @white
+      if @world.tryToBuild(building, false)
+        color = @red
+      models.push({shape: cursor, color: color, size: building.size})
 
     models.sort(@isCloserThan) #.reverse()
 
@@ -77,14 +79,13 @@ class Busyverse.IsoView
     @prism(x,y, 0.3,0.3,1.2)
 
   assembleCellModel: (cell) =>
-    cell_shape = @prism(cell.location[0], cell.location[1], 1,1,0.05) 
+    cell_shape = @prism(cell.location[0], cell.location[1], 1,1,0.01) 
     color = @blue
     if cell.color == 'darkgreen'
       color = @green
     else if cell.color == 'red'
       color = @red
     { shape: cell_shape, color: color }
-
 
   point: (x,y,z=0) -> Point(x * @scale, y * @scale, z * @scale)
 

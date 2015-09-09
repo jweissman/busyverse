@@ -8,6 +8,7 @@ class Busyverse.Person
   visionRadius: 4
   velocity: [0,0]
 
+
   constructor: (@id, @name, @position) ->
     @position   ?= [0,0]
     @random     ?= new Busyverse.Support.Randomness()
@@ -16,6 +17,13 @@ class Busyverse.Person
     @activeTask = "idle"
 
     console.log "new person (#{@id} -- #{@name}) created at #{@position} with task #{@activeTask}" if Busyverse.debug
+
+  backgroundWorker: =>
+    return @background_worker if (@background_worker?)
+    @background_worker = Busyverse.createWorker()
+    @background_worker.onmessage = (result) =>
+      @handlePathResponse result.data.path
+    @background_worker
 
   send: (msg, world=Busyverse.engine.game.world) =>
     @activeTask = "idle"
@@ -32,8 +40,8 @@ class Busyverse.Person
         @buildingToCreate = new Busyverse.Buildings.Farm()
         openArea = world.findOpenAreaOfSizeInCity(city, @buildingToCreate.size, 2*city.population.length)
         if typeof(openArea) == 'undefined' || openArea == null
-          
           return "NO OPEN AREAS FOR BUILDING"
+
         @destinationCell = openArea
         @buildingToCreate.position = @destinationCell
 
@@ -50,13 +58,18 @@ class Busyverse.Person
 
         closest_resource = null
         min_dist = Infinity
-        target = @random.valueFromPercentageMap
-          20: city.center()
-          80: @position
-        console.log "finding resources closest to #{target}" if Busyverse.debug
-
+        target = @mapPosition(world)
         sortedResources = resources.sort (a, b) =>
-          return if @geometry.euclideanDistance(a.position, target) <= @geometry.euclideanDistance(b.position, target) then 1 else -1
+          distance_to_a = @geometry.euclideanDistance(a.position, target)  
+          distance_to_b = @geometry.euclideanDistance(b.position, target) 
+
+          return if distance_to_a < distance_to_b
+            -1 
+          else if distance_to_b < distance_to_a
+            1
+          else
+            0
+            
 
         @resourceToGather = @random.valueFromList(sortedResources[..4])
         @destinationCell  = @resourceToGather.position
@@ -94,7 +107,7 @@ class Busyverse.Person
     @seek(world)
     if @atSoughtLocation(world)
       console.log "CREATING BUILDING #{@buildingToCreate.name} at #{@buildingToCreate.position}" if Busyverse.debug
-      world.tryToBuild @buildingToCreate
+      world.tryToBuild(@buildingToCreate, true)
       @send 'build'
 
   gather: (world, city) =>
@@ -184,10 +197,8 @@ class Busyverse.Person
       }
       console.log msg if Busyverse.trace
 
-      @background_worker = Busyverse.createWorker()
-      @background_worker.onmessage = (result) =>
-        @handlePathResponse result.data.path
-      @background_worker.postMessage msg
+      worker = @backgroundWorker()
+      worker.postMessage(msg)
        
   handlePathResponse: (pathData) =>
     console.log "Person#handlePathResponse" if Busyverse.debug and Busyverse.verbose
