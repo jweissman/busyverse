@@ -1,9 +1,6 @@
 #= require support/geometry
 #= require support/randomness
 
-class Busyverse.GridCell
-  constructor: (@location, @color) ->
-
 class Busyverse.Grid
   constructor: (@width, @height, @cells, distribution) ->
     @cells ?= []
@@ -22,7 +19,7 @@ class Busyverse.Grid
 
   createCellAt: (location, distribution) =>
     color = @random.valueFromPercentageMap distribution
-    new Busyverse.GridCell(location, color)
+    { location: location, color: color }
 
   # start moving all this to world?
   evolve: (depth=6, noise=true) =>
