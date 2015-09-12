@@ -9,6 +9,7 @@ class Busyverse.IsoRenderer
     @projectedMousePos = null
     @canvasElement.addEventListener 'mousemove', ((evt) =>
       @mousePos = @getMousePos(@canvasElement, evt)
+      @projectedMousePos = @projectCoordinate([@mousePos.x, @mousePos.y])
       console.log('Mouse position: ' + @mousePos.x + ',' + @mousePos.y) if Busyverse.debug
       return
     ), false
@@ -19,17 +20,15 @@ class Busyverse.IsoRenderer
       x: evt.clientX - (rect.left)
       y: evt.clientY - (rect.top)
     }
+  
 
   draw: (world, scale=Busyverse.scale) =>
     view = new Busyverse.IsoView(world)
+
     world.map.eachCell (cell) => 
       if world.isCellExplored(cell)
         cell_model = view.assembleCellModel(cell)
         @iso.add cell_model.shape, cell_model.color
-
-
-    if @mousePos && @mousePos.x && @mousePos.y
-      @projectedMousePos = @projectCoordinate([@mousePos.x, @mousePos.y])
 
     for model in view.assembleModels(@projectedMousePos)
       @iso.add(model.shape, model.color)
@@ -42,9 +41,9 @@ class Busyverse.IsoRenderer
       view = new Busyverse.Views.PersonView(person, @context)
       view.render(pos.x, pos.y)
 
-  projectCoordinate: (xy, scale=Busyverse.scale) =>
-    x = xy[0] * 2
-    y = xy[1] * 2
+  projectCoordinate: (xy, scale=Busyverse.scale, offset=Busyverse.engine.game.ui.offset) =>
+    x = (xy[0] * 2) - offset.x
+    y = (xy[1] * 2) - offset.y
     tx = @iso.transformation
     ox = @iso.originX
     oy = @iso.originY

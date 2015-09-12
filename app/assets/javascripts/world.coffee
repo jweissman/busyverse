@@ -116,7 +116,7 @@ class Busyverse.World
     @random.valueFromList @randomPassableAreasOfSize(sz)
     
   isAreaPassable: (loc, sz=[0,0]) =>
-    console.log "World#isAreaPassable loc=#{loc} sz=#{sz}" #if Busyverse.debug
+    console.log "World#isAreaPassable loc=#{loc} sz=#{sz}" if Busyverse.debug
     for x in [0..sz[0]-1]
       for y in [0..sz[1]-1]
         lx = loc[0] + x

@@ -28,7 +28,7 @@ class Busyverse.Engine
 
     console.log "Playing game!" if Busyverse.debug
 
-  handleClick: (event) => @game.click(@ui.renderer.projectedMousePos)
+  handleClick: (event) => @game.click(@ui.renderer.projectedMousePos, event)
 
   handleCommand: (event) =>
     command = $("input:first").val()

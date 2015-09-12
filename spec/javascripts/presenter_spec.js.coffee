@@ -20,6 +20,9 @@ context "Presenter", ->
       fill: ->
       fillText: @fillText  
       stroke: ->
+      save: ->  
+      translate: ->  
+      restore: ->  
 
     @canvas    = 
       getContext: => @context

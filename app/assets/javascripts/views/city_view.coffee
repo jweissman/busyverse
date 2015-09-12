@@ -3,24 +3,24 @@ class Busyverse.Views.CityView extends Busyverse.View
   render: (world) =>
     city = @model
 
-    cover = [Busyverse.width * Busyverse.cellSize,
-             Busyverse.height * Busyverse.cellSize]
+    # cover = [Busyverse.width * Busyverse.cellSize,
+    #          Busyverse.height * Busyverse.cellSize]
 
-    if world.isDay() 
-      percentOfDay = world.percentOfDay()
-      alpha = percentOfDay/2
-      if percentOfDay >= 0.5
-        alpha = 0.5 - percentOfDay/2
+    # if world.isDay() 
+    #   percentOfDay = world.percentOfDay()
+    #   alpha = percentOfDay/2
+    #   if percentOfDay >= 0.5
+    #     alpha = 0.5 - percentOfDay/2
 
-      @rect
-        position: [0,0]
-        size: cover
-        fill: "rgba(128,128,0,#{alpha})"
-    else
-      @rect
-        position: [0,0]
-        size: cover
-        fill: "rgba(0,0,192,0.125)"
+    #   @rect
+    #     position: [0,0]
+    #     size: cover
+    #     fill: "rgba(128,128,0,#{alpha})"
+    # else
+    #   @rect
+    #     position: [0,0]
+    #     size: cover
+    #     fill: "rgba(0,0,192,0.125)"
 
     @rect 
       position: [10,10]

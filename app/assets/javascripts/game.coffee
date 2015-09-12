@@ -28,10 +28,10 @@ class Busyverse.Game
     console.log 'Playing!'
     @launch()
     true
-
     
   launch: ->
     console.log 'Launching!' if Busyverse.verbose
+    @ui.centerAt @world.city.buildings[0].position
     @step()
 
   step: =>
@@ -46,21 +46,15 @@ class Busyverse.Game
     console.log "Rendering to UI" if Busyverse.verbose
     @ui.render(@world)
 
-  click: (position) => 
+  click: (position, event) => 
+    console.log "click position=#{position} event=#{event}"
+    #target = @ui.renderer.mousePos
+    @ui.centerAt(position)
     @attemptToConstructBuilding(position)
 
   attemptToConstructBuilding: (mouseLocation) =>
     building = new Busyverse.Buildings.Farm(mouseLocation)
     @world.tryToBuild(building, true)
-
-    # passable  = @world.isAreaPassable(mouseLocation, building.size)
-    # available = @world.city.availableForBuilding(mouseLocation, building.size)
-
-    # if passable && available
-    #   console.log "Available for building!"
-    #   @world.city.create(building)
-    # else
-    #   console.log "Not available for building! (passable=#{passable}, available=#{available})"
 
   send: (command, person_id) =>
     console.log "Game#send command=#{command} person_id=#{person_id}"
@@ -77,7 +71,6 @@ class Busyverse.Game
       person = @world.city.population[person_id]
       person.send op
       
-
 # kickstart fn
 Busyverse.kickstart = ->
   engine = Busyverse.engine = new Busyverse.Engine(Busyverse.game)
