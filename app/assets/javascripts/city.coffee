@@ -11,7 +11,9 @@ class Busyverse.City
 
     @resources     = { 'food': 10, 'wood': 10, 'iron': 0, 'gold': 0 }
     @random = new Busyverse.Support.Randomness()
-    console.log "New city created with population #{@population}!" if Busyverse.verbose
+
+    if Busyverse.verbose
+      console.log "New city created with population #{@population}!" 
 
   detectIdleOrWanderingPerson: =>
     for person in @population
@@ -19,7 +21,8 @@ class Busyverse.City
         return person
 
   center: =>
-    console.log "City#center -- finding center of #{@buildings.length} buildings" if Busyverse.debug
+    if Busyverse.debug
+      console.log "City#center -- finding center of #{@buildings.length} buildings" 
     xs = 0
     ys = 0
     for building in @buildings

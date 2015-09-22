@@ -21,7 +21,8 @@ class Busyverse.World
     @random     = new Busyverse.Support.Randomness()
     @geometry   = new Busyverse.Support.Geometry()
 
-    console.log("Created new world, '#{@name}'! (Dimensions: #{@width}x#{@height})") if Busyverse.debug
+    if Busyverse.debug
+      console.log("Created new world, '#{@name}'! (Dimensions: #{@width}x#{@height})") 
 
   setup: (distribution={20: 'darkgreen', 80: 'darkblue'}, evolve=true, resources=true, build=true) =>
     console.log "World#setup"
@@ -36,10 +37,12 @@ class Busyverse.World
         position = @randomPassableCell()
         if position
           resource = new Busyverse.Resources.Wood(position)
-          console.log "distribute resource #{resource.name} at #{position}!" if Busyverse.trace
+          if Busyverse.trace
+            console.log "distribute resource #{resource.name} at #{position}!" 
           @resources.push resource
         else
-          console.log "WARNING -- could not distribute resource" if Busyverse.debug
+          if Busyverse.debug
+            console.log "WARNING -- could not distribute resource" 
 
     if build
       farm = new Busyverse.Buildings.Farm(origin)

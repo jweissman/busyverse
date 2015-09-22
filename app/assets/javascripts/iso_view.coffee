@@ -32,18 +32,20 @@ class Busyverse.IsoView
 
     for building in @world.city.buildings
       shape = @constructBuildingShape building
-      models.push {shape: shape, color: @red, size: building.size}
+      color = new Color(building.color.red, building.color.green, building.color.blue)
+      models.push {shape: shape, color: color, size: building.size}
 
     for person in @world.city.population
       shape = @constructPersonShape person
       models.push {shape: shape, color: @white, size: [1,1]}
 
-    if mousePosition
-      building = new Busyverse.Buildings.Farm(mousePosition)
+    if mousePosition && Busyverse.engine.game.chosenBuilding
+      building = Busyverse.Building.generate(Busyverse.engine.game.chosenBuilding.name, mousePosition)
       cursor = @constructBuildingShape building
       color = @white
       if @world.tryToBuild(building, false)
-        color = @red
+        color = new Color(building.color.red, building.color.green, building.color.blue)
+
       models.push({shape: cursor, color: color, size: building.size})
 
     models.sort(@isCloserThan) #.reverse()

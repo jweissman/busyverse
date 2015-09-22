@@ -11,14 +11,8 @@ context 'Building', ->
     @tower = new Busyverse.Buildings.Tower([4,5])
 
   describe '.color', ->
-    it 'should be brown for farms', ->
-      expect(@farm.color).to.eql('brown')
-
-    it 'should be darkred for houses', ->
-      expect(@house.color).to.eql('darkred')
-
     it 'should be grey for towers', ->
-      expect(@tower.color).to.eql('grey')
+      expect(@tower.color).to.eql({ red: 60, green: 60, blue: 60})
 
   describe "#doesOverlap", ->
     it 'should indicate whether a position overlaps', ->

@@ -3,7 +3,7 @@
 
 class Busyverse.Buildings.Farm extends Busyverse.Building
   name: 'Small Farm'
-  size: [2, 2, 0.2]
-  color: 'brown'
-  costs: 
+  size: [2, 2, 0.1]
+  color: { red: 160, green: 20, blue: 20 }
+  costs:
     'wood': 2

@@ -1,7 +1,7 @@
 #= require busyverse
 #= require views/view
 #= require views/world_view
-#= require views/city_view
+#= require views/ui_view
 #= require views/building_view
 #= require views/person_view
 #= require game
@@ -10,6 +10,7 @@
 
 context "Presenter", ->
   beforeEach ->
+    Busyverse.engine = { game: { chosenBuilding: {name: "Small Farm"}}}
     @rect = sinon.spy()
     @fillText = sinon.spy()
 
@@ -30,7 +31,7 @@ context "Presenter", ->
 
     @world     = { 
       resources: [], 
-      city: { buildings: [], population: [] },
+      city: { buildings: [], population: [], canAfford: -> true },
       map: { eachCell: -> },
       isDay: -> false,
       describeTime: -> "midnight"

@@ -3,6 +3,21 @@
 #= require iso_renderer
 #= require iso_view
 
+class Busyverse.BoundingBox
+  constructor: (@name, @position, @size) ->
+  hit: (pos) ->
+    console.log "new bounding box #{@name} at"
+    console.log @position
+    console.log "of size"
+    console.log @size
+    console.log "--- was hit at ...?"
+    console.log pos
+    wasHit = @position[0] <= pos.x <= @position[0] + @size[0] &&
+             @position[1] <= pos.y <= @position[1] + @size[1]
+    console.log wasHit
+    return wasHit
+
+
 class Busyverse.Presenter
   constructor: () ->
     @views = {}
@@ -14,69 +29,40 @@ class Busyverse.Presenter
     if canvas != null
       @canvas   = canvas
       @context  = @canvas.getContext('2d')
-      @offset = { x: 0, y: 0 }
+      @offset   = { x: 0, y: 0 }
       @renderer = new Busyverse.IsoRenderer(@canvas)
     else
-      console.log "WARNING: canvas is null in Presenter#attach" if Busyverse.debug
+      if Busyverse.debug
+        console.log "WARNING: canvas is null in Presenter#attach"
 
   centerAt: (pos, scale=Busyverse.scale) =>
-    console.log "---> Presenter#centerAt"
-    console.log "  => pos: #{pos}"
-    target = @renderer.iso._translatePoint(Isomer.Point(pos[0]*scale, pos[1]*scale))
-    console.log "  => target: "
-    console.log target
-    # console.log "pos"
-    # console.log pos
+    point = Isomer.Point(pos[0]*scale, pos[1]*scale)
+    target = @renderer.iso._translatePoint(point)
+    
     w = @canvas.width
     h = @canvas.height
-    # console.log "canvas width/height"
-    # console.log w
-    # console.log h
-
-    # cx = @offset.x - (pos.x - w/4) 
-    # cy = @offset.y - (pos.y - h/4) 
-
-    cx = target.x + w/4
-    cy = target.y + h/4
-
-    r = 255
-    g = 0
-    b = 0
-    a = 100
-    @context.fillStyle = "rgba("+r+","+g+","+b+","+(a/255)+")";
-    # @context.fillRect( cx, cy, 10, 10 );
-    #@context.fillRect( target.x, target.y, 10, 10 ); # => yes! :)
-
-    center = { x: w/2, y: h/2 }
-    @context.fillRect( center.x, center.y, 10, 10 ); # => yes! :)
-
     @translate(w/2 - target.x, h/2 - target.y)
 
-    # what we want is center 
-
-    # @translate target.x, target.y
-
   translate: (x,y) =>
-    console.log "New offset! => #{x}, #{y}"
-    @offset = {x: x, y: y} 
+    console.log "New offset! => #{x}, #{y}" if Busyverse.debug
+    @offset = {x: x, y: y}
 
   render: (world) =>
     console.log "Rendering!" if Busyverse.debug
-
     @clear()
     @context.save()
-    # @context.scale(1.5,1.5)
     @context.translate(@offset.x,@offset.y)
     @renderer.draw world
     @context.restore()
-
-    # really just renders the ui at this point
-    # maybe move person tags *into* this layer
-    @renderCity(world.city, world)
+    @ui_view = new Busyverse.Views.UIView(world.city, @context)
+    @ui_view.render(world)
 
   clear: ->
     @context.clearRect 0, 0, @canvas.width, @canvas.height
 
-  renderCity: (city, world) ->
-    console.log "----> Rendering city" if Busyverse.verbose
-    (new Busyverse.Views.CityView(city, @context)).render(world)
+  boundingBoxes: (world) ->
+    boxes = []
+    for element in @ui_view.constructPalette(world.city)
+      box = new Busyverse.BoundingBox(element.name, element.position, element.size)
+      boxes.push(box) if element.clickable
+    boxes

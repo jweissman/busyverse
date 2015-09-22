@@ -1,12 +1,16 @@
 #= require views/view
 
-# TODO rename WidgetView
 class Busyverse.Views.UIView extends Busyverse.View
   render: (world) =>
     city = @model
 
     @renderCover(world)
     @renderUi(world, city)
+
+  renderUi: (world, city) =>      
+    @renderCityDetail(city)
+    @renderTime(world)
+    @renderBuildingPalette(city)
 
   renderCover: (world) =>
     cover = [Busyverse.width * Busyverse.cellSize,
@@ -28,46 +32,55 @@ class Busyverse.Views.UIView extends Busyverse.View
         size: cover
         fill: "rgba(0,0,192,0.125)"
 
-  renderUi: (world, city) =>      
-    @renderCityDetail(city)
-    @renderTime(world)
-    @renderBuildingPalette(city)
-
-  renderBuildingPalette: (city) =>
-    @rect 
-      position: [10,115]
-      size: [150, 100]
-      fill: 'ivory'
-
-    building_list = [ new Busyverse.Buildings.Farm(), 
-                      new Busyverse.Buildings.House(), 
-                      new Busyverse.Buildings.Tower() ]
-
+   
+  constructPalette: (city) =>
+    palette = []
+    building_list = Busyverse.Building.all()
     building_index = 0
+    currentBuildingName = ''
+    if Busyverse.engine.game.chosenBuilding 
+      currentBuildingName = Busyverse.engine.game.chosenBuilding.name 
     for building in building_list
-      selected = building.name == 'Small Farm'
+
+      selected = building.name == currentBuildingName #'Small Farm'
       affordable = city.canAfford building
 
       color = if selected 
         'lightgreen' 
       else 
         if affordable then 'forestgreen' else 'grey'
-
-      @rect
-        position: [13, 120 + building_index * 30 ]
-        size: [ 143, 28 ]
-        fill: color
-
-      @text 
-        msg: building.name
-        position: [14,140 + building_index * 30]
-        size: '24px'
+  
+      palette.push { 
+        name: building.name
+        position: [13.5, (119.5 + building_index * 30)], 
+        size: [143, 28]  
+        fill: color 
+        clickable: affordable && !selected
+      }
 
       building_index = building_index + 1
+    palette
+
+  renderBuildingPalette: (city) =>
+    @rect 
+      position: [10.5,115.5]
+      size: [150, 100]
+      fill: 'ivory'
+
+    for element in @constructPalette(city)
+      @rect
+        position: element.position
+        size: element.size
+        fill: element.fill
+
+      @text 
+        msg: element.name
+        position: [element.position[0] + 4, element.position[1] + 21]
+        size: '24px'
 
   renderCityDetail: (city) =>
     @rect 
-      position: [10,10]
+      position: [10.5,10.5]
       size: [160, 100]
       fill: 'ivory'
 
@@ -77,7 +90,7 @@ class Busyverse.Views.UIView extends Busyverse.View
       size: '24px'
 
     @rect
-      position: [15, 40]
+      position: [15.5, 40.5]
       size: [150, 65]
       fill: 'goldenrod'
 
@@ -93,7 +106,7 @@ class Busyverse.Views.UIView extends Busyverse.View
 
   renderTime: (world) =>
     @rect
-      position: [200, 10]
+      position: [200.5, 10.5]
       size: [240, 40]
       fill: 'ivory'
 

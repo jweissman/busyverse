@@ -19,6 +19,8 @@ class Busyverse.Game
     @player ?= new Busyverse.Player()
     @world  ?= new Busyverse.World(@width, @height, @cellSize)
 
+    @chosenBuilding = new Busyverse.Buildings.Farm()
+
   setup: ->
     @world.setup()
     console.log "Game#new world=#{@world.name}" if Busyverse.debug
@@ -48,12 +50,34 @@ class Busyverse.Game
 
   click: (position, event) => 
     console.log "click position=#{position} event=#{event}"
-    #target = @ui.renderer.mousePos
-    @ui.centerAt(position)
-    @attemptToConstructBuilding(position)
+
+    pos = @ui.renderer.mousePos
+    adjusted_pos = {x: pos.x * 2, y: pos.y * 2}
+
+    ui_hit = false
+    for box in @ui.boundingBoxes(@world)
+      hit = box.hit adjusted_pos 
+      if hit
+        @handleClickElement(box.name) 
+        ui_hit = true
+
+    unless ui_hit
+      if @chosenBuilding != null
+        if @attemptToConstructBuilding(position)
+          @chosenBuilding = null
+      @ui.centerAt(position) # -> maybe only if shift-clicking?
+
+      # @chosenBuilding = null
+
+  handleClickElement: (elementName) =>
+    console.log "!!!!!!! handle click element: #{elementName} "
+    for building in Busyverse.Building.all()
+      if building.name == elementName
+        console.log "would be choosing #{building.name}"
+        @chosenBuilding = building
 
   attemptToConstructBuilding: (mouseLocation) =>
-    building = new Busyverse.Buildings.Farm(mouseLocation)
+    building = Busyverse.Building.generate(@chosenBuilding.name, mouseLocation) 
     @world.tryToBuild(building, true)
 
   send: (command, person_id) =>
@@ -73,6 +97,6 @@ class Busyverse.Game
       
 # kickstart fn
 Busyverse.kickstart = ->
-  engine = Busyverse.engine = new Busyverse.Engine(Busyverse.game)
+  engine = Busyverse.engine = new Busyverse.Engine(Busyverse.game) # where does this game come from? play.html.erb?
   engine.setup()
   window.onload = -> engine.run()

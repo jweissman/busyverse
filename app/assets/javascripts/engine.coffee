@@ -12,20 +12,19 @@ class Busyverse.Engine
       console.log "--- warning: jQuery is undefined!" if Busyverse.debug
     else
       $('#terminal').submit @handleCommand
-    
+     
     # Turn the lights on
     @ui.attach(@canvas)
     @canvas.addEventListener 'mousedown', @handleClick
-    
+     
     # Kick game engine
     @game.play(@ui)
-
+    
     people = @game.world.city.population
     options = $('#target')
     options.append $('<option />').val(-1).text('all')
     $.each people, -> options.append $('<option />').val(@id).text(@name)
-
-
+     
     console.log "Playing game!" if Busyverse.debug
 
   handleClick: (event) => @game.click(@ui.renderer.projectedMousePos, event)
@@ -35,7 +34,8 @@ class Busyverse.Engine
 
     result = @game.send command, $('#target').val()
 
-    console.log "Sent command #{command} to game with result #{result}" if Busyverse.debug
+    if Busyverse.debug
+      console.log "Sent command #{command} to game with result #{result}" 
     $("span#response").text(result)
 
     event.preventDefault()

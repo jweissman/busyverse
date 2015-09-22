@@ -3,5 +3,7 @@
 
 class Busyverse.Buildings.House extends Busyverse.Building
   name: 'Residence'
-  size: [4,4]
-  color: "darkred"
+  size: [1,1,1]
+  color: { red: 160, green: 240, blue: 130 }
+  costs:
+    'wood': 3

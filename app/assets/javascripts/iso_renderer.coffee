@@ -20,7 +20,6 @@ class Busyverse.IsoRenderer
       x: evt.clientX - (rect.left)
       y: evt.clientY - (rect.top)
     }
-  
 
   draw: (world, scale=Busyverse.scale) =>
     view = new Busyverse.IsoView(world)
