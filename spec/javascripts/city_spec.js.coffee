@@ -6,7 +6,7 @@ context "City", ->
     @city = new Busyverse.City()
 
     origin = [0,0]
-    @farm = new Busyverse.Buildings.Farm(origin)
+    @farm = { position: origin, doesOverlap: -> true }
 
   describe "#create", ->
     it 'should create structures', ->
@@ -15,9 +15,6 @@ context "City", ->
       expect(@city.buildings).to.include(@farm)
 
   describe "#grow", ->
-    # beforeEach ->
-    #   @city = new Busyverse.City()
-  
     it 'should increase population size', ->
       old_population = @city.population.length
       @city.grow(mapToCanvasCoordinates: ->)
@@ -33,10 +30,10 @@ context "City", ->
 
     describe "#availableForBuilding", ->
       it 'should indicate building locations', ->
-        expect(@city.availableForBuilding(@farm.position, [1,1])).to.equal(true)
-        console.log "CREATING FARM"
+        available = => @city.availableForBuilding(@farm.position, [1,1])
+        expect(available()).to.equal(true)
         @city.create(@farm)
-        expect(@city.availableForBuilding(@farm.position, [1,1])).to.equal(false)
+        expect(available()).to.equal(false)
 
     describe "#isAreaFullyExplored", ->
       it 'should indicate whether an area has been entirely explored', ->

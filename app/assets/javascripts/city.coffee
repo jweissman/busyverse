@@ -13,7 +13,7 @@ class Busyverse.City
     @random = new Busyverse.Support.Randomness()
 
     if Busyverse.verbose
-      console.log "New city created with population #{@population}!" 
+      console.log "New city created with population #{@population}!"
 
   detectIdleOrWanderingPerson: =>
     for person in @population
@@ -22,7 +22,8 @@ class Busyverse.City
 
   center: =>
     if Busyverse.debug
-      console.log "City#center -- finding center of #{@buildings.length} buildings" 
+      console.log "City#center"
+      console.log "-- finding center of #{@buildings.length} buildings"
     xs = 0
     ys = 0
     for building in @buildings
@@ -35,20 +36,7 @@ class Busyverse.City
     @resources[resource.name] = @resources[resource.name] + 1
 
   grow: (world) =>
-    name     = @random.valueFromList [
-      "Alain", 
-      "Ferris", 
-      "Orff", 
-      "Enoch", 
-      "Carol", 
-      "Sam", 
-      "Deborah", "Liam", "Thiago", "Elias", "Sem",
-      "Allard", "Artemis", "Stephanie", "Estrella", "Simon", "Paul", "Gilles", "Mia", "Anya", "Jen",
-      "Ana", "Amelie", "Augustine", "Aaron", "Anton", "Andre", "Anders", "Ahmed", "Emma", "Lucas",
-      "Bob", "Amy", "John", "Kevin", "Tom", "Alex", "Brad", "Carrie", "Sofia", "Elisabeth", "Luka", "Gabriel",
-      "Felix", "Jean-Paul", "Michel", "Antoine", "Mohamed", "Fatima", "Juan", "Ali", "Hiroto", "Eden", "Maria", "Lisbet"
-      "George", "Gina", "Dean", "Sarah", "Cindy", "Terrence", "Clark", "Karim", "Isabel", "William", "Aya",
-    ]
+    name     = @random.valueFromList Busyverse.humanNames
     
     position = if world then world.mapToCanvasCoordinates(@center()) else [0,0]
     id       = @population.length

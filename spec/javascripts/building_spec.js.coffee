@@ -17,5 +17,5 @@ context 'Building', ->
   describe "#doesOverlap", ->
     it 'should indicate whether a position overlaps', ->
       expect(@farm.doesOverlap([2,2], [2,2])).to.eql(true)
-      expect(@farm.doesOverlap([4,4], [2,2])).to.eql(false)
+      expect(@farm.doesOverlap([5,5], [2,2])).to.eql(false)
       # expect(@farm.doesOverlap([3,4], [2,2])).to.eql(false)

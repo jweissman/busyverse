@@ -5,7 +5,11 @@ cd ~/development/etc/busyverse
 tmux new \; \
   rename-window 'server' \; \
   new-window -n 'konacha' \; \
-  new-window -n 'vim' -d 'vim .' \; \
+  new-window -n 'vim-busyverse' -d 'vim .' \; \
   send-keys -t 'server' 'bundle exec rails server' Enter \; \
   send-keys -t 'konacha' 'bundle exec rake konacha:serve' Enter \; \
+  select-window -t :2 \; \
+  split-window -v \; \
+  send-keys 'clear && archey -c && echo && echo Happy coding! && echo && echo' Enter \; \
+
   attach \;

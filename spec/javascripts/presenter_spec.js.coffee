@@ -14,23 +14,23 @@ context "Presenter", ->
     @rect = sinon.spy()
     @fillText = sinon.spy()
 
-    @context  = 
+    @context  =
       beginPath: ->
       rect: @rect
       clearRect: ->
       fill: ->
-      fillText: @fillText  
+      fillText: @fillText
       stroke: ->
-      save: ->  
-      translate: ->  
-      restore: ->  
+      save: ->
+      translate: ->
+      restore: ->
 
-    @canvas    = 
+    @canvas    =
       getContext: => @context
       addEventListener: ->
 
-    @world     = { 
-      resources: [], 
+    @world     = {
+      resources: [],
       city: { buildings: [], population: [], canAfford: -> true },
       map: { eachCell: -> },
       isDay: -> false,
