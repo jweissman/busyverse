@@ -2,6 +2,9 @@
 
 [ ![Codeship Status for jweissman/busyverse](https://www.codeship.io/projects/9c8a5150-0a08-0133-3248-521d3b82cdba/status)](https://codeship.com/projects/90649)
 
+   ![In-game Screenshot](https://raw.github.com/jweissman/busyverse/master/img/Screenshot%202015-09-22%2022.44.37.png)
+
+
 A city-building game. You control workers by giving them programmatic
 commands. 
 
