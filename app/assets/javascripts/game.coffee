@@ -100,5 +100,5 @@ class Busyverse.Game
 Busyverse.kickstart = ->
   # where does this game come from? play.html.erb?
   Busyverse.engine = new Busyverse.Engine(Busyverse.game)
-  engine.setup()
-  window.onload = -> engine.run()
+  Busyverse.engine.setup()
+  window.onload = -> Busyverse.engine.run()
