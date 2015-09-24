@@ -27,11 +27,10 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 # gem 'bcrypt', '~> 3.1.7'
 
 # Use Unicorn as the app server
-# gem 'unicorn'
+gem 'unicorn'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
-#
 
 gem 'rails_12factor', group: :production
 
@@ -39,6 +38,7 @@ gem 'pg'
 
 group :development, :test do
   gem 'sqlite3'
+
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
 
@@ -56,6 +56,10 @@ group :development, :test do
   gem 'sinon-rails'
   gem 'sinon-chai-rails'
 
+  # Use poltergeist for headless JS specs (do we actually need this *and* selenium?)
   gem 'poltergeist'
+
+  # Use cucumber for behavior-driven development
+  gem 'cucumber-rails', require: false
 end
 
