@@ -1,3 +1,5 @@
+#= require jquery
+
 class Busyverse.Engine
   constructor: (@game, @ui) ->
     @game ?= new Busyverse.Game()
@@ -7,15 +9,16 @@ class Busyverse.Engine
     @game.setup()
     
     @canvas = document.getElementById('busyverse')
+
     # Turn the lights on
     @ui.attach(@canvas)
-    @canvas.addEventListener 'mousedown', @handleClick
 
-    if typeof(jQuery) == 'undefined'
-      console.log "--- warning: jQuery is undefined!" if Busyverse.debug
+    if @canvas != null
+      @canvas.addEventListener 'mousedown', @handleClick
     else
-      $('#terminal').submit @handleCommand
-     
+      console.log "--- warning: canvas is null" if Busyverse.debug
+
+    $('#terminal').submit @handleCommand
     people = @game.world.city.population
     options = $('#target')
     options.append $('<option />').val(-1).text('all')
@@ -31,10 +34,19 @@ class Busyverse.Engine
     result = @game.send command, $('#target').val()
 
     if Busyverse.debug
-      console.log "Sent command #{command} to game with result #{result}" 
+      console.log "Sent command #{command} to game with result #{result}"
     $("span#response").text(result)
 
     event.preventDefault()
     return
 
+  @instrument: ->
+    engine = new Busyverse.Engine()
+    engine.setup()
+    window.onload = -> engine.run()
+    engine
 
+# kickstart fn
+Busyverse.kickstart = ->
+  Busyverse.engine = Busyverse.Engine.instrument()
+  true

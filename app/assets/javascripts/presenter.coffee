@@ -21,6 +21,7 @@ class Busyverse.BoundingBox
 class Busyverse.Presenter
   constructor: () ->
     @views = {}
+    @renderer = null
     console.log 'New presenter created!' if Busyverse.debug
 
   attach: (canvas) =>
@@ -36,6 +37,7 @@ class Busyverse.Presenter
         console.log "WARNING: canvas is null in Presenter#attach"
 
   centerAt: (pos, scale=Busyverse.scale) =>
+    return false if @renderer == null
     point = Isomer.Point(pos[0]*scale, pos[1]*scale)
     target = @renderer.iso._translatePoint(point)
     
@@ -48,6 +50,8 @@ class Busyverse.Presenter
     @offset = {x: x, y: y}
 
   render: (world) =>
+    return false if @renderer == null
+
     console.log "Rendering!" if Busyverse.debug
     @clear()
     @context.save()
@@ -58,6 +62,7 @@ class Busyverse.Presenter
     @ui_view.render(world)
 
   clear: ->
+    return false if @renderer == null
     @context.clearRect 0, 0, @canvas.width, @canvas.height
 
   boundingBoxes: (world) ->

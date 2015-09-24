@@ -15,8 +15,9 @@ class Busyverse.Person
     @geometry   ?= new Busyverse.Support.Geometry()
 
     @activeTask = "idle"
-
-    console.log "new person (#{@id} -- #{@name}) created at #{@position} with task #{@activeTask}" if Busyverse.debug
+    if Busyverse.debug
+      console.log "new person (#{@id} -- #{@name}) created at #{@position}"
+      console.log "current task is #{@activeTask}"
 
   backgroundWorker: =>
     return @background_worker if (@background_worker?)

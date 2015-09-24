@@ -95,10 +95,3 @@ class Busyverse.Game
     else # not 'all'
       person = @world.city.population[person_id]
       person.send op
-      
-# kickstart fn
-Busyverse.kickstart = ->
-  # where does this game come from? play.html.erb?
-  Busyverse.engine = new Busyverse.Engine(Busyverse.game)
-  Busyverse.engine.setup()
-  window.onload = -> Busyverse.engine.run()
