@@ -24,37 +24,5 @@ context "Person", ->
   describe "#send", ->
     it 'should adopt a new active task', ->
       world = {}
-      @person.send('wander', world) #{type: 'user_command', operation: "wander"}, world)
+      @person.send('wander', world)
       expect(@person.activeTask).to.equal("wander")
-      # @person.send("build")
-      # expect(@person.activeTask).to.equal("build")
-
-  # describe "#wander", ->
-  #   it 'should advance towards a randomly selected destination', ->
-  #     somewhere = [10,10]
-  #     world = { 
-  #       # nearestUnexploredCell: => somewhere
-  #       # canvasToMapCoordinates: (xy) => xy
-  #       # mapToCanvasCoordinates: (xy) => xy
-  #       # anyUnexplored: -> true
-  #       # randomLocation: -> somewhere
-  #     }
-  #     city = center: -> 
-  #     @person.wander(world, city)
-  #     expect(@person.destination).to.equal(somewhere)
-
-  describe "#move", ->
-    it 'should advance position by velocity', ->
-      world = {
-        markExplored: (pos) ->
-        markExploredSurrounding: (pos) ->
-        canvasToMapCoordinates: (pos) ->
-      }
-      @person.velocity = [1,1]
-      @person.move(world)
-      expect(@person.position).to.deep.equal([1, 1])
-
-  # describe 'update'
-  # describe 'build'
-  # describe 'updatePath'
-

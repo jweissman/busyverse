@@ -9,11 +9,11 @@
 #= require player
 
 class Busyverse.Game
-  width:  Math.floor Busyverse.width / Busyverse.cellSize 
-  height: Math.floor Busyverse.height / Busyverse.cellSize 
+  width:  Math.floor Busyverse.width / Busyverse.cellSize
+  height: Math.floor Busyverse.height / Busyverse.cellSize
   cellSize: Busyverse.cellSize
 
-  stepLength: Busyverse.stepLength 
+  stepLength: Busyverse.stepLength
 
   constructor: (@world, @player) ->
     @player ?= new Busyverse.Player()
@@ -42,13 +42,13 @@ class Busyverse.Game
     @render()
     setTimeout @step, @stepLength
 
-  update: () => @world.update() 
+  update: () => @world.update()
 
   render: () =>
     console.log "Rendering to UI" if Busyverse.verbose
     @ui.render(@world)
 
-  click: (position, event) => 
+  click: (position, event) =>
     console.log "click position=#{position} event=#{event}"
 
     pos = @ui.renderer.mousePos
@@ -56,9 +56,9 @@ class Busyverse.Game
 
     ui_hit = false
     for box in @ui.boundingBoxes(@world)
-      hit = box.hit adjusted_pos 
+      hit = box.hit adjusted_pos
       if hit
-        @handleClickElement(box.name) 
+        @handleClickElement(box.name)
         ui_hit = true
 
     unless ui_hit
@@ -77,17 +77,18 @@ class Busyverse.Game
         @chosenBuilding = building
 
   attemptToConstructBuilding: (mouseLocation) =>
-    building = Busyverse.Building.generate(@chosenBuilding.name, mouseLocation) 
+    building = Busyverse.Building.generate(@chosenBuilding.name, mouseLocation)
     @world.tryToBuild(building, true)
 
   send: (command, person_id) =>
     console.log "Game#send command=#{command} person_id=#{person_id}"
     console.log command
     op = command
-    console.log "WARNING: NO TARGET ID person_id PROVIDED FOR COMMAND" unless person_id
+    unless person_id
+      console.log "WARNING: NO TARGET ID person_id PROVIDED FOR COMMAND"
 
     if person_id < 0 # 'all'
-      responses = "" 
+      responses = ""
       for person in @world.city.population
         responses += person.send(op) + ". "
       responses
@@ -97,6 +98,7 @@ class Busyverse.Game
       
 # kickstart fn
 Busyverse.kickstart = ->
-  engine = Busyverse.engine = new Busyverse.Engine(Busyverse.game) # where does this game come from? play.html.erb?
+  # where does this game come from? play.html.erb?
+  Busyverse.engine = new Busyverse.Engine(Busyverse.game)
   engine.setup()
   window.onload = -> engine.run()
