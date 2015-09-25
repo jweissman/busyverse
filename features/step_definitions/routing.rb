@@ -1,6 +1,5 @@
 Given(/^I am on (.*)$/) do |page|
-  puts "--- would be routing to #{page}"
-  #pending
+  visit root_path
 end
 
 When(/^I click (.*)$/) do |element|

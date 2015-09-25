@@ -26,3 +26,14 @@ context "Person", ->
       world = {}
       @person.send('wander', world)
       expect(@person.activeTask).to.equal("wander")
+
+  describe "#move", ->
+    it 'should advance position by velocity', ->
+      world = {
+        markExplored: (pos) ->
+        markExploredSurrounding: (pos) ->
+        canvasToMapCoordinates: (pos) ->
+      }
+      @person.velocity = [1,1]
+      @person.move(world)
+      expect(@person.position).to.deep.equal([1, 1])

@@ -5,7 +5,7 @@
 class Busyverse.Person
   size: [5,9]
   speed: 2.0
-  visionRadius: 4
+  visionRadius: Busyverse.defaultVisionRadius
   velocity: [0,0]
 
 
@@ -28,30 +28,36 @@ class Busyverse.Person
 
   send: (msg, world=Busyverse.engine.game.world) =>
     @activeTask = "idle"
-    console.log "Person#send msg=#{msg}"
+    console.log "Person#send msg=#{msg}" if Busyverse.trace
     city = world.city
     console.log "updating #{@name}'s active task to #{cmd}" if Busyverse.debug
     cmd = msg
 
     if cmd == "wander" or cmd == "idle" or cmd == "build" or cmd == "gather"
-      if cmd == "build" 
+      if cmd == "build"
         if city.resources['wood'] < 2
           return "A NEW FARM REQUIRES 2 WOOD"
 
         @buildingToCreate = new Busyverse.Buildings.Farm()
-        openArea = world.findOpenAreaOfSizeInCity(city, @buildingToCreate.size, 2*city.population.length)
+
+        size = @buildingToCreate.size
+        radius = 2*city.population.length
+        openArea = world.findOpenAreaOfSizeInCity(city, size, radius)
+
         if typeof(openArea) == 'undefined' || openArea == null
           return "NO OPEN AREAS FOR BUILDING"
 
         @destinationCell = openArea
         @buildingToCreate.position = @destinationCell
 
-        console.log "BUILDING #{@buildingToCreate.name} AT #{@buildingToCreate.position}" if Busyverse.debug and Busyverse.verbose
+        if Busyverse.debug and Busyverse.verbose
+          console.log "building #{@buildingToCreate.name}..."
+          console.log "...at #{@buildingToCreate.position}"
 
       else if cmd == "gather"
         console.log "GATHER COMMAND RECEIVED" if Busyverse.debug
         return "no resources to gather!" unless world.resources.length > 0
-        resources = world.resources.filter (resource) =>
+        resources = world.resources.filter (resource) ->
           world.isLocationExplored(resource.position)
 
         if resources.length == 0
@@ -61,11 +67,11 @@ class Busyverse.Person
         min_dist = Infinity
         target = @mapPosition(world)
         sortedResources = resources.sort (a, b) =>
-          distance_to_a = @geometry.euclideanDistance(a.position, target)  
-          distance_to_b = @geometry.euclideanDistance(b.position, target) 
+          distance_to_a = @geometry.euclideanDistance(a.position, target)
+          distance_to_b = @geometry.euclideanDistance(b.position, target)
 
           return if distance_to_a < distance_to_b
-            -1 
+            -1
           else if distance_to_b < distance_to_a
             1
           else
@@ -74,7 +80,9 @@ class Busyverse.Person
 
         @resourceToGather = @random.valueFromList(sortedResources[..4])
         @destinationCell  = @resourceToGather.position
-        console.log "Gathering #{@resourceToGather.name} at #{@destinationCell}" if Busyverse.debug
+        if Busyverse.debug
+          name = @resourceToGather.name
+          console.log "Gathering #{name} at #{@destinationCell}"
 
 
       @activeTask  = cmd
@@ -93,7 +101,7 @@ class Busyverse.Person
     else if @activeTask == "gather"
       @gather(world, city)
     if @activeTask != "idle"
-      @move(world, city) 
+      @move(world, city)
 
   move: (world, city) =>
     @position[0] = @position[0] + @velocity[0]
@@ -107,17 +115,17 @@ class Busyverse.Person
   build: (world, city) =>
     @seek(world)
     if @atSoughtLocation(world)
-      console.log "CREATING BUILDING #{@buildingToCreate.name} at #{@buildingToCreate.position}" if Busyverse.debug
       world.tryToBuild(@buildingToCreate, true)
       @send 'build'
 
   gather: (world, city) =>
     if world.resources.length == 0
-      @send('idle') 
+      @send('idle')
       return
+
     @seek(world)
+
     if @atSoughtLocation(world)
-      console.log "GATHERING RESOURCE #{@resourceToGather.name}" if Busyverse.debug
       if world.resources.indexOf(@resourceToGather)
         world.resources.remove(world.resources.indexOf(@resourceToGather))
         city.addResource @resourceToGather
@@ -130,23 +138,27 @@ class Busyverse.Person
 
   pickWanderDestinationCell: (world, city) =>
     @random.valueFromPercentageMap
-      40: world.nearbyUnexploredCell(@mapPosition(world),15)
-      30: world.nearbyUnexploredCell(@mapPosition(world),30)
-      25: world.randomPassableCell()
+      70: world.nearbyUnexploredCell(@mapPosition(world),5)
+      20: world.nearbyUnexploredCell(@mapPosition(world),8)
+      10: world.nearbyUnexploredCell(@mapPosition(world),13)
+      # 5:  world.randomPassableCell()
 
   wander: (world, city) =>
     @destinationCell ?= @pickWanderDestinationCell(world, city)
     @velocity         = [0,0]
-    console.log "#{@name} wandering to #{@destinationCell}" if Busyverse.debug && Busyverse.verbose
+
     @seek(world)
     if @atSoughtLocation(world)
-      console.log "Person#wander ---> At sought location (#{@destination}), could be picking new wander target" if Busyverse.debug
       @path = null
       @destinationCell = @pickWanderDestinationCell(world, city)
 
   atSoughtLocation: (world) =>
     return false unless @destinationCell
-    offset = [ (Busyverse.cellSize / 2) - @size[0] / 2, (Busyverse.cellSize / 2) - @size[1] / 2 ]
+
+    x_off = (Busyverse.cellSize / 2) - @size[0] / 2
+    y_off = (Busyverse.cellSize / 2) - @size[1] / 2
+    offset = [ x_off, y_off ]
+
     target = world.mapToCanvasCoordinates(@destinationCell, offset)
     distance = @geometry.euclideanDistance(@position, target)
     distance <= @speed*2
@@ -165,21 +177,26 @@ class Busyverse.Person
 
     recompute = false
 
-    if @path && @path.length > 0 && @arrayEqual(@path[@path.length-1], @destinationCell)
-      offset = [ (Busyverse.cellSize / 2) - @size[0] / 2, (Busyverse.cellSize / 2) - @size[1] / 2 ]
+    more_path_left = @path && @path.length > 0
+
+    if more_path_left && @arrayEqual(@path[@path.length-1], @destinationCell)
+      x_off = (Busyverse.cellSize / 2) - @size[0] / 2
+      y_off = (Busyverse.cellSize / 2) - @size[1] / 2
+      offset = [ x_off, y_off ]
       nextTarget = world.mapToCanvasCoordinates(@path[0], offset)
       distance = @geometry.euclideanDistance(nextTarget, @position)
 
-      if distance <= @speed * 2  
+      if distance <= @speed * 2
         matches   = @path.filter (n) => @arrayEqual(n, srcCell.location)
         src_index = @path.indexOf(matches[0])
         @path.splice(0, src_index+1)
 
       if @path.length >= 1
-        offset = [ (Busyverse.cellSize / 2) - @size[0] / 2, (Busyverse.cellSize / 2) - @size[1] / 2 ]
+        x_off = (Busyverse.cellSize / 2) - @size[0] / 2
+        y_off = (Busyverse.cellSize / 2) - @size[1] / 2
+        offset = [ x_off, y_off ]
         nextTarget = world.mapToCanvasCoordinates(@path[0], offset)
         @destination = nextTarget
-      else if distance <= @speed * 2
       else
         recompute = true
     else
@@ -202,18 +219,19 @@ class Busyverse.Person
       worker.postMessage(msg)
        
   handlePathResponse: (pathData) =>
-    console.log "Person#handlePathResponse" if Busyverse.debug and Busyverse.verbose
+    console.log "Person#handlePathResponse" if Busyverse.trace
     @recomputing = false
     @path = pathData
 
     if @path && @path.length > 1
       console.log "GOT PATH! Setting destination..." if Busyverse.verbose
       world = Busyverse.engine.game.world
-      offset = [ (Busyverse.cellSize / 2) - @size[0] / 2, (Busyverse.cellSize / 2) - @size[1] / 2 ]
+      x_off = (Busyverse.cellSize / 2) - @size[0] / 2
+      y_off = (Busyverse.cellSize / 2) - @size[1] / 2
+      offset = [ x_off, y_off ]
       @destination = world.mapToCanvasCoordinates(@path[1], offset)
       console.log "new destination = #{@destination}" if Busyverse.verbose
     else
-      console.log "WARNING! @path was empty, setting path, destinationCell and destination to null..." if Busyverse.debug
       @path = null
       @destinationCell = null
 
@@ -233,9 +251,9 @@ class Busyverse.Person
       @velocity[0] = 0
     
     if dy >= @speed
-      if @destination[1] < @position[1] 
+      if @destination[1] < @position[1]
         @velocity[1] = -@speed
-      else if @destination[1] > @position[1] 
+      else if @destination[1] > @position[1]
         @velocity[1] = @speed
     else
       @velocity[1] = 0

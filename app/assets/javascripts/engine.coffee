@@ -6,6 +6,7 @@ class Busyverse.Engine
     @ui   ?= new Busyverse.Presenter()
 
   setup: ->
+    console.log(Busyverse.banner)
     @game.setup()
     
     @canvas = document.getElementById('busyverse')

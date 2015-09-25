@@ -37,6 +37,8 @@ gem 'rails_12factor', group: :production
 gem 'pg'
 
 group :development, :test do
+  gem 'rspec-rails', '~> 2.0'
+
   gem 'sqlite3'
 
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -61,5 +63,6 @@ group :development, :test do
 
   # Use cucumber for behavior-driven development
   gem 'cucumber-rails', require: false
+  gem 'capybara-webkit'
 end
 

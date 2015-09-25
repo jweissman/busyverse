@@ -23,7 +23,7 @@ class Busyverse.Building
              new Busyverse.Buildings.Tower() ]
 
   @generate: (name, location) ->
-    console.log "generating building of type #{name} at #{location}"
+    console.log "generating building of type #{name} at #{location}" if Busyverse.debug
     building = null
     if name == 'Small Farm'
       building = new Busyverse.Buildings.Farm(location)
@@ -31,5 +31,4 @@ class Busyverse.Building
       building = new Busyverse.Buildings.House(location)
     else if name == 'Large Tower'
       building = new Busyverse.Buildings.Tower(location)
-    console.log building
     building

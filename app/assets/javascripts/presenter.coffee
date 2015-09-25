@@ -2,21 +2,7 @@
 #= require support/geometry
 #= require iso_renderer
 #= require iso_view
-
-class Busyverse.BoundingBox
-  constructor: (@name, @position, @size) ->
-  hit: (pos) ->
-    console.log "new bounding box #{@name} at"
-    console.log @position
-    console.log "of size"
-    console.log @size
-    console.log "--- was hit at ...?"
-    console.log pos
-    wasHit = @position[0] <= pos.x <= @position[0] + @size[0] &&
-             @position[1] <= pos.y <= @position[1] + @size[1]
-    console.log wasHit
-    return wasHit
-
+#= require bounding_box
 
 class Busyverse.Presenter
   constructor: () ->
@@ -68,6 +54,7 @@ class Busyverse.Presenter
   boundingBoxes: (world) ->
     boxes = []
     for element in @ui_view.constructPalette(world.city)
-      box = new Busyverse.BoundingBox(element.name, element.position, element.size)
+      {name, position, size} = element
+      box = new Busyverse.BoundingBox(name, position, size)
       boxes.push(box) if element.clickable
     boxes
