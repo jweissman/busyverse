@@ -4,6 +4,7 @@
 #= require resources/wood
 #= require world
 #= require sinon
+#= require spec_helper
 
 context "World", ->
   beforeEach ->
@@ -37,30 +38,31 @@ context "World", ->
 
   describe "#randomCell", ->
     it 'should be within the world', ->
-      @random_api = valueInRange: (range) => 0
-      @random_mock = sinon.mock(@random_api)
+      @spy = sinon.spy()
+      random = valueInRange: @spy
 
-      @world.random = @random_api 
-      @random_mock.expects("valueInRange").once().withArgs(@height)
-      @random_mock.expects("valueInRange").once().withArgs(@width)
-
+      @world.random = random
       @world.randomCell()
 
-      @random_mock.verify()
+      @spy.should.have.been.calledWith(@height)
+      @spy.should.have.been.calledWith(@width)
 
   describe "#canvasToMapCoordinates", ->
     it 'should convert according to cell size', ->
       x = 25.5
       y = 54.5
 
-      expectedLocation = [ Math.round(x / @world.cellSize), Math.round(y / @world.cellSize)]
+      expectX = Math.round(x / @world.cellSize)
+      expectY = Math.round(y / @world.cellSize)
+      
+      expectedLocation = [ expectX, expectY ]
       actualLocation = @world.canvasToMapCoordinates([x, y])
 
       expect(actualLocation).to.deep.eql(expectedLocation)
 
   describe "#findOpenAreasOfSizeInCity", ->
     it 'should find open areas', ->
-      city = 
+      city =
         availableForBuilding: -> true
         center: -> [3,3]
 

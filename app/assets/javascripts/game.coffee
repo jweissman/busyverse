@@ -49,7 +49,7 @@ class Busyverse.Game
     @ui.render(@world)
 
   click: (position, event) =>
-    console.log "click position=#{position} event=#{event}"
+    console.log "click position=#{position} event=#{event}" if Busyverse.trace
 
     pos = @ui.renderer.mousePos
     adjusted_pos = {x: pos.x * 2, y: pos.y * 2}
@@ -65,15 +65,13 @@ class Busyverse.Game
       if @chosenBuilding != null
         if @attemptToConstructBuilding(position)
           @chosenBuilding = null
-      @ui.centerAt(position) # -> maybe only if shift-clicking?
-
-      # @chosenBuilding = null
+      @ui.centerAt(position)
 
   handleClickElement: (elementName) =>
-    console.log "!!!!!!! handle click element: #{elementName} "
+    console.log "Game#handleClickElement: #{elementName} " if Busyverse.trace
     for building in Busyverse.Building.all()
       if building.name == elementName
-        console.log "would be choosing #{building.name}"
+        console.log "would be choosing #{building.name}" if Busyverse.debug
         @chosenBuilding = building
 
   attemptToConstructBuilding: (mouseLocation) =>

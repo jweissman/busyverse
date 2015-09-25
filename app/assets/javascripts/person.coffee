@@ -8,7 +8,6 @@ class Busyverse.Person
   visionRadius: Busyverse.defaultVisionRadius
   velocity: [0,0]
 
-
   constructor: (@id, @name, @position) ->
     @position   ?= [0,0]
     @random     ?= new Busyverse.Support.Randomness()
@@ -138,10 +137,11 @@ class Busyverse.Person
 
   pickWanderDestinationCell: (world, city) =>
     @random.valueFromPercentageMap
-      70: world.nearbyUnexploredCell(@mapPosition(world),5)
-      20: world.nearbyUnexploredCell(@mapPosition(world),8)
-      10: world.nearbyUnexploredCell(@mapPosition(world),13)
-      # 5:  world.randomPassableCell()
+      70: world.nearbyUnexploredCell(@mapPosition(world),13)
+      20: world.nearbyUnexploredCell(@mapPosition(world),21)
+      10: world.nearbyUnexploredCell(@mapPosition(world),44)
+      5:  world.nearbyUnexploredCell(@mapPosition(world),65)
+      1:  world.randomPassableCell()
 
   wander: (world, city) =>
     @destinationCell ?= @pickWanderDestinationCell(world, city)
