@@ -7,7 +7,7 @@ A city-building game. You control workers by giving them commands.
 
 ## Requirements
 
-Ruby 2.2.2. No system dependencies so far. Configuration is currently all in code. No databse functionality needed yet (the game engine is entirely in JS.)
+Ruby 2.2.2. No system dependencies so far. The game engine is entirely in JS and configuration is currently all in code, so no database required yet.
 
 ![In-game Screenshot](https://raw.github.com/jweissman/busyverse/master/img/busyverse-sm.png)
 
