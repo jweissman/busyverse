@@ -1,8 +1,6 @@
 #= require busyverse
 #= require views/view
-#= require views/world_view
 #= require views/ui_view
-#= require views/building_view
 #= require views/person_view
 #= require game
 #= require presenter
@@ -48,4 +46,3 @@ context "Presenter", ->
     it 'should render the world', ->
       @presenter.render @world
       @fillText.should.have.been.called.twice
-      
