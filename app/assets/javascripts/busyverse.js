@@ -15,17 +15,17 @@ var Busyverse = {
   Worker: {},
 
   // config
-  width: 800,
-  height: 600,
+  width: 600,
+  height: 800,
 
   cellSize: 10,
-  stepLength: 36,
+  stepLength: 32,
     
   initialPopulation: 3,
   startingResources: 500,
   defaultVisionRadius: 6,
 
-  scale: 0.86,
+  scale: 0.76,
 
   // banner
   banner: " _                                   \n"+        

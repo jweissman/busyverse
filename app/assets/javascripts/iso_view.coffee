@@ -28,38 +28,85 @@ class Busyverse.IsoView
     for resource in @world.resources
       if @world.isLocationExplored resource.position
         shape = @constructResourceShape resource
-        models.push {shape: shape, color: @green, size: [1,1]}
+        models.push
+          shape: shape
+          color: @green
+          # size: [1,1]
+          position: resource.position
 
     for building in @world.city.buildings
-      shape = @constructBuildingShape building
-      color = new Color(building.color.red, building.color.green, building.color.blue)
-      models.push {shape: shape, color: color, size: building.size}
+      { red, green, blue } = building.color
+      color = new Color(red, green, blue)
+      for dx in [0...building.size[0]]
+        for dy in [0...building.size[1]]
+          x = building.position[0] + dx
+          y = building.position[1] + dy
+          shape = @constructBuildingShape building, x, y
+          models.push
+            shape: shape
+            color: color
+            position: [x,y]
 
     for person in @world.city.population
       shape = @constructPersonShape person
-      models.push {shape: shape, color: @white, size: [1,1]}
+      models.push
+        shape: shape
+        color: @white
+        # size: [1,1]
+        position: person.mapPosition(@world)
 
     if mousePosition && Busyverse.engine.game.chosenBuilding
-      building = Busyverse.Building.generate(Busyverse.engine.game.chosenBuilding.name, mousePosition)
-      cursor = @constructBuildingShape building
+      name = Busyverse.engine.game.chosenBuilding.name
+      building = Busyverse.Building.generate(name, mousePosition)
+      # cursor = @constructBuildingShape building
       color = @white
       if @world.tryToBuild(building, false)
-        color = new Color(building.color.red, building.color.green, building.color.blue)
+        { red, green, blue } = building.color
+        color = new Color(red, green, blue)
+      for dx in [0...building.size[0]]
+        for dy in [0...building.size[1]]
+          x = building.position[0] + dx
+          y = building.position[1] + dy
+          shape = @constructBuildingShape building, x, y
+          models.push
+            shape: shape
+            color: color
+            position: [x,y]
+      # models.push
+      #   shape: cursor
+      #   color: color
+      #   size: building.size
+      #   position: building.position
 
-      models.push({shape: cursor, color: color, size: building.size})
+    models.sort(@isCloserToCamera)
 
-    models.sort(@isCloserThan) #.reverse()
+  isCloserToCamera: (model_a,model_b) =>
+    #console.log "--- IsoView#isCloserToCamera"
+    @camera = [-10,-10] #,30]
 
-  isCloserThan: (model_a,model_b) =>
-    @camera = [-10,-10,30]
-    a = model_a.shape.paths[0].points[0]
-    b = model_b.shape.paths[0].points[0]
+    a = model_a.position
+    b = model_b.position
 
-    a_pos = [a.x + model_a.size[0]/2, a.y + model_a.size[1]/2, 0]
-    b_pos = [b.x + model_a.size[0]/2, b.y + model_b.size[1]/2, 0]
+    # console.log " ====="
+    # console.log " ---> model a position: #{a}"
+    # console.log " ---> model a size: #{model_a.size}"
+    # console.log " ====="
+    # console.log " ---> model b position: #{b}"
+    # console.log " ---> model b size: #{model_b.size}"
+    # console.log " ====="
+
+    a_pos = a # [a[0] + model_a.size[0], a[1]] # + model_a.size[1]]
+    b_pos = b # [b[0] + model_b.size[0], b[1]] # + model_b.size[1]]
+
+    # console.log " ---> model a adjusted position: #{a_pos}"
+    # console.log " ---> model b adjusted position: #{b_pos}"
 
     delta_a = @geometry.euclideanDistance(a_pos, @camera)
     delta_b = @geometry.euclideanDistance(b_pos, @camera)
+
+    # console.log " ====="
+    # console.log " ---> distance of a to camera: #{delta_a}"
+    # console.log " ---> distance of b to camera: #{delta_b}"
 
     less_than_condition = delta_a < delta_b
     more_than_condition = delta_a > delta_b
@@ -72,8 +119,13 @@ class Busyverse.IsoView
     tree = new Tree(resource.position)
     @pyramid(tree.x, tree.y, tree.size)
 
-  constructBuildingShape: (building) =>
-    @prism(building.position[0], building.position[1], building.size[0], building.size[1], building.size[2])
+  constructBuildingShape: (building, x, y) =>
+    # x = x #building.position[0]
+    # y = y # building.position[1]
+    w = 1 # building.size[0]
+    l = 1 # building.size[1]
+    h = building.size[2]
+    @prism(x, y, w, l, h)
 
   constructPersonShape: (person) =>
     x = person.position[0] / Busyverse.cellSize
@@ -81,7 +133,7 @@ class Busyverse.IsoView
     @prism(x,y, 0.3,0.3,1.2)
 
   assembleCellModel: (cell) =>
-    cell_shape = @prism(cell.location[0], cell.location[1], 1,1,0.01) 
+    cell_shape = @prism(cell.location[0], cell.location[1], 1,1,0.01)
     color = @blue
     if cell.color == 'darkgreen'
       color = @green
@@ -94,7 +146,7 @@ class Busyverse.IsoView
   prism: (x,y,length,width,height) ->
     Prism( @point(x,y), length * @scale, width * @scale, height * @scale)
 
-  pyramid: (x,y,size) -> 
+  pyramid: (x,y,size) ->
     location = @point(x, y)
     length = size[0] * @scale
     width = size[1] * @scale

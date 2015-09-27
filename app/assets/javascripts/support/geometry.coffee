@@ -1,6 +1,6 @@
 class Busyverse.Support.Geometry
-  euclideanDistance: (a, b) => 
-    # console.log "Geometry#euclideanDistance a=#{a}, b=#{b}"
+  euclideanDistance: (a, b) ->
+    console.log "Geometry#euclideanDistance a=#{a}, b=#{b}" if Busyverse.trace
     a1 = a[0]
     a2 = a[1]
     b1 = b[0]
@@ -11,8 +11,8 @@ class Busyverse.Support.Geometry
 
     Math.sqrt( (dx*dx) + (dy*dy) )
 
-  euclideanDistance3: (a, b) => 
-    # console.log "Geometry#euclideanDistance a=#{a}, b=#{b}"
+  euclideanDistance3: (a, b) ->
+    console.log "Geometry#euclideanDistance3 a=#{a}, b=#{b}" if Busyverse.trace
     a1 = a[0]
     a2 = a[1]
     a3 = a[2]
@@ -26,6 +26,5 @@ class Busyverse.Support.Geometry
     dz = Math.abs(b3 - a3)
 
     Math.sqrt( (dx*dx) + (dy*dy) + (dz*dz) )
-
 
   # pickClosestTo: (a*b)
