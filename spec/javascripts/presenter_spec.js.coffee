@@ -22,6 +22,7 @@ context "Presenter", ->
       save: ->
       translate: ->
       restore: ->
+      drawImage: ->
 
     @canvas    =
       getContext: => @context
@@ -29,7 +30,11 @@ context "Presenter", ->
 
     @world     = {
       resources: [],
-      city: { buildings: [], population: [], canAfford: -> true },
+      city:
+        buildings: [],
+        population: [],
+        canAfford: -> true,
+        getNewlyExploredLocations: -> []
       map: { eachCell: -> },
       isDay: -> false,
       describeTime: -> "midnight"

@@ -11,7 +11,12 @@ context "Busyverse.IsoRenderer", ->
       addEventListener: ->
     }
 
-    @renderer = new Busyverse.IsoRenderer(@canvas)
+    offscreenContext = {}
+    @offscreenCanvas = {
+      getContext: -> offscreenContext
+    }
+
+    @renderer = new Busyverse.IsoRenderer(@canvas, @offscreenCanvas)
 
   describe "getMousePos", ->
     it 'computes mouse position', ->

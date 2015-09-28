@@ -42,7 +42,7 @@ class Busyverse.City
     id       = @population.length
 
     person = new Busyverse.Person(id, name, position, task)
-    task     = "wander" #@random.valueFromList [ "wander" ] #, "gather", "build" ]
+    task     = "wander"
 
     person.send(task, world)
 
@@ -58,7 +58,8 @@ class Busyverse.City
     true
     
   create: (structure) =>
-    console.log "creating new building [name=#{structure.name}]" if Busyverse.debug and Busyverse.verbose
+    if Busyverse.debug
+      console.log "creating new building [name=#{structure.name}]"
     return false unless @canAfford(structure)
 
     for resource of structure.costs
@@ -67,7 +68,8 @@ class Busyverse.City
     @buildings.push(structure)
 
   indicateAccessible: (location) =>
-    console.log "City#indicateAccessible [location=#{location}]" if Busyverse.debug and Busyverse.verbose
+    if Busyverse.trace
+      console.log "City#indicateAccessible [location=#{location}]"
 
     @accessible[location[0]] ?= []
     @accessible[location[0]][location[1]] = true
@@ -77,22 +79,38 @@ class Busyverse.City
       true
     else
       false
+  
+  allExploredLocations: => @exploredLocations ||= []
 
-  explore:    (location) => 
-    console.log "City#explore [location=#{location}]" if Busyverse.debug and Busyverse.verbose
+
+  explore:    (location) =>
+    if Busyverse.trace
+      console.log "City#explore [location=#{location}]"
     @explored[location[0]] ?= []
     @explored[location[0]][location[1]] = true
 
-  isExplored: (location) => 
+    @exploredLocations ||= []
+    @exploredLocations.push(location)
+
+    @newlyExploredLocations ||= []
+    @newlyExploredLocations.push(location)
+
+  getNewlyExploredLocations: =>
+    locations = @newlyExploredLocations
+    @newlyExploredLocations = []
+    locations
+
+  isExplored: (location) =>
     return false unless location
-    # console.log "determining if location #{location} is explored...?"
+
     if @explored[location[0]] && @explored[location[0]][location[1]]
       true
     else
       false
     
-  isAreaFullyExplored: (location, size) => 
-    console.log "City#isAreaFullyExplored [location=#{location}, size=#{size}]" if Busyverse.debug and Busyverse.verbose
+  isAreaFullyExplored: (location, size) =>
+    if Busyverse.trace
+      console.log "City#isAreaFullyExplored [loc=#{location}, size=#{size}]"
     for x in [0..size[0]]
       for y in [0..size[1]]
         shifted_location = [location[0] + x, location[1] + y]

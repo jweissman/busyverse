@@ -8,16 +8,32 @@ class Busyverse.Presenter
   constructor: () ->
     @views = {}
     @renderer = null
+    @offset   = { x: 0, y: 0 }
+
     console.log 'New presenter created!' if Busyverse.debug
 
   attach: (canvas) =>
     console.log "About to create drawing context" if Busyverse.verbose
 
+
     if canvas != null
       @canvas   = canvas
       @context  = @canvas.getContext('2d')
-      @offset   = { x: 0, y: 0 }
-      @renderer = new Busyverse.IsoRenderer(@canvas)
+
+      @offscreenCanvas = document.createElement('canvas')
+      @offscreenCanvas.width  = 15000 # canvas.width  * 1.0 # + 100 # * 2
+      @offscreenCanvas.height = 15000 # canvas.height * 1.0 # + 100 # * 2
+      #@offscreenCanvas.getContext('2d').translate(1000, 1000)
+      # Does this become easier if stop translating context around for scrolling?
+      # We have to know what goes under the camera
+      # And translate everything accordingl
+      # Seems nightmarish really !
+      # But then after that maybe simpler to do layers with
+      # offscreen canvas
+      # Worth it??
+
+      @renderer = new Busyverse.IsoRenderer(@canvas, @offscreenCanvas)
+
     else
       if Busyverse.debug
         console.log "WARNING: canvas is null in Presenter#attach"
@@ -31,8 +47,8 @@ class Busyverse.Presenter
     h = @canvas.height
     @translate(w/2 - target.x, h/2 - target.y)
 
-  translate: (x,y) =>
-    console.log "New offset! => #{x}, #{y}" if Busyverse.debug
+  translate: (x, y) =>
+    console.log "New offset! => #{x}, #{y}" #if Busyverse.debug
     @offset = {x: x, y: y}
 
   render: (world) =>
@@ -42,7 +58,8 @@ class Busyverse.Presenter
     @clear()
     @context.save()
     @context.translate(@offset.x,@offset.y)
-    @renderer.draw world
+    @renderer.drawBg(world, @offset)
+    @renderer.draw(world, @offset)
     @context.restore()
     @ui_view = new Busyverse.Views.UIView(world.city, @context)
     @ui_view.render(world)

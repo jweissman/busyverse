@@ -1,10 +1,15 @@
 Point = Isomer.Point
 
 class Busyverse.IsoRenderer
-  constructor: (@canvasElement) ->
-    @context  = @canvasElement.getContext('2d')
+  constructor: (@canvasElement, @offscreenCanvasElement) ->
+    @context  = @canvasElement.getContext '2d'
+    @offscreenContext = @offscreenCanvasElement.getContext '2d'
+
     #console.log @iso
-    @iso = new Isomer(@canvasElement) #@canvas)
+    #origin = { originX: 0, originY: 0 }
+    offset = 5000
+    @iso = new Isomer(@canvasElement, originX: offset, originY: offset)
+    @bg_iso = new Isomer(@offscreenCanvasElement, originX: offset, originY: offset)
 
     @projectedMousePos = null
     @canvasElement.addEventListener 'mousemove', ((evt) =>
@@ -20,17 +25,31 @@ class Busyverse.IsoRenderer
       y: evt.clientY - (rect.top)
     }
 
-  draw: (world, scale=Busyverse.scale) =>
-    view = new Busyverse.IsoView(world)
+  constructView: (world) -> new Busyverse.IsoView(world)
 
-    world.map.eachCell (cell) =>
-      if world.isCellExplored(cell)
-        cell_model = view.assembleCellModel(cell)
-        @iso.add cell_model.shape, cell_model.color
+  constructCellModels: (view, world) ->
+    for location in world.city.getNewlyExploredLocations()
+      cell = world.map.getCellAt location
+      cell_model = view.assembleCellModel cell
 
+  drawCells: (cell_models, offset) =>
+    for cell_model in cell_models
+      @bg_iso.add cell_model.shape, cell_model.color
+
+    { x, y } = offset
+    { width, height } = @canvasElement
+    src = @offscreenContext.canvas
+
+    w = width
+    h = height
+    @context.drawImage src, -x, -y, w, h, -x, -y, w, h
+
+  drawModels: (view, world) =>
     for model in view.assembleModels(@projectedMousePos)
       @iso.add(model.shape, model.color)
-    
+
+  drawPeopleLabels: (world) =>
+    scale = Busyverse.scale
     @context.fillStyle = "#FFFFFF"
     @context.font = "Bold 30px Helvetica"
 
@@ -39,8 +58,19 @@ class Busyverse.IsoRenderer
       y = person.position[1]*scale / Busyverse.cellSize
       point = Point(x, y)
       pos = @iso._translatePoint(point)
-      view = new Busyverse.Views.PersonView(person, @context)
-      view.render(pos.x, pos.y)
+      personView = new Busyverse.Views.PersonView(person, @context)
+      personView.render(pos.x, pos.y)
+
+  drawBg: (world, offset) =>
+    view = @constructView(world)
+    cell_models = @constructCellModels(view,world)
+
+    @drawCells(cell_models, offset)
+
+  draw: (world) =>
+    view = @constructView(world)
+    @drawModels(view)
+    @drawPeopleLabels(world)
 
   projectCoordinate: (xy) =>
     scale  = Busyverse.scale
@@ -62,9 +92,9 @@ class Busyverse.IsoRenderer
     d = (-(ox * tx[0][1]))
     py = (d - (ox * tx[0][0]) + (tx[0][0] * y) + (tx[0][1] * x)) / det
 
-    offsetX = -0.0 / scale
-    offsetY = 3.0 / scale
+    # offsetX = -0.0 / scale
+    # offsetY = 0.0 / scale
 
-    x = Math.floor(px/scale + offsetX)
-    y = Math.floor(py/scale + offsetY)
+    x = Math.floor(px/scale) # + offsetX)
+    y = Math.floor(py/scale) # + offsetY)
     [ x, y ]

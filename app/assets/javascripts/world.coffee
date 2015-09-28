@@ -159,11 +159,27 @@ class Busyverse.World
     return areas
 
   allCellsWithin: (maxDistance, center) =>
-    cellsInRadius = []
-    @map.eachCell (cell) =>
-      if @geometry.euclideanDistance(cell.location, center) <= maxDistance
-        cellsInRadius.push(cell)
-    cellsInRadius
+    @cellPatterns ?= {}
+    unless @cellPatterns[maxDistance]
+      @cellPatterns[maxDistance] = @computeCellPattern(maxDistance)
+    @applyCellPattern(@cellPatterns[maxDistance], center)
+
+  computeCellPattern: (distance) ->
+    pattern = []
+    for x in [-distance..distance]
+      for y in [-distance..distance]
+        if @geometry.euclideanDistance([x,y], [0,0]) <= distance
+          pattern.push([x,y])
+    pattern
+
+  applyCellPattern: (pattern, origin) ->
+    cells = []
+    for xy in pattern
+      target = [ xy[0] + origin[0], xy[1] + origin[1] ]
+      cell = @map.getCellAt(target)
+      if cell
+        cells.push cell
+    cells
 
   markExplored: (cellCoords) =>
     @city.explore(cellCoords) unless @isLocationExplored(cellCoords)
