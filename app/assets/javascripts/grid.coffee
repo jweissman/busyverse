@@ -25,7 +25,7 @@ class Busyverse.Grid
   evolve: (depth=6, noise=true) =>
     return if depth <= 0
     console.log "evolve depth=#{depth}" if Busyverse.debug
-    @eachCell (cell) => 
+    @eachCell (cell) =>
       cell.color = @random.valueFromPercentageMap
         25: if noise then 'darkgreen' else @mostCommonNeighborColor(cell)
         30: cell.color
@@ -34,8 +34,8 @@ class Busyverse.Grid
     @evolve(depth-1, !noise)
 
   decorate: =>
-    @eachCell (cell) => 
-      land  = @countNeighborsWithColor(cell, 'darkgreen') 
+    @eachCell (cell) =>
+      land  = @countNeighborsWithColor(cell, 'darkgreen')
 
       if land > 5
         cell.color = @random.valueFromPercentageMap
@@ -48,21 +48,9 @@ class Busyverse.Grid
         cell.color = @random.valueFromPercentageMap
           20: cell.color
           15: 'darkblue'
-          # 10: 'navy'
-          # 5: 'midnightblue'
-          # 4: 'mediumblue'
-          # 3: 'lightyellow'
-          # 2: 'grey'
-
-      # surroundingColor = @mostCommonNeighborColor(cell)
-      # if surroundingColor 
-      #cell.color = @random.valueFromPercentageMap
-      #  15: if noise then 'green' else @mostCommonNeighborColor(cell)
-      #  45: cell.color
-      #  40: @mostCommonNeighborColor(cell)
 
   countNeighborsWithColor: (cell, color) =>
-    matching = @getAllNeighbors(cell.location).filter (n) => n.color == color
+    matching = @getAllNeighbors(cell.location).filter (n) -> n.color == color
     matching.length
 
   mostCommonNeighborColor: (cell) =>
@@ -77,7 +65,8 @@ class Busyverse.Grid
     for color in colors
       color_counts[color] ?= 0
       color_counts[color] = color_counts[color] + 1
-      if most_common_color == null || color_counts[color] > color_counts[most_common_color]
+      more_common = color_counts[color] > color_counts[most_common_color]
+      if most_common_color == null || more_common
         most_common_color = color
 
     most_common_color
@@ -107,14 +96,18 @@ class Busyverse.Grid
   getCellToEastOf:  (location) => @getCellAt([location[0] + 1, location[1]])
   getCellToWestOf:  (location) => @getCellAt([location[0] - 1, location[1]])
 
-  getCellToNorthwestOf: (location) => @getCellAt([location[0] - 1, location[1] - 1])
-  getCellToNortheastOf: (location) => @getCellAt([location[0] + 1, location[1] - 1])
+  getCellToNorthwestOf: (location) =>
+    @getCellAt([location[0] - 1, location[1] - 1])
+  getCellToNortheastOf: (location) =>
+    @getCellAt([location[0] + 1, location[1] - 1])
 
-  getCellToSouthwestOf: (location) => @getCellAt([location[0] - 1, location[1] + 1])
-  getCellToSoutheastOf: (location) => @getCellAt([location[0] + 1, location[1] + 1])
+  getCellToSouthwestOf: (location) =>
+    @getCellAt([location[0] - 1, location[1] + 1])
+  getCellToSoutheastOf: (location) =>
+    @getCellAt([location[0] + 1, location[1] + 1])
   
   getCellsAround: (location) =>
-    [ 
+    [
       @getCellToNorthOf(location),
       @getCellToEastOf(location),
       @getCellToWestOf(location),
@@ -124,13 +117,14 @@ class Busyverse.Grid
   isLocationPassable: (loc) =>
     cell = @getCellAt loc
     return false unless cell
-    cell.color == 'green' || cell.color == 'forestgreen' || cell.color == 'darkgreen'
+    is_green = cell.color == 'green' ||
+               cell.color == 'forestgreen' ||
+               cell.color == 'darkgreen'
+    return is_green
 
   getLocationsAround: (loc) =>
-    # console.log "getting cells around #{loc}"
     around = []
-    neighbors = # @getCellsAround(loc) 
-      @getAllNeighbors(loc)
+    neighbors = @getAllNeighbors(loc)
     for cell in neighbors
       if @isLocationPassable(cell.location)
         around.push(cell.location)
@@ -138,7 +132,7 @@ class Busyverse.Grid
     around
 
   getAllNeighbors: (location) =>
-    [ 
+    [
       @getCellToNorthOf(location)
       @getCellToNorthwestOf(location)
       @getCellToNortheastOf(location)

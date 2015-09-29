@@ -1,6 +1,7 @@
 class Busyverse.View
   constructor: (@model, @context) ->
-    console.log "Created new view for model #{@model} in context #{@context}" if Busyverse.debug and Busyverse.verbose
+    if Busyverse.trace
+      console.log "View#new model=#{@model} context=#{@context}"
 
   x: -> @model.position[0]
   y: -> @model.position[1]
@@ -11,10 +12,11 @@ class Busyverse.View
   size: -> @model.size
 
 
-  rect: (position: pos, size: size, fill: fill, stroke: stroke) =>
+  rect: (opts) =>
+    { position, size, fill, stroke } = opts
     stroke ?= 'black'
-    x = pos[0]
-    y = pos[1]
+    x = position[0]
+    y = position[1]
     w = size[0]
     h = size[1]
 
@@ -26,7 +28,8 @@ class Busyverse.View
     @context.strokeStyle = stroke
     @context.stroke()
 
-  text: (msg: msg, position: pos, size: size, font: font, fill: fill, style: style) =>
+  text: (opts) =>
+    { msg, position, size, font, fill, style } = opts
     font ?= "Helvetica"
     fill ?= 'black'
     size ?= '16px'
@@ -35,9 +38,10 @@ class Busyverse.View
     @context.fillStyle = fill
     @context.font = "#{style} #{size} #{font}"
 
-    @context.fillText msg, pos[0], pos[1]
+    @context.fillText msg, position[0], position[1]
 
-  textWidth: (msg: msg, font: font, size: size, style: style) =>
+  textWidth: (opts) =>
+    { msg, font, size, style } = opts
     font ?= "Helvetica"
     size ?= '16px'
     style ?= ''

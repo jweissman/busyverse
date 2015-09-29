@@ -4,7 +4,7 @@ Array::remove = (from, to) ->
   @push.apply @, rest
 
 Array::equals = (b) ->
-    @length is b.length and @every (elem, i) -> elem is b[i]
+  @length is b.length and @every (elem, i) -> elem is b[i]
 
 class Busyverse.Pathfinder
   constructor: (@map, @source, @target) ->
@@ -28,8 +28,8 @@ class Busyverse.Pathfinder
 
     for u in potentialUnvisited
       unvisitedWeight = @dist[u]
-      if unvisitedWeight < smallestUnivisitedDistance 
-        smallestUnivisitedDistance = unvisitedWeight 
+      if unvisitedWeight < smallestUnivisitedDistance
+        smallestUnivisitedDistance = unvisitedWeight
         closest = u
 
     closest
@@ -47,11 +47,11 @@ class Busyverse.Pathfinder
     neighbors = @map.getLocationsAround(@current)
     neighbors.filter (n) => n in @unvisited
 
-  foundTarget: -> 
-    @current && @current.equals @target 
+  foundTarget: ->
+    @current && @current.equals @target
 
   shouldTerminate: ->
-    @unvisited.length == 0 || @foundTarget() 
+    @unvisited.length == 0 || @foundTarget()
 
   assemblePath: =>
     sequence = []
@@ -63,7 +63,7 @@ class Busyverse.Pathfinder
     sequence.reverse()
 
   detectShortestPath: =>
-    until @shouldTerminate() 
+    until @shouldTerminate()
       nextCell = @closestUnvisited()
       return [] if nextCell == null
       @visit nextCell
@@ -79,8 +79,12 @@ class Busyverse.Support.Pathfinding
 Busyverse.findPath = (data) ->
   map = JSON.parse data.map
 
-  grid = new Busyverse.Grid(Busyverse.width / Busyverse.cellSize, Busyverse.height / Busyverse.cellSize, map)
-  path = (new Busyverse.Support.Pathfinding(grid)).shortestPath data.src, data.tgt
+  h = Busyverse.width / Busyverse.cellSize
+  w = Busyverse.height / Busyverse.cellSize
+  grid = new Busyverse.Grid(h, w, map)
+
+  path_finder = new Busyverse.Support.Pathfinding(grid)
+  path = path_finder.shortestPath data.src, data.tgt
 
   msg = {
     personId: data.personId

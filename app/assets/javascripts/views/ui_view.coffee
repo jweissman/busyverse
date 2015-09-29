@@ -7,7 +7,7 @@ class Busyverse.Views.UIView extends Busyverse.View
     @renderCover(world)
     @renderUi(world, city)
 
-  renderUi: (world, city) =>      
+  renderUi: (world, city) =>
     @renderCityDetail(city)
     @renderTime(world)
     @renderBuildingPalette(city)
@@ -16,7 +16,7 @@ class Busyverse.Views.UIView extends Busyverse.View
     cover = [Busyverse.width * Busyverse.cellSize,
              Busyverse.height * Busyverse.cellSize]
 
-    if world.isDay() 
+    if world.isDay()
       percentOfDay = world.percentOfDay()
       alpha = percentOfDay/2
       if percentOfDay >= 0.5
@@ -33,28 +33,28 @@ class Busyverse.Views.UIView extends Busyverse.View
         fill: "rgba(0,0,192,0.125)"
 
    
-  constructPalette: (city) =>
+  constructPalette: (city) ->
     palette = []
     building_list = Busyverse.Building.all()
     building_index = 0
     currentBuildingName = ''
-    if Busyverse.engine.game.chosenBuilding 
-      currentBuildingName = Busyverse.engine.game.chosenBuilding.name 
+    if Busyverse.engine.game.chosenBuilding
+      currentBuildingName = Busyverse.engine.game.chosenBuilding.name
     for building in building_list
 
-      selected = building.name == currentBuildingName #'Small Farm'
+      selected = building.name == currentBuildingName
       affordable = city.canAfford building
 
-      color = if selected 
-        'lightgreen' 
-      else 
+      color = if selected
+        'lightgreen'
+      else
         if affordable then 'forestgreen' else 'grey'
   
-      palette.push { 
+      palette.push {
         name: building.name
-        position: [13.5, (119.5 + building_index * 30)], 
-        size: [143, 28]  
-        fill: color 
+        position: [13.5, (119.5 + building_index * 30)],
+        size: [143, 28]
+        fill: color
         clickable: affordable && !selected
       }
 
@@ -62,7 +62,7 @@ class Busyverse.Views.UIView extends Busyverse.View
     palette
 
   renderBuildingPalette: (city) =>
-    @rect 
+    @rect
       position: [10.5,115.5]
       size: [150, 100]
       fill: 'ivory'
@@ -73,18 +73,18 @@ class Busyverse.Views.UIView extends Busyverse.View
         size: element.size
         fill: element.fill
 
-      @text 
+      @text
         msg: element.name
         position: [element.position[0] + 4, element.position[1] + 21]
         size: '24px'
 
   renderCityDetail: (city) =>
-    @rect 
+    @rect
       position: [10.5,10.5]
       size: [160, 100]
       fill: 'ivory'
 
-    @text 
+    @text
       msg: city.name
       position: [12,33]
       size: '24px'
@@ -97,7 +97,7 @@ class Busyverse.Views.UIView extends Busyverse.View
     row = 0
     for resource of city.resources
       quantity = city.resources[resource]
-      @text 
+      @text
         msg: "#{resource}: #{quantity}"
         position: [17, 55 + (15 * row)]
         size: '14px'

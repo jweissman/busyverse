@@ -18,12 +18,13 @@ class Busyverse.Building
     b_y2 = @position[1] + @size[1]
     a_x1 < b_x2 && a_x2 > b_x1 && a_y1 < b_y2 && a_y2 > b_y1
 
-  @all: -> [ new Busyverse.Buildings.Farm(), 
-             new Busyverse.Buildings.House(), 
+  @all: -> [ new Busyverse.Buildings.Farm(),
+             new Busyverse.Buildings.House(),
              new Busyverse.Buildings.Tower() ]
 
   @generate: (name, location) ->
-    console.log "generating building of type #{name} at #{location}" if Busyverse.debug
+    if Busyverse.trace
+      console.log "Building.generate type=#{name} at #{location}"
     building = null
     if name == 'Small Farm'
       building = new Busyverse.Buildings.Farm(location)

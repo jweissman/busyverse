@@ -40,8 +40,10 @@ class Busyverse.IsoRenderer
     { width, height } = @canvasElement
     src = @offscreenContext.canvas
 
-    w = width
-    h = height
+    w = Math.floor width
+    h = Math.floor height
+    x = Math.floor x
+    y = Math.floor y
     @context.drawImage src, -x, -y, w, h, -x, -y, w, h
 
   drawModels: (view, world) =>
