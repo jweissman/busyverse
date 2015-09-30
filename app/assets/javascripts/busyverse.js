@@ -15,15 +15,18 @@ var Busyverse = {
   Worker: {},
 
   // config
-  width:  800,
-  height: 1000,
+  width:  1000,
+  height: 800,
 
   cellSize: 10,
+
+  bufferSize: 16000,
+
   stepLength: 26,
     
-  initialPopulation: 3,
-  startingResources: 500,
-  defaultVisionRadius: 6,
+  initialPopulation: 6,
+  startingResources: 600,
+  defaultVisionRadius: 4,
 
   scale: 0.76,
 

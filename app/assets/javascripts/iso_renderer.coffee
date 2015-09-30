@@ -6,10 +6,12 @@ class Busyverse.IsoRenderer
     @offscreenContext = @backgroundCanvas.getContext '2d'
     @foregroundContext = @foregroundCanvas.getContext '2d'
 
-    offset = 5000
-    @iso    = new Isomer(@canvasElement, originX: offset, originY: offset)
-    @bg_iso = new Isomer(@backgroundCanvas, originX: offset, originY: offset)
-    @fg_iso = new Isomer(@foregroundCanvas, originX: offset, originY: offset)
+    sz = Busyverse.bufferSize 
+    o = 5000
+    offset = { originX: o, originY: o } # sz / 2, originY: sz * (9/10) }
+    @iso    = new Isomer(@canvasElement, offset) #originX: offset, originY: offset)
+    @bg_iso = new Isomer(@backgroundCanvas, offset) #originX: offset, originY: offset)
+    @fg_iso = new Isomer(@foregroundCanvas, offset) #originX: offset, originY: offset)
 
     @projectedMousePos = null
     @canvasElement.addEventListener 'mousemove', ((evt) =>

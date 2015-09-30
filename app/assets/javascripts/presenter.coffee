@@ -15,18 +15,19 @@ class Busyverse.Presenter
   attach: (canvas) =>
     console.log "About to create drawing context" if Busyverse.verbose
 
-
     if canvas != null
       @canvas   = canvas
       @context  = @canvas.getContext('2d')
 
+      sz = Busyverse.bufferSize
       @bgCanvas = document.createElement('canvas')
-      @bgCanvas.width  = 15000
-      @bgCanvas.height = 15000
+      @bgCanvas.width  = sz # 15000
+      @bgCanvas.height = sz # 15000
       
       @fgCanvas = document.createElement('canvas')
-      @fgCanvas.width  = 15000
-      @fgCanvas.height = 15000
+      @fgCanvas.width  = sz # 15000
+      @fgCanvas.height = sz # 15000
+
       @renderer = new Busyverse.IsoRenderer(@canvas, @bgCanvas, @fgCanvas)
 
     else
