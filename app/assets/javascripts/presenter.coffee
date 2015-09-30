@@ -21,12 +21,12 @@ class Busyverse.Presenter
 
       sz = Busyverse.bufferSize
       @bgCanvas = document.createElement('canvas')
-      @bgCanvas.width  = sz # 15000
-      @bgCanvas.height = sz # 15000
+      @bgCanvas.width  = sz
+      @bgCanvas.height = sz
       
       @fgCanvas = document.createElement('canvas')
-      @fgCanvas.width  = sz # 15000
-      @fgCanvas.height = sz # 15000
+      @fgCanvas.width  = sz
+      @fgCanvas.height = sz
 
       @renderer = new Busyverse.IsoRenderer(@canvas, @bgCanvas, @fgCanvas)
 
