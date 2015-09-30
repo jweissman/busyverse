@@ -137,15 +137,8 @@ class Busyverse.Person
 
   pickWanderDestinationCell: (world, city) =>
     pos = @mapPosition(world)
-    nearbyCell = world.nearbyUnexploredCell(pos, 4 + (@visionRadius*2) ) 
+    nearbyCell = world.nearbyUnexploredCell(pos, 21 + (@visionRadius*3) )
     nearbyCell || world.randomPassableCell()
-
-    #@random.valueFromPercentageMap
-    #  5:    world.nearbyUnexploredCell(@mapPosition(world),13)
-    #  10:   world.nearbyUnexploredCell(@mapPosition(world),21)
-    #  20:   world.nearbyUnexploredCell(@mapPosition(world),44)
-    #  50:   world.nearbyUnexploredCell(@mapPosition(world),65)
-    #  100:  world.randomPassableCell()
 
   wander: (world, city) =>
     @destinationCell ?= @pickWanderDestinationCell(world, city)

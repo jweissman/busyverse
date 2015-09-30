@@ -20,11 +20,14 @@ class Busyverse.Presenter
       @canvas   = canvas
       @context  = @canvas.getContext('2d')
 
-      @offscreenCanvas = document.createElement('canvas')
-      @offscreenCanvas.width  = 15000
-      @offscreenCanvas.height = 15000
+      @bgCanvas = document.createElement('canvas')
+      @bgCanvas.width  = 15000
+      @bgCanvas.height = 15000
       
-      @renderer = new Busyverse.IsoRenderer(@canvas, @offscreenCanvas)
+      @fgCanvas = document.createElement('canvas')
+      @fgCanvas.width  = 15000
+      @fgCanvas.height = 15000
+      @renderer = new Busyverse.IsoRenderer(@canvas, @bgCanvas, @fgCanvas)
 
     else
       if Busyverse.debug

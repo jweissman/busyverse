@@ -1,15 +1,15 @@
 Point = Isomer.Point
 
 class Busyverse.IsoRenderer
-  constructor: (@canvasElement, @offscreenCanvasElement) ->
+  constructor: (@canvasElement, @backgroundCanvas, @foregroundCanvas) ->
     @context  = @canvasElement.getContext '2d'
-    @offscreenContext = @offscreenCanvasElement.getContext '2d'
+    @offscreenContext = @backgroundCanvas.getContext '2d'
+    @foregroundContext = @foregroundCanvas.getContext '2d'
 
-    #console.log @iso
-    #origin = { originX: 0, originY: 0 }
     offset = 5000
-    @iso = new Isomer(@canvasElement, originX: offset, originY: offset)
-    @bg_iso = new Isomer(@offscreenCanvasElement, originX: offset, originY: offset)
+    @iso    = new Isomer(@canvasElement, originX: offset, originY: offset)
+    @bg_iso = new Isomer(@backgroundCanvas, originX: offset, originY: offset)
+    @fg_iso = new Isomer(@foregroundCanvas, originX: offset, originY: offset)
 
     @projectedMousePos = null
     @canvasElement.addEventListener 'mousemove', ((evt) =>
@@ -44,11 +44,26 @@ class Busyverse.IsoRenderer
     h = Math.floor height
     x = Math.floor x
     y = Math.floor y
+
     @context.drawImage src, -x, -y, w, h, -x, -y, w, h
 
-  drawModels: (view, world) =>
+  drawModels: (view, world, offset) =>
+    { width, height } = @canvasElement
+    { x, y } = offset
+
+    w = Math.floor width
+    h = Math.floor height
+    x = Math.floor x
+    y = Math.floor y
+
+    @foregroundContext.clearRect -x, -y, w, h
+
     for model in view.assembleModels(@projectedMousePos)
-      @iso.add(model.shape, model.color)
+      @fg_iso.add(model.shape, model.color)
+
+    src = @foregroundContext.canvas
+
+    @context.drawImage src, -x, -y, w, h, -x, -y, w, h
 
   drawPeopleLabels: (world) =>
     scale = Busyverse.scale
@@ -69,9 +84,9 @@ class Busyverse.IsoRenderer
 
     @drawCells(cell_models, offset)
 
-  draw: (world) =>
+  draw: (world, offset) =>
     view = @constructView(world)
-    @drawModels(view)
+    @drawModels(view, world, offset)
     @drawPeopleLabels(world)
 
   projectCoordinate: (xy) =>
