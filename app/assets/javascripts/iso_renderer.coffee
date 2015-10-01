@@ -64,33 +64,34 @@ class Busyverse.IsoRenderer
     for model in view.assembleModels(@projectedMousePos)
       @fg_iso.add(model.shape, model.color)
 
+    @drawPeopleLabels(world)
+
     src = @foregroundContext.canvas
 
     @context.drawImage src, -x, -y, w, h, 0, 0, w, h
 
   drawPeopleLabels: (world) =>
     scale = Busyverse.scale
-    @context.fillStyle = "#FFFFFF"
-    @context.font = "Bold 30px Helvetica"
+    # @context.fillStyle = "#FFFFFF"
+    # @context.font = "Bold 30px Helvetica"
 
     for person in world.city.population
       x = person.position[0]*scale / Busyverse.cellSize
       y = person.position[1]*scale / Busyverse.cellSize
       point = Point(x, y)
       pos = @iso._translatePoint(point)
-      personView = new Busyverse.Views.PersonView(person, @context)
+      personView = new Busyverse.Views.PersonView(person, @foregroundContext)
       personView.render(pos.x, pos.y)
 
   drawBg: (world, offset) =>
     view = @constructView(world)
     cell_models = @constructCellModels(view,world)
-
     @drawCells(cell_models, offset)
 
   draw: (world, offset) =>
     view = @constructView(world)
+    # @drawPeopleLabels(world)
     @drawModels(view, world, offset)
-    @drawPeopleLabels(world)
 
   projectCoordinate: (xy) =>
     return [0,0] unless Busyverse.engine.game.ui
