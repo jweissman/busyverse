@@ -2,16 +2,17 @@ Point = Isomer.Point
 
 class Busyverse.IsoRenderer
   constructor: (@canvasElement, @backgroundCanvas, @foregroundCanvas) ->
-    @context  = @canvasElement.getContext '2d'
-    @offscreenContext = @backgroundCanvas.getContext '2d'
+    @context           = @canvasElement.getContext '2d'
+    @offscreenContext  = @backgroundCanvas.getContext '2d'
     @foregroundContext = @foregroundCanvas.getContext '2d'
 
-    sz = Busyverse.bufferSize 
-    o = 5000
-    offset = { originX: o, originY: o } # sz / 2, originY: sz * (9/10) }
-    @iso    = new Isomer(@canvasElement, offset) #originX: offset, originY: offset)
-    @bg_iso = new Isomer(@backgroundCanvas, offset) #originX: offset, originY: offset)
-    @fg_iso = new Isomer(@foregroundCanvas, offset) #originX: offset, originY: offset)
+    sz = Busyverse.bufferSize
+    o = sz/2
+    offset = { originX: o, originY: o }
+
+    @iso    = new Isomer(@canvasElement, offset)
+    @bg_iso = new Isomer(@backgroundCanvas, offset)
+    @fg_iso = new Isomer(@foregroundCanvas, offset)
 
     @projectedMousePos = null
     @canvasElement.addEventListener 'mousemove', ((evt) =>
@@ -47,7 +48,7 @@ class Busyverse.IsoRenderer
     x = Math.floor x
     y = Math.floor y
 
-    @context.drawImage src, -x, -y, w, h, -x, -y, w, h
+    @context.drawImage src, -x, -y, w, h, 0, 0, w, h
 
   drawModels: (view, world, offset) =>
     { width, height } = @canvasElement
@@ -65,7 +66,7 @@ class Busyverse.IsoRenderer
 
     src = @foregroundContext.canvas
 
-    @context.drawImage src, -x, -y, w, h, -x, -y, w, h
+    @context.drawImage src, -x, -y, w, h, 0, 0, w, h
 
   drawPeopleLabels: (world) =>
     scale = Busyverse.scale
@@ -92,10 +93,14 @@ class Busyverse.IsoRenderer
     @drawPeopleLabels(world)
 
   projectCoordinate: (xy) =>
+    return [0,0] unless Busyverse.engine.game.ui
+
     scale  = Busyverse.scale
     offset = Busyverse.engine.game.ui.offset
+
     x = (xy[0] * 2) - offset.x
     y = (xy[1] * 2) - offset.y
+
     tx = @iso.transformation
     ox = @iso.originX
     oy = @iso.originY
@@ -111,9 +116,6 @@ class Busyverse.IsoRenderer
     d = (-(ox * tx[0][1]))
     py = (d - (ox * tx[0][0]) + (tx[0][0] * y) + (tx[0][1] * x)) / det
 
-    # offsetX = -0.0 / scale
-    # offsetY = 0.0 / scale
-
-    x = Math.floor(px/scale) # + offsetX)
-    y = Math.floor(py/scale) # + offsetY)
+    x = Math.floor(px/scale)
+    y = Math.floor(py/scale)
     [ x, y ]

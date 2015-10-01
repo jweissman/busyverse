@@ -175,7 +175,9 @@ class Busyverse.World
   applyCellPattern: (pattern, origin) ->
     cells = []
     for xy in pattern
-      target = [ xy[0] + origin[0], xy[1] + origin[1] ]
+      x = Math.floor xy[0] + origin[0]
+      y = Math.floor xy[1] + origin[1]
+      target = [ x, y ]
       cell = @map.getCellAt(target)
       if cell
         cells.push cell

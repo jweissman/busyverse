@@ -55,7 +55,7 @@ class Busyverse.Presenter
     console.log "Rendering!" if Busyverse.debug
     @clear()
     @context.save()
-    @context.translate(@offset.x,@offset.y)
+    #@context.translate(@offset.x,@offset.y)
     @renderer.drawBg(world, @offset)
     @renderer.draw(world, @offset)
     @context.restore()
