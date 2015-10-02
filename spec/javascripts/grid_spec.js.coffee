@@ -3,7 +3,7 @@
 
 context "Grid", ->
   beforeEach ->
-    @grid = new Busyverse.Grid(10, 10)  
+    @grid = new Busyverse.Grid(10, 10)
 
   describe ".width", ->
     it 'should be 10', ->

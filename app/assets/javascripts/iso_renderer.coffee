@@ -72,9 +72,6 @@ class Busyverse.IsoRenderer
 
   drawPeopleLabels: (world) =>
     scale = Busyverse.scale
-    # @context.fillStyle = "#FFFFFF"
-    # @context.font = "Bold 30px Helvetica"
-
     for person in world.city.population
       x = person.position[0]*scale / Busyverse.cellSize
       y = person.position[1]*scale / Busyverse.cellSize
@@ -90,7 +87,6 @@ class Busyverse.IsoRenderer
 
   draw: (world, offset) =>
     view = @constructView(world)
-    # @drawPeopleLabels(world)
     @drawModels(view, world, offset)
 
   projectCoordinate: (xy) =>

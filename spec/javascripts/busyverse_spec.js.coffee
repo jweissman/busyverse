@@ -1,9 +1,10 @@
 #= require busyverse
 #= require engine
 #= require game
+#= require kickstart
 
 describe "Busyverse", ->
-  describe ".kickstart()", ->
+  describe ".kickstart", ->
     it 'should safely fire up the engines', ->
       worker = { postMessage: -> }
       Busyverse.createWorker = -> worker

@@ -12,8 +12,6 @@ context "World", ->
     @height = 5
 
     @world = new Busyverse.World(@width, @height)
-    
-    @world.setup({ 100: 'darkgreen' }, false, false, false)
 
   describe ".width", ->
     it 'should be as assigned', ->
@@ -33,6 +31,7 @@ context "World", ->
   describe "#setup", ->
     it 'should distribute resources', ->
       @world.setup({ 100: 'darkgreen' }, false, true, false)
+
       expect(@world.resources.length).to.eql(@world.startingResources)
 
 
@@ -62,6 +61,8 @@ context "World", ->
 
   describe "#findOpenAreasOfSizeInCity", ->
     it 'should find open areas', ->
+      @world.setup({ 100: 'darkgreen' }, false, false, false)
+
       city =
         availableForBuilding: -> true
         center: -> [3,3]
@@ -72,6 +73,8 @@ context "World", ->
 
   describe "#getPath", ->
     it 'should find shortest path', ->
+      @world.setup({ 100: 'darkgreen' }, false, false, false)
+
       path = @world.getPath([0,2],[3,5])
       expect(path[0]).to.eql([0,2])
       expect(path[3]).to.eql([3,5])

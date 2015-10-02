@@ -48,11 +48,15 @@ class Busyverse.Game
     console.log "Rendering to UI" if Busyverse.verbose
     @ui.render(@world)
 
-  click: (position, event) =>
-    console.log "click position=#{position} event=#{event}" if Busyverse.trace
+  click: (position) =>
+    return unless @ui
+    console.log "click position=#{position}" if Busyverse.trace
 
+    action = ''
     pos = @ui.renderer.mousePos
-    adjusted_pos = {x: pos.x * 2, y: pos.y * 2}
+    return unless pos
+
+    adjusted_pos = [ pos.x * 2, pos.y * 2 ]
 
     ui_hit = false
     for box in @ui.boundingBoxes(@world)
@@ -65,7 +69,8 @@ class Busyverse.Game
       if @chosenBuilding != null
         if @attemptToConstructBuilding(position)
           @chosenBuilding = null
-      @ui.centerAt(position)
+      else
+        @ui.centerAt(position)
 
   handleClickElement: (elementName) =>
     console.log "Game#handleClickElement: #{elementName} " if Busyverse.trace

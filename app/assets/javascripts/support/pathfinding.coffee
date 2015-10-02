@@ -8,10 +8,13 @@ Array::equals = (b) ->
 
 class Busyverse.Pathfinder
   constructor: (@map, @source, @target) ->
+    console.log "Pathfinder.new" if Busyverse.trace
     @geometry = new Busyverse.Support.Geometry()
     @dist = {}
     @prev = {}
     @unvisited = []
+
+    console.log @map if Busyverse.debug
 
     @map.eachCell (cell) =>
       @dist[cell.location] = Infinity

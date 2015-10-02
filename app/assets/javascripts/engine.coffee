@@ -11,7 +11,6 @@ class Busyverse.Engine
     
     @canvas = document.getElementById('busyverse')
 
-    # Turn the lights on
     @ui.attach(@canvas)
 
     if @canvas != null
@@ -20,15 +19,31 @@ class Busyverse.Engine
       console.log "--- warning: canvas is null" if Busyverse.debug
 
     $('#terminal').submit @handleCommand
+
     people = @game.world.city.population
     options = $('#target')
     options.append $('<option />').val(-1).text('all')
     $.each people, -> options.append $('<option />').val(@id).text(@name)
+
+    document.onkeypress = (e) => @handleKeypress(e)
      
   run: -> @game.play(@ui)
 
   handleClick: (event) => @game.click(@ui.renderer.projectedMousePos, event)
 
+  handleKeypress: (event) ->
+    console.log "KEYPRESS"
+    console.log event
+    if event.keyCode == 61
+      console.log "+"
+      # i think we need to be able to 'reboot' the ui engine!
+      #Busyverse.scale = Busyverse.scale * 2
+      # @ui.attach(@canvas)
+
+    else if event.keyCode == 45
+      console.log "-"
+      #Busyverse.scale = Busyverse.scale / 2
+      # @ui.attach(@canvas)
   handleCommand: (event) =>
     command = $("input:first").val()
 
@@ -46,8 +61,3 @@ class Busyverse.Engine
     engine.setup()
     window.onload = -> engine.run()
     engine
-
-# kickstart fn
-Busyverse.kickstart = ->
-  Busyverse.engine = Busyverse.Engine.instrument()
-  true

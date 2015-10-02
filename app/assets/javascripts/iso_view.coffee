@@ -21,8 +21,6 @@ class Busyverse.IsoView
   white: new Color(160, 160, 160)
 
   constructor: (@world) ->
-    #@models = @assembleModels()
-
   assembleModels: (mousePosition) =>
     models = []
 
@@ -32,7 +30,6 @@ class Busyverse.IsoView
         models.push
           shape: shape
           color: @green
-          # size: [1,1]
           position: resource.position
 
     for building in @world.city.buildings

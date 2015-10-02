@@ -5,6 +5,7 @@
 #= require resources/wood
 #= require grid
 #= require city
+#= require terraformer
 
 class Busyverse.World
   name: 'Busylandia'
@@ -13,7 +14,7 @@ class Busyverse.World
   startingResources: Busyverse.startingResources
 
   constructor: (@width, @height, @cellSize) ->
-    @age        = 480
+    @age        = 480 # day one, 8 am
     @city       = new Busyverse.City()
     @map        = new Busyverse.Grid(@width, @height)
     @resources  = []
@@ -24,35 +25,39 @@ class Busyverse.World
     if Busyverse.debug
       console.log "Created new world, '#{@name}'!"
       console.log "Dimensions of #{@name}: #{@width}x#{@height})"
+      console.log @map
 
   defaultDistribution: {20: 'darkgreen', 80: 'darkblue'},
 
   setup: (dist=@defaultDistribution, evolve=true, resources=true, build=true) =>
     console.log "World#setup" if Busyverse.trace
-    origin = null
 
-    until origin
-      @map.setup(dist, evolve)
-      origin = @randomPassableAreaOfSize [3,3]
+    @terraformer = new Busyverse.Terraformer()
+    @map = @terraformer.compose(@map, dist, evolve)
 
-    if resources
-      for j in [1..@startingResources]
-        position = @randomPassableCell()
-        if position
-          resource = new Busyverse.Resources.Wood(position)
-          if Busyverse.trace
-            console.log "distribute resource #{resource.name} at #{position}!"
-          @resources.push resource
-        else
-          if Busyverse.debug
-            console.log "WARNING -- could not distribute resource"
+    @distributeResoures() if resources
 
     if build
+      until origin
+        origin = @randomPassableAreaOfSize [4,4]
+
       farm = new Busyverse.Buildings.Farm(origin)
       @city.create farm
 
       for i in [1..@initialPopulation]
         @city.grow @
+
+  distributeResoures: ->
+    for j in [1..@startingResources]
+      position = @randomPassableCell()
+      if position
+        resource = new Busyverse.Resources.Wood(position)
+        if Busyverse.trace
+          console.log "distribute resource #{resource.name} at #{position}!"
+        @resources.push resource
+      else
+        if Busyverse.debug
+          console.log "WARNING -- could not distribute resource"
 
   tryToBuild: (building, create=false) =>
     passable  = @isAreaPassable(building.position, building.size)
@@ -77,7 +82,6 @@ class Busyverse.World
 
   percentOfDay: ->
     (@getHour() - @dayStart) / (@dayEnd - @dayStart)
-      # normalize night too somehow... hmmm
 
   pad: (num, size) ->
     s = '000000000' + num
@@ -106,9 +110,11 @@ class Busyverse.World
   randomPassableAreasOfSize: (sz) =>
     if Busyverse.debug && Busyverse.verbose
       console.log "World#randomPassableAreasOfSize size=#{sz}"
+
     location = null
     cells = @map.allCells()
     areas = []
+
     for cell in cells
       console.log "consider location #{cell.location}" if Busyverse.trace
       passable_area = @isAreaPassable(cell.location, sz)

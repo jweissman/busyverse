@@ -1,21 +1,36 @@
 #= require busyverse
 #= require city
 #= require game
+#= require sinon
 
 describe "Game", ->
   describe '.world', ->
-    it 'should have a name', ->
-      world = new Busyverse.World()
+    it 'should be as assigned', ->
+      world = {}
       game = new Busyverse.Game(world)
-
       game.world.should.equal(world)
-      game.world.name.should.equal("Busylandia")
 
   describe '.player', ->
     it 'should have a score', ->
-      player = new Busyverse.Player()
-      game = new Busyverse.Game(null, player)
-
+      world  = {}
+      player = { name: 'Rucker' }
+      game = new Busyverse.Game(world, player)
       game.player.should.equal(player)
-      game.player.score.should.equal(0)
 
+  describe '.click', ->
+    it 'should handle ui clicks', ->
+      world = {}
+      game = new Busyverse.Game(world)
+
+      game.ui = {
+        renderer: { mousePos: [5,4] },
+        boundingBoxes: -> [
+          { name: 'woot', hit: -> true }
+        ]
+      }
+
+      position = [213, 432]
+      sinon.spy(game, "handleClickElement")
+      game.click(position)
+      game.handleClickElement.should.have.been.called
+      game.handleClickElement.getCall(0).args[0].should.equal('woot')

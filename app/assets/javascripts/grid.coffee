@@ -2,74 +2,13 @@
 #= require support/randomness
 
 class Busyverse.Grid
-  constructor: (@width, @height, @cells, distribution) ->
-    @cells ?= []
+  constructor: (@width, @height, @cells) ->
     @random = new Busyverse.Support.Randomness()
-    
-  setup: (distribution, evolve=true) =>
-    @build(distribution)
-    @evolve()
-    @decorate()
-
-  build: (distribution) =>
-    for x in [0..@width]
-      @cells[x] = []
-      for y in [0..@height]
-        @cells[x][y] = @createCellAt([x,y], distribution)
-
-  createCellAt: (location, distribution) =>
-    color = @random.valueFromPercentageMap distribution
-    { location: location, color: color }
-
-  # start moving all this to world?
-  evolve: (depth=6, noise=true) =>
-    return if depth <= 0
-    console.log "evolve depth=#{depth}" if Busyverse.debug
-    @eachCell (cell) =>
-      cell.color = @random.valueFromPercentageMap
-        25: if noise then 'darkgreen' else @mostCommonNeighborColor(cell)
-        30: cell.color
-        35: @mostCommonNeighborColor(cell)
-    # @decorate() if noise
-    @evolve(depth-1, !noise)
-
-  decorate: =>
-    @eachCell (cell) =>
-      land  = @countNeighborsWithColor(cell, 'darkgreen')
-
-      if land > 5
-        cell.color = @random.valueFromPercentageMap
-          20: cell.color
-          15: 'darkgreen'
-
-      blue = @countNeighborsWithColor(cell, 'darkblue')
-
-      if blue > 4
-        cell.color = @random.valueFromPercentageMap
-          20: cell.color
-          15: 'darkblue'
-
-  countNeighborsWithColor: (cell, color) =>
-    matching = @getAllNeighbors(cell.location).filter (n) -> n.color == color
-    matching.length
-
-  mostCommonNeighborColor: (cell) =>
-    neighbors = @getAllNeighbors(cell.location)
-    colors = []
-    for neighbor in neighbors
-      colors.push(neighbor.color)
-
-    # find mode...
-    most_common_color = null
-    color_counts = {}
-    for color in colors
-      color_counts[color] ?= 0
-      color_counts[color] = color_counts[color] + 1
-      more_common = color_counts[color] > color_counts[most_common_color]
-      if most_common_color == null || more_common
-        most_common_color = color
-
-    most_common_color
+    @cells ?= []
+    #for y in [0..@height]
+    #  for x in [0..@width]
+    #    @cells[x] ?= []
+    #    @cells[x][y] = {location: [x,y]}
 
   eachCell: (callbackFn) =>
     for y in [0..@height]
@@ -90,6 +29,8 @@ class Busyverse.Grid
       @cells[x][y]
     else
       null
+
+  directions: ['north', 'south', 'east', 'west']
 
   getCellToNorthOf: (location) => @getCellAt([location[0], location[1] - 1])
   getCellToSouthOf: (location) => @getCellAt([location[0], location[1] + 1])

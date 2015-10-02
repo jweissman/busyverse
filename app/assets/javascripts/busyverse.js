@@ -28,7 +28,7 @@ var Busyverse = {
   startingResources: 600,
   defaultVisionRadius: 4,
 
-  scale: 0.76,
+  scale: 0.11,
 
   // banner
   banner: " _                                   \n"+        
