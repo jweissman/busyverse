@@ -5,10 +5,6 @@ class Busyverse.Grid
   constructor: (@width, @height, @cells) ->
     @random = new Busyverse.Support.Randomness()
     @cells ?= []
-    #for y in [0..@height]
-    #  for x in [0..@width]
-    #    @cells[x] ?= []
-    #    @cells[x][y] = {location: [x,y]}
 
   eachCell: (callbackFn) =>
     for y in [0..@height]

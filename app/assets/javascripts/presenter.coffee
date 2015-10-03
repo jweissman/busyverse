@@ -9,8 +9,16 @@ class Busyverse.Presenter
     @views = {}
     @renderer = null
     @offset   = { x: 0, y: 0 }
+    @offsetPos = [0,0]
 
-    console.log 'New presenter created!' if Busyverse.debug
+  cachedCanvases: {}
+  getCanvas: (name) =>
+    if !@cachedCanvases[name]
+      canvas = document.createElement('canvas')
+      @cachedCanvases[name] = canvas
+      return canvas
+    @cachedCanvases[name]
+
 
   attach: (canvas) =>
     console.log "About to create drawing context" if Busyverse.verbose
@@ -20,11 +28,11 @@ class Busyverse.Presenter
       @context  = @canvas.getContext('2d')
 
       sz = Busyverse.bufferSize
-      @bgCanvas = document.createElement('canvas')
+      @bgCanvas = @getCanvas("background")
       @bgCanvas.width  = sz
       @bgCanvas.height = sz
       
-      @fgCanvas = document.createElement('canvas')
+      @fgCanvas = @getCanvas("foreground")
       @fgCanvas.width  = sz
       @fgCanvas.height = sz
 
@@ -36,8 +44,9 @@ class Busyverse.Presenter
 
   centerAt: (pos, scale=Busyverse.scale) =>
     return false if @renderer == null
+    @offsetPos = pos
     point = Isomer.Point(pos[0]*scale, pos[1]*scale)
-    target = @renderer.iso._translatePoint(point)
+    target = @renderer.fg_iso._translatePoint(point)
     
     w = @canvas.width
     h = @canvas.height
@@ -49,15 +58,15 @@ class Busyverse.Presenter
 
     @offset = {x: x, y: y}
 
+  # zoom: (direction) => if direction == 'in' then ... else ...
+
   render: (world) =>
     return false if @renderer == null
 
     console.log "Rendering!" if Busyverse.debug
     @clear()
-    @context.save()
     @renderer.drawBg(world, @offset)
     @renderer.draw(world, @offset)
-    @context.restore()
     @ui_view = new Busyverse.Views.UIView(world.city, @context)
     @ui_view.render(world)
 

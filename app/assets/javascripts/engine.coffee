@@ -7,16 +7,16 @@ class Busyverse.Engine
 
   setup: ->
     console.log(Busyverse.banner)
-    @game.setup()
-    
     @canvas = document.getElementById('busyverse')
-
-    @ui.attach(@canvas)
-
     if @canvas != null
       @canvas.addEventListener 'mousedown', @handleClick
+      (new Busyverse.Views.SplashView(null, @canvas.getContext('2d'))).render()
     else
       console.log "--- warning: canvas is null" if Busyverse.debug
+
+    @game.setup()
+
+    @ui.attach(@canvas)
 
     $('#terminal').submit @handleCommand
 
@@ -32,18 +32,24 @@ class Busyverse.Engine
   handleClick: (event) => @game.click(@ui.renderer.projectedMousePos, event)
 
   handleKeypress: (event) ->
-    console.log "KEYPRESS"
-    console.log event
-    if event.keyCode == 61
-      console.log "+"
-      # i think we need to be able to 'reboot' the ui engine!
-      #Busyverse.scale = Busyverse.scale * 2
-      # @ui.attach(@canvas)
+    if event.keyCode == 61 # +
+      if Busyverse.scale <= 1.1
+        Busyverse.scale = Busyverse.scale * 1.45
+        @ui.attach(@canvas)
+        @ui.centerAt(@ui.offsetPos)
+      else
+        console.log "already zoomed in as far as we will permit"
+    else if event.keyCode == 45 # -
+      if Busyverse.scale >= 0.15
+        Busyverse.scale = Busyverse.scale * 0.6
+        @ui.attach(@canvas)
+        @ui.centerAt(@ui.offsetPos)
+      else
+        console.log "already zoomed out as far as we will permit"
 
-    else if event.keyCode == 45
-      console.log "-"
-      #Busyverse.scale = Busyverse.scale / 2
-      # @ui.attach(@canvas)
+    else if event.keyCode == 32 # space
+      @ui.centerAt(@game.world.city.center())
+
   handleCommand: (event) =>
     command = $("input:first").val()
 

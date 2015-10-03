@@ -2,17 +2,18 @@ Point = Isomer.Point
 
 class Busyverse.IsoRenderer
   constructor: (@canvasElement, @backgroundCanvas, @foregroundCanvas) ->
+    @newlyCreated = true
+
     @context           = @canvasElement.getContext '2d'
     @offscreenContext  = @backgroundCanvas.getContext '2d'
     @foregroundContext = @foregroundCanvas.getContext '2d'
 
     sz = Busyverse.bufferSize
-    o = sz/2
-    offset = { originX: o, originY: o }
+    @origin = { originX: sz * 0.50, originY: sz * 0.90 }
 
-    @iso    = new Isomer(@canvasElement, offset)
-    @bg_iso = new Isomer(@backgroundCanvas, offset)
-    @fg_iso = new Isomer(@foregroundCanvas, offset)
+    #@iso    = new Isomer(@canvasElement) #, @origin)
+    @bg_iso = new Isomer(@backgroundCanvas, @origin)
+    @fg_iso = new Isomer(@foregroundCanvas, @origin)
 
     @projectedMousePos = null
     @canvasElement.addEventListener 'mousemove', ((evt) =>
@@ -31,7 +32,13 @@ class Busyverse.IsoRenderer
   constructView: (world) -> new Busyverse.IsoView(world)
 
   constructCellModels: (view, world) ->
-    for location in world.city.getNewlyExploredLocations()
+    locations = world.city.getNewlyExploredLocations()
+
+    if @newlyCreated
+      locations = world.city.allExploredLocations()
+      @newlyCreated = false
+
+    for location in locations
       cell = world.map.getCellAt location
       cell_model = view.assembleCellModel cell
 
@@ -76,7 +83,7 @@ class Busyverse.IsoRenderer
       x = person.position[0]*scale / Busyverse.cellSize
       y = person.position[1]*scale / Busyverse.cellSize
       point = Point(x, y)
-      pos = @iso._translatePoint(point)
+      pos = @fg_iso._translatePoint(point)
       personView = new Busyverse.Views.PersonView(person, @foregroundContext)
       personView.render(pos.x, pos.y)
 
@@ -95,15 +102,15 @@ class Busyverse.IsoRenderer
     scale  = Busyverse.scale
     offset = Busyverse.engine.game.ui.offset
 
-    x = (xy[0] * 2) - offset.x
-    y = (xy[1] * 2) - offset.y
+    x = (xy[0] * 2) - (offset.x)
+    y = (xy[1] * 2) - (offset.y)
 
-    tx = @iso.transformation
-    ox = @iso.originX
-    oy = @iso.originY
+    tx = @bg_iso.transformation
 
-    if Busyverse.debug
-      console.log "project #{xy} with tx #{tx} by origin #{ox},#{oy}"
+    { originX, originY } = @bg_iso
+
+    ox = originX
+    oy = originY
 
     det = (tx[0][1] * tx[1][0]) - (tx[0][0] * tx[1][1])
 
@@ -111,8 +118,10 @@ class Busyverse.IsoRenderer
     px =   (a  + (oy * tx[1][0]) - (tx[1][0] * y) - (tx[1][1] * x)) / det
 
     d = (-(ox * tx[0][1]))
-    py = (d - (ox * tx[0][0]) + (tx[0][0] * y) + (tx[0][1] * x)) / det
+    py = (d - (oy * tx[0][0]) + (tx[0][0] * y) + (tx[0][1] * x)) / det
 
+    offsetPos = Busyverse.engine.game.ui.offsetPos
     x = Math.floor(px/scale)
     y = Math.floor(py/scale)
+
     [ x, y ]

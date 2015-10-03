@@ -11,7 +11,7 @@ class Tree
     @y = xy[1]
 
 class Busyverse.IsoView
-  scale: Busyverse.scale
+  #scale: Busyverse.scale
 
   geometry: new Busyverse.Support.Geometry()
 
@@ -21,6 +21,8 @@ class Busyverse.IsoView
   white: new Color(160, 160, 160)
 
   constructor: (@world) ->
+    @scale = Busyverse.scale
+
   assembleModels: (mousePosition) =>
     models = []
 

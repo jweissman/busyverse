@@ -34,7 +34,8 @@ context "Presenter", ->
         buildings: [],
         population: [],
         canAfford: -> true,
-        getNewlyExploredLocations: -> []
+        getNewlyExploredLocations: -> [],
+        allExploredLocations: -> []
       map: { eachCell: -> },
       isDay: -> false,
       describeTime: -> "midnight"
