@@ -1,5 +1,7 @@
 #= require busyverse
-#= require_tree ./buildings
+#= require building_type
+#= require building
+#= require tabletop
 #= require person
 #= require city
 #= require grid
@@ -19,38 +21,49 @@ class Busyverse.Game
     @player ?= new Busyverse.Player()
     @world  ?= new Busyverse.World(@width, @height, @cellSize)
 
-    @chosenBuilding = new Busyverse.Buildings.Farm()
+    @chosenBuilding = null
 
-  setup: ->
-    @world.setup()
-    console.log "Game#new world=#{@world.name}" if Busyverse.debug
+    Tabletop.init
+      key: Busyverse.buildingSheetId
+      callback: @setupBuildingTypes
+      simpleSheet: true
+
+  setupBuildingTypes: (buildingData) =>
+    for building in buildingData
+      { name, description, cost } = building
+      { width, length, height, red, green, blue } = building
+      size = [ parseInt(width), parseInt(length), parseFloat(height) ]
+      color = { red: parseInt(red), green: parseInt(green), blue: parseInt(blue) }
+
+      buildingType = new Busyverse.BuildingType
+        name: name
+        description: description
+        cost: cost
+        size:  size
+        color:  color
+        
+    @world.setupBuildings()
+
+  setup: -> @world.setup()
 
   play: (ui) =>
     @ui = ui
-    console.log 'Playing!'
     @launch()
     true
     
-  launch: ->
-    console.log 'Launching!' if Busyverse.verbose
-    @ui.centerAt @world.city.buildings[0].position
-    @step()
+  launch: -> @step()
 
   step: =>
-    console.log "tick" if Busyverse.debug and Busyverse.verbose
     @update()
     @render()
     setTimeout @step, @stepLength
 
   update: () => @world.update()
 
-  render: () =>
-    console.log "Rendering to UI" if Busyverse.verbose
-    @ui.render(@world)
+  render: () => @ui.render(@world)
 
   click: (position) =>
     return unless @ui
-    console.log "click position=#{position}" if Busyverse.trace
 
     action = ''
     pos = @ui.renderer.mousePos
@@ -74,9 +87,10 @@ class Busyverse.Game
 
   handleClickElement: (elementName) =>
     console.log "Game#handleClickElement: #{elementName} " if Busyverse.trace
-    for building in Busyverse.Building.all()
+    for building in Busyverse.BuildingType.all
       if building.name == elementName
-        console.log "would be choosing #{building.name}" if Busyverse.debug
+        console.log "would be choosing #{building.name}" # if Busyverse.debug
+        console.log building
         @chosenBuilding = building
 
   attemptToConstructBuilding: (mouseLocation) =>

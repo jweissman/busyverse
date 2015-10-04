@@ -29,7 +29,7 @@ class Busyverse.World
 
   defaultDistribution: {60: 'darkgreen', 40: 'darkblue'},
 
-  setup: (dist=@defaultDistribution, evolve=true, resources=true, build=true) =>
+  setup: (dist=@defaultDistribution, evolve=true, resources=true) =>
     console.log "World#setup" if Busyverse.trace
 
     @terraformer = new Busyverse.Terraformer()
@@ -37,15 +37,26 @@ class Busyverse.World
 
     @distributeResoures() if resources
 
-    if build
-      until origin
-        origin = @randomPassableAreaOfSize [4,4]
+  setupBuildings: =>
+    until origin
+      origin = @randomPassableAreaOfSize [4,4]
 
-      farm = new Busyverse.Buildings.Farm(origin)
-      @city.create farm
+    buildingType = Busyverse.BuildingType.all[0]
+    building = Busyverse.Building.generate buildingType.name, origin
 
-      for i in [1..@initialPopulation]
-        @city.grow @
+    @city.create building
+    @markExploredSurrounding(origin, 25)
+    Busyverse.engine.ui.centerAt(origin) #@world.city.buildings[0].position)
+
+    @createPeople(origin)
+
+  createPeople: (origin) =>
+
+    for i in [1..@initialPopulation]
+      console.log "creating person at #{origin}"
+      @city.grow @
+
+    Busyverse.engine.onPeopleCreated()
 
   distributeResoures: ->
     for j in [1..@startingResources]
@@ -218,7 +229,21 @@ class Busyverse.World
     return null if nearby_cells.length == 0
 
     @random.valueFromList(nearby_cells).location
-    
+
+  nearbyCell: (cellCoords, distance=15) =>
+    if Busyverse.verbose
+      console.log "World#nearbyUnexploredCell coords=#{cellCoords}"
+    closest = null
+    min_dist = 10000
+
+    nearby_cells = @allCellsWithin(distance, cellCoords)
+    nearby_cells = nearby_cells.filter (cell) =>
+      @map.isLocationPassable(cell.location)
+
+    return null if nearby_cells.length == 0
+
+    @random.valueFromList(nearby_cells).location
+      
   getPath: (source, target) =>
     @pathfinder.shortestPath(source, target)
 

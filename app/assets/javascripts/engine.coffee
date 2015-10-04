@@ -5,8 +5,11 @@ class Busyverse.Engine
     @game ?= new Busyverse.Game()
     @ui   ?= new Busyverse.Presenter()
 
+  renderBanner: -> console.log(Busyverse.banner)
+
   setup: ->
-    console.log(Busyverse.banner)
+    @renderBanner()
+
     @canvas = document.getElementById('busyverse')
     if @canvas != null
       @canvas.addEventListener 'mousedown', @handleClick
@@ -15,20 +18,19 @@ class Busyverse.Engine
       console.log "--- warning: canvas is null" if Busyverse.debug
 
     @game.setup()
-
     @ui.attach(@canvas)
 
     $('#terminal').submit @handleCommand
+    document.onkeypress = (e) => @handleKeypress(e)
 
+    true
+
+  onPeopleCreated: ->
     people = @game.world.city.population
     options = $('#target')
     options.append $('<option />').val(-1).text('all')
     $.each people, -> options.append $('<option />').val(@id).text(@name)
 
-    document.onkeypress = (e) => @handleKeypress(e)
-
-    true
-     
   run: -> @game.play(@ui)
 
   handleClick: (event) => @game.click(@ui.renderer.projectedMousePos, event)

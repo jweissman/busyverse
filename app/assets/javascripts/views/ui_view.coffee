@@ -35,7 +35,7 @@ class Busyverse.Views.UIView extends Busyverse.View
    
   constructPalette: (city) ->
     palette = []
-    building_list = Busyverse.Building.all()
+    building_list = Busyverse.BuildingType.all
     building_index = 0
     currentBuildingName = ''
     if Busyverse.engine.game.chosenBuilding
@@ -62,12 +62,13 @@ class Busyverse.Views.UIView extends Busyverse.View
     palette
 
   renderBuildingPalette: (city) =>
+    palette = @constructPalette(city)
     @rect
       position: [10.5,115.5]
-      size: [150, 100]
+      size: [150, 10 + palette.length * 30 ]
       fill: 'ivory'
 
-    for element in @constructPalette(city)
+    for element in palette
       @rect
         position: element.position
         size: element.size

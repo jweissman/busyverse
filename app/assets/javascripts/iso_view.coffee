@@ -36,6 +36,7 @@ class Busyverse.IsoView
 
     for building in @world.city.buildings
       { red, green, blue } = building.color
+      #console.log red
       color = new Color(red, green, blue)
       for dx in [0...building.size[0]]
         for dy in [0...building.size[1]]

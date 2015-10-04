@@ -1,6 +1,5 @@
 #= require support/randomness
 #= require support/geometry
-#= require buildings/farm
 
 class Busyverse.Person
   size: [5,9]
@@ -37,9 +36,10 @@ class Busyverse.Person
         if city.resources['wood'] < 2
           return "A NEW FARM REQUIRES 2 WOOD"
 
-        @buildingToCreate = new Busyverse.Buildings.Farm()
+        @buildingToCreate = @random.valueFromList Busyverse.BuildingType.all
+        #new Busyverse.Buildings.Farm()
 
-        size = @buildingToCreate.size
+        { size } = @buildingToCreate
         radius = 2*city.population.length
         openArea = world.findOpenAreaOfSizeInCity(city, size, radius)
 
@@ -47,11 +47,11 @@ class Busyverse.Person
           return "NO OPEN AREAS FOR BUILDING"
 
         @destinationCell = openArea
-        @buildingToCreate.position = @destinationCell
+        @buildingToCreatePosition = @destinationCell
 
-        if Busyverse.debug and Busyverse.verbose
-          console.log "building #{@buildingToCreate.name}..."
-          console.log "...at #{@buildingToCreate.position}"
+        # if Busyverse.debug and Busyverse.verbose
+        # console.log "building #{@buildingToCreate.name}..."
+        console.log "planning to build a #{@buildingToCreate} at #{@buildingToCreatePosition}"
 
       else if cmd == "gather"
         console.log "GATHER COMMAND RECEIVED" if Busyverse.debug
@@ -114,7 +114,10 @@ class Busyverse.Person
   build: (world, city) =>
     @seek(world)
     if @atSoughtLocation(world)
-      world.tryToBuild(@buildingToCreate, true)
+      { name } = @buildingToCreate
+      pos = @buildingToCreatePosition
+      bldg = Busyverse.Building.generate(name, pos)
+      world.tryToBuild(bldg, true)
       @send 'build'
 
   gather: (world, city) =>
@@ -137,11 +140,12 @@ class Busyverse.Person
 
   pickWanderDestinationCell: (world, city) =>
     pos = @mapPosition(world)
-    nearbyCell = world.nearbyUnexploredCell(pos, 3 + (@visionRadius) ) ||
-                 world.nearbyUnexploredCell(pos, 5 + (@visionRadius*3) ) ||
-                 world.nearbyUnexploredCell(pos, 8 + (@visionRadius*5) )
+    nearbyCell = world.nearbyUnexploredCell(pos, 1 + (@visionRadius) ) ||
+                 world.nearbyUnexploredCell(pos, 2 + (@visionRadius*5) ) ||
+                 world.nearbyCell(pos, 3 + (@visionRadius*2))
+                 #world.nearbyUnexploredCell(pos, 8 + (@visionRadius*5) )
 
-    nearbyCell || world.randomPassableCell()
+    nearbyCell
 
   wander: (world, city) =>
     @destinationCell ?= @pickWanderDestinationCell(world, city)

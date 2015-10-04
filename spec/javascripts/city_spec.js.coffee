@@ -1,5 +1,4 @@
 #= require city
-#= require buildings/farm
 
 context "City", ->
   beforeEach ->

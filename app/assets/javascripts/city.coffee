@@ -45,7 +45,6 @@ class Busyverse.City
     task     = "wander"
 
     person.send(task, world)
-
     @population.push(person)
 
   update: (world) =>
@@ -54,6 +53,8 @@ class Busyverse.City
 
   canAfford: (structure) =>
     for resource of structure.costs
+      # console.log resource
+      # console.log structure.costs[resource]
       return false if @resources[resource] < structure.costs[resource]
     true
     
@@ -124,6 +125,4 @@ class Busyverse.City
     for building in @buildings
       if building.doesOverlap(location, size)
         return false
-
     true
-
