@@ -25,7 +25,7 @@ You should also now be able to view test suite output at http://localhost:3500.
 
 ## Playing the Game
 
-You start off overlooking a Small Farm. Click around the map to scroll. 
+You start off overlooking a Small Farm. Click around the map to scroll. Use +/- to scroll.
 
 You will see a few **workers** with a badge indicating their name and current task. Their initial task will be to *wander* and uncover the map. 
 

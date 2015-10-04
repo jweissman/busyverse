@@ -11,5 +11,6 @@ describe "Busyverse", ->
       expect(Busyverse.kickstart()).to.eql(true)
 
       # kickstart instruments window.onload, so let's call that?
-      window.onload()
+      # window.onload()
+      # TODO do this through a black box test
 

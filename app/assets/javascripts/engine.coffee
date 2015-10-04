@@ -26,6 +26,8 @@ class Busyverse.Engine
     $.each people, -> options.append $('<option />').val(@id).text(@name)
 
     document.onkeypress = (e) => @handleKeypress(e)
+
+    true
      
   run: -> @game.play(@ui)
 
@@ -64,6 +66,7 @@ class Busyverse.Engine
 
   @instrument: ->
     engine = new Busyverse.Engine()
-    engine.setup()
-    window.onload = -> engine.run()
+    window.onload = ->
+      engine.setup()
+      engine.run()
     engine

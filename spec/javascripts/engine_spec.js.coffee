@@ -5,7 +5,8 @@
 context "Engine", ->
   beforeEach ->
     @play = sinon.spy()
-    @game = { play: @play }
+    world = { city: -> }
+    @game = { play: @play, world: world, setup: -> }
     @ui = { attach: -> }
     @engine = new Busyverse.Engine(@game, @ui)
 

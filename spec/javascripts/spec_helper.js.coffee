@@ -4,6 +4,6 @@
 Busyverse.debug = false
 Busyverse.verbose = false
 
-Busyverse.width = 100
-Busyverse.height = 100
-Busyverse.bufferSize = 10
+Busyverse.width = 20
+Busyverse.height = 20
+Busyverse.bufferSize = 1
