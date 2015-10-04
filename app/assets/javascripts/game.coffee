@@ -33,7 +33,10 @@ class Busyverse.Game
       { name, description, cost } = building
       { width, length, height, red, green, blue } = building
       size = [ parseInt(width), parseInt(length), parseFloat(height) ]
-      color = { red: parseInt(red), green: parseInt(green), blue: parseInt(blue) }
+      color =
+        red: parseInt(red)
+        green: parseInt(green)
+        blue: parseInt(blue)
 
       buildingType = new Busyverse.BuildingType
         name: name

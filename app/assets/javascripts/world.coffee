@@ -45,7 +45,7 @@ class Busyverse.World
     building = Busyverse.Building.generate buildingType.name, origin
 
     @city.create building
-    @markExploredSurrounding(origin, 25)
+    @markExploredSurrounding(origin, 10)
     Busyverse.engine.ui.centerAt(origin) #@world.city.buildings[0].position)
 
     @createPeople(origin)
