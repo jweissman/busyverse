@@ -57,8 +57,9 @@ class Busyverse.City
     true
     
   create: (structure) =>
-    console.log "City.create -- creating new building [name=#{structure.name}]"
-    console.log "               at #{structure.position}"
+    if Busyverse.trace
+      console.log "City.create -- creating new #{structure.name}"
+      console.log "               at #{structure.position}"
     return false unless @canAfford(structure)
 
     for resource of structure.costs

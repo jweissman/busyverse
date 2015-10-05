@@ -78,13 +78,13 @@ class Busyverse.World
           console.log "WARNING -- could not distribute resource"
 
   tryToBuild: (building, create=false) =>
-    console.log "World#tryToBuild"
-    console.log building
+    console.log "World#tryToBuild" if Busyverse.trace
     { position, size, name } = building
     passable  = @isAreaPassable position, size
     available = @city.availableForBuilding position, size, name
-    #if Busyverse.debug
-    console.log "--- passable? #{passable} -- available? #{available}"
+
+    if Busyverse.debug
+      console.log "--- passable? #{passable} -- available? #{available}"
 
     if passable && available
       @city.create(building) if create

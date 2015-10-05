@@ -35,9 +35,9 @@ class Busyverse.Engine
   run: -> @game.play(@ui)
 
   handleClick: (event) =>
-    console.log "Engine#handleClick"
+    console.log "Engine#handleClick" if Busyverse.trace
     projectedPosition = @ui.renderer.projectedMousePos
-    console.log "projectedPosition = #{projectedPosition}"
+    console.log "projectedPosition = #{projectedPosition}" if Busyverse.debug
     @game.click projectedPosition, event
 
   handleKeypress: (event) ->

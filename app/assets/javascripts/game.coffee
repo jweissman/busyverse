@@ -67,7 +67,7 @@ class Busyverse.Game
   render: () => @ui.render(@world)
 
   click: (position, event) =>
-    console.log "Game#click position=#{position}"
+    console.log "Game#click position=#{position}" if Busyverse.trace
     return unless @ui && @ui.renderer
 
     holdingShift = event.shiftKey
@@ -99,16 +99,18 @@ class Busyverse.Game
         @chosenBuilding = building
 
   attemptToConstructBuilding: (mouseLocation) =>
-    console.log "Game#attemptToConstructBuilding #{mouseLocation}"
+    if Busyverse.trace
+      console.log "Game#attemptToConstructBuilding #{mouseLocation}"
     pos = [ mouseLocation[0], mouseLocation[1], 0 ]
     building = Busyverse.Building.generate(@chosenBuilding.name, pos)
     { stackable, position, size, name } = building
-    console.log "--- attempting to construct #{name} at #{position}"
+    if Busyverse.debug
+      console.log "--- attempting to construct #{name} at #{position}"
     if stackable
-      console.log "--- stackable!"
+      console.log "--- stackable!" if Busyverse.debug
       shouldStack = @world.city.shouldNewBuildingBeStacked(position, size, name)
       if shouldStack
-        console.log "--- should stack!"
+        console.log "--- should stack!" if Busyverse.debug
         building.position[2] = building.size[2] *
           @world.city.stackHeight(building.position)
 
