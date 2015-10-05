@@ -150,11 +150,7 @@ class Busyverse.City
     return false unless @isAreaFullyExplored(location, sz)
     for building in @buildings
       if building.doesOverlap(location, sz)
-        # note this assumes we're the same type, it seems possible we're not
-        # should maybe pass that in as a param
         { position, name, stackable } = building
-        console.log " --- pos #{position} / #{location}"
-        console.log " --- stackable? #{stackable}"
         if position[0] == location[0] && position[1] == location[1] &&
                name == nm && stackable
           return true

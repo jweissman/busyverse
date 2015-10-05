@@ -73,8 +73,8 @@ class Busyverse.World
     { position, size, name } = building
     passable  = @isAreaPassable position, size
     available = @city.availableForBuilding position, size, name
-    #if Busyverse.debug
-    console.log "--- passable? #{passable} -- available? #{available}"
+    if Busyverse.debug
+      console.log "--- passable? #{passable} -- available? #{available}"
 
     if passable && available
       @city.create(building) if create

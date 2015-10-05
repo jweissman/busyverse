@@ -90,9 +90,9 @@ class Busyverse.IsoView
     b = model_b.position
 
     if a[0] == b[0] && a[1] == b[1]
-      console.log "same space on xy, comparing z"
-      console.log a
-      console.log b
+      # console.log "same space on xy, comparing z"
+      # console.log a
+      # console.log b
       return 1 if a[2] > b[2]
       return -1 if a[2] < b[2]
       return 0

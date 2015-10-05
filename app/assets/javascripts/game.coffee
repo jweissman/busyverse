@@ -99,7 +99,9 @@ class Busyverse.Game
 
   attemptToConstructBuilding: (mouseLocation) =>
     building = Busyverse.Building.generate(@chosenBuilding.name, mouseLocation)
-    if @world.city.shouldNewBuildingBeStacked(building.position, building.size, building.name)
+    { position, size, name } = building
+    shouldStack = @world.city.shouldNewBuildingBeStacked(position, size, name)
+    if shouldStack
       building.position[2] = building.size[2] *
         @world.city.stackHeight(building.position)
 
