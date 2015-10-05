@@ -45,6 +45,5 @@ var Busyverse = {
 
 
   // google sheet api ids
-  buildingSheetId: '1D4tS4SUO2d4Y2NQ58gQPGpiIsl9vn6zBz4igCKyOCf0' // new busyverse
-     // '1Zj0wx8Uag4pwUEq641r0ICTmr983Qp2OSCcPIpyMcGE' -- old busyverse
+  buildingSheetId: '1D4tS4SUO2d4Y2NQ58gQPGpiIsl9vn6zBz4igCKyOCf0'
 };

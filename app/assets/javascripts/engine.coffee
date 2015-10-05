@@ -43,6 +43,7 @@ class Busyverse.Engine
         @ui.centerAt(@ui.offsetPos)
       else
         console.log "already zoomed in as far as we will permit"
+
     else if event.keyCode == 45 # -
       if Busyverse.scale >= 0.15
         Busyverse.scale = Busyverse.scale * 0.6

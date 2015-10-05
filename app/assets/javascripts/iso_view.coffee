@@ -42,11 +42,12 @@ class Busyverse.IsoView
         for dy in [0...building.size[1]]
           x = building.position[0] + dx
           y = building.position[1] + dy
-          shape = @constructBuildingShape building, x, y
+          z = building.position[2]
+          shape = @constructBuildingShape building, x, y, z
           models.push
             shape: shape
             color: color
-            position: [x,y]
+            position: [x,y,z]
 
     for person in @world.city.population
       shape = @constructPersonShape person
@@ -63,16 +64,22 @@ class Busyverse.IsoView
       if @world.tryToBuild(building, false)
         { red, green, blue } = building.color
         color = new Color(red, green, blue)
+        shouldStack = @world.city.shouldNewBuildingBeStacked(
+          building.position, building.size, building.name)
+        if shouldStack
+          building.position[2] = building.size[2] *
+                                 @world.city.stackHeight(building.position)
 
       for dx in [0...building.size[0]]
         for dy in [0...building.size[1]]
           x = building.position[0] + dx
           y = building.position[1] + dy
-          shape = @constructBuildingShape building, x, y
+          z = building.position[2] #+ dz
+          shape = @constructBuildingShape building, x, y, z
           models.push
             shape: shape
             color: color
-            position: [x,y]
+            position: [x,y,z]
 
     models.sort(@isCloserToCamera)
 
@@ -81,6 +88,14 @@ class Busyverse.IsoView
 
     a = model_a.position
     b = model_b.position
+
+    if a[0] == b[0] && a[1] == b[1]
+      console.log "same space on xy, comparing z"
+      console.log a
+      console.log b
+      return 1 if a[2] > b[2]
+      return -1 if a[2] < b[2]
+      return 0
 
     a_pos = a
     b_pos = b
@@ -99,19 +114,19 @@ class Busyverse.IsoView
     tree = new Tree(resource.position)
     @pyramid(tree.x, tree.y, tree.size)
 
-  constructBuildingShape: (building, x, y) =>
+  constructBuildingShape: (building, x, y, z) =>
     w = 1
     l = 1
     h = building.size[2]
-    @prism(x, y, w, l, h)
+    @prism(x, y, z, w, l, h)
 
   constructPersonShape: (person) =>
     x = person.position[0] / Busyverse.cellSize
     y = person.position[1] / Busyverse.cellSize
-    @prism(x,y, 0.3,0.3,1.2)
+    @prism(x,y,0.0, 0.3,0.3,1.2)
 
   assembleCellModel: (cell) =>
-    cell_shape = @prism(cell.location[0], cell.location[1], 0.95,0.95,0.01)
+    cell_shape = @prism(cell.location[0], cell.location[1], 0, 0.95,0.95,0.01)
     color = @blue
     if cell.color == 'darkgreen'
       color = @green
@@ -121,8 +136,8 @@ class Busyverse.IsoView
 
   point: (x,y,z=0) -> Point(x * @scale, y * @scale, z * @scale)
 
-  prism: (x,y,length,width,height) ->
-    Prism( @point(x,y), length * @scale, width * @scale, height * @scale)
+  prism: (x,y,z,length,width,height) ->
+    Prism( @point(x,y,z), length * @scale, width * @scale, height * @scale)
 
   pyramid: (x,y,size) ->
     location = @point(x, y)

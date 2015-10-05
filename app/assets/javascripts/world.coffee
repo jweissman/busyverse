@@ -45,13 +45,12 @@ class Busyverse.World
     building = Busyverse.Building.generate buildingType.name, origin
 
     @city.create building
-    @markExploredSurrounding(origin, 10)
-    Busyverse.engine.ui.centerAt(origin) #@world.city.buildings[0].position)
-
+    @markExploredSurrounding(origin, 8)
+    Busyverse.engine.ui.centerAt(origin)
     @createPeople(origin)
 
-  createPeople: (origin) =>
 
+  createPeople: (origin) =>
     for i in [1..@initialPopulation]
       console.log "creating person at #{origin}"
       @city.grow @
@@ -71,8 +70,12 @@ class Busyverse.World
           console.log "WARNING -- could not distribute resource"
 
   tryToBuild: (building, create=false) =>
-    passable  = @isAreaPassable(building.position, building.size)
-    available = @city.availableForBuilding(building.position, building.size)
+    { position, size, name } = building
+    passable  = @isAreaPassable position, size
+    available = @city.availableForBuilding position, size, name
+    #if Busyverse.debug
+    console.log "--- passable? #{passable} -- available? #{available}"
+
     if passable && available
       @city.create(building) if create
       true

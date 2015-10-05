@@ -30,7 +30,7 @@ class Busyverse.Game
 
   setupBuildingTypes: (buildingData) =>
     for building in buildingData
-      { name, description, cost } = building
+      { name, description, cost, stackable } = building
       { width, length, height, red, green, blue } = building
       size = [ parseInt(width), parseInt(length), parseFloat(height) ]
       color =
@@ -41,6 +41,7 @@ class Busyverse.Game
       buildingType = new Busyverse.BuildingType
         name: name
         description: description
+        stackable: stackable
         cost: cost
         size:  size
         color:  color
@@ -98,6 +99,10 @@ class Busyverse.Game
 
   attemptToConstructBuilding: (mouseLocation) =>
     building = Busyverse.Building.generate(@chosenBuilding.name, mouseLocation)
+    if @world.city.shouldNewBuildingBeStacked(building.position, building.size, building.name)
+      building.position[2] = building.size[2] *
+        @world.city.stackHeight(building.position)
+
     @world.tryToBuild(building, true)
 
   send: (command, person_id) =>

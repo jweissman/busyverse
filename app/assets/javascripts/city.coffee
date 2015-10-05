@@ -53,8 +53,6 @@ class Busyverse.City
 
   canAfford: (structure) =>
     for resource of structure.costs
-      # console.log resource
-      # console.log structure.costs[resource]
       return false if @resources[resource] < structure.costs[resource]
     true
     
@@ -119,10 +117,48 @@ class Busyverse.City
           return false
     true
 
-  availableForBuilding: (location, size) =>
-    return false unless @isAreaFullyExplored(location, size)
-
+  stackHeight: (location) =>
+    height = 0
     for building in @buildings
-      if building.doesOverlap(location, size)
-        return false
+      if building.position[0] == location[0] &&
+         building.position[1] == location[1]
+        height = height + 1
+    height
+    
+
+  shouldNewBuildingBeStacked: (location, building_size, building_name) =>
+    # { position, name, stackable } = building
+    # console.log " --- pos #{position} / #{location}"
+    # console.log " --- stackable? #{stackable}"
+    # if position[0] == location[0] && position[1] == location[1] &&
+    #        name == nm && stackable
+    #   return true
+    for building in @buildings
+      if building.doesOverlap(location, building_size)
+        # note this assumes we're the same type, it seems possible we're not
+        # should maybe pass that in as a param
+        { position, name, stackable } = building
+        console.log " --- pos #{position} / #{location}"
+        console.log " --- stackable? #{stackable}"
+        if position[0] == location[0] && position[1] == location[1] &&
+               name == building_name && stackable
+          return true
+    return false
+
+
+  availableForBuilding: (location, sz, nm) =>
+    return false unless @isAreaFullyExplored(location, sz)
+    for building in @buildings
+      if building.doesOverlap(location, sz)
+        # note this assumes we're the same type, it seems possible we're not
+        # should maybe pass that in as a param
+        { position, name, stackable } = building
+        console.log " --- pos #{position} / #{location}"
+        console.log " --- stackable? #{stackable}"
+        if position[0] == location[0] && position[1] == location[1] &&
+               name == nm && stackable
+          return true
+        else
+          return false
+
     true

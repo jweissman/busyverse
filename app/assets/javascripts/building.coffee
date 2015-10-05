@@ -2,8 +2,10 @@
 
 class Busyverse.Building
   constructor: (@position, @type) ->
-    { @name, @color, @size, @costs } = @type
-    console.log "--- creating new #{@size} #{@name} at #{@position}" if Busyverse.debug
+    @position[2] ?= 0
+    { @name, @color, @size, @costs, @stackable } = @type
+    if Busyverse.debug
+      console.log "--- creating new #{@size} #{@name} at #{@position}"
 
   doesOverlap: (location, sz) ->
     a_x1 = location[0]
@@ -25,7 +27,7 @@ class Busyverse.Building
   @generate: (name, location) ->
     if Busyverse.trace
       console.log "Building.generate type=#{name} at #{location}"
-    matching = Busyverse.BuildingType.all.filter (type) => type.name == name
+    matching = Busyverse.BuildingType.all.filter (type) -> type.name == name
     matchingType = matching[0]
 
     building = new Busyverse.Building(location, matchingType)
