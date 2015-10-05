@@ -52,15 +52,23 @@ class Busyverse.World
 
   createPeople: (origin) =>
     for i in [1..@initialPopulation]
-      console.log "creating person at #{origin}"
+      console.log "creating person at #{origin}" if Busyverse.debug
       @city.grow @
 
     Busyverse.engine.onPeopleCreated()
 
   distributeResoures: ->
     for j in [1..@startingResources]
-      position = @randomPassableCell()
-      if position
+      position = null
+      goodPosition = false
+      attempts = 0
+      until goodPosition || (attempts+=1) > 10
+        position = @randomPassableCell()
+        goodPosition = true
+        for resource in @resources
+          goodPosition = false if position[0] == resource.position[0] &&
+                                  position[1] == resource.position[1]
+      if position != null
         resource = new Busyverse.Resources.Wood(position)
         if Busyverse.trace
           console.log "distribute resource #{resource.name} at #{position}!"
@@ -70,11 +78,13 @@ class Busyverse.World
           console.log "WARNING -- could not distribute resource"
 
   tryToBuild: (building, create=false) =>
+    console.log "World#tryToBuild"
+    console.log building
     { position, size, name } = building
     passable  = @isAreaPassable position, size
     available = @city.availableForBuilding position, size, name
-    if Busyverse.debug
-      console.log "--- passable? #{passable} -- available? #{available}"
+    #if Busyverse.debug
+    console.log "--- passable? #{passable} -- available? #{available}"
 
     if passable && available
       @city.create(building) if create

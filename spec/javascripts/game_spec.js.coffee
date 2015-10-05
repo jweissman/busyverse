@@ -29,8 +29,10 @@ describe "Game", ->
         ]
       }
 
+      evt = { shiftKey: false }
+
       position = [213, 432]
       sinon.spy(game, "handleClickElement")
-      game.click(position)
+      game.click(position, evt)
       game.handleClickElement.should.have.been.called
       game.handleClickElement.getCall(0).args[0].should.equal('woot')

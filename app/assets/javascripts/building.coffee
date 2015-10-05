@@ -4,8 +4,6 @@ class Busyverse.Building
   constructor: (@position, @type) ->
     @position[2] ?= 0
     { @name, @color, @size, @costs, @stackable } = @type
-    if Busyverse.debug
-      console.log "--- creating new #{@size} #{@name} at #{@position} (stackable? #{@stackable})"
 
   doesOverlap: (location, sz) ->
     a_x1 = location[0]

@@ -66,8 +66,11 @@ class Busyverse.Game
 
   render: () => @ui.render(@world)
 
-  click: (position) =>
-    return unless @ui
+  click: (position, event) =>
+    console.log "Game#click position=#{position}"
+    return unless @ui && @ui.renderer
+
+    holdingShift = event.shiftKey
 
     action = ''
     pos = @ui.renderer.mousePos
@@ -84,32 +87,37 @@ class Busyverse.Game
 
     unless ui_hit
       if @chosenBuilding != null
-        if @attemptToConstructBuilding(position)
-          @chosenBuilding = null
+        @attemptToConstructBuilding(position)
+        @chosenBuilding = null if !@world.city.canAfford(@chosenBuilding) || !holdingShift
       else
-        @ui.centerAt(position)
+        @ui.centerAt(position) if holdingShift
 
   handleClickElement: (elementName) =>
     console.log "Game#handleClickElement: #{elementName} " if Busyverse.trace
     for building in Busyverse.BuildingType.all
       if building.name == elementName
-        console.log "would be choosing #{building.name}" # if Busyverse.debug
-        console.log building
         @chosenBuilding = building
 
   attemptToConstructBuilding: (mouseLocation) =>
-    building = Busyverse.Building.generate(@chosenBuilding.name, mouseLocation)
-    { position, size, name } = building
-    shouldStack = @world.city.shouldNewBuildingBeStacked(position, size, name)
-    if shouldStack
-      building.position[2] = building.size[2] *
-        @world.city.stackHeight(building.position)
+    console.log "Game#attemptToConstructBuilding #{mouseLocation}"
+    pos = [ mouseLocation[0], mouseLocation[1], 0 ]
+    building = Busyverse.Building.generate(@chosenBuilding.name, pos)
+    { stackable, position, size, name } = building
+    console.log "--- attempting to construct #{name} at #{position}"
+    if stackable
+      console.log "--- stackable!"
+      shouldStack = @world.city.shouldNewBuildingBeStacked(position, size, name)
+      if shouldStack
+        console.log "--- should stack!"
+        building.position[2] = building.size[2] *
+          @world.city.stackHeight(building.position)
 
     @world.tryToBuild(building, true)
 
   send: (command, person_id) =>
-    console.log "Game#send command=#{command} person_id=#{person_id}"
-    console.log command
+    if Busyverse.trace
+      console.log "Game#send command=#{command} person_id=#{person_id}"
+      console.log command
     op = command
     unless person_id
       console.log "WARNING: NO TARGET ID person_id PROVIDED FOR COMMAND"

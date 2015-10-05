@@ -9,7 +9,7 @@ class Busyverse.City
     @population   ?= []
     @buildings    ?= []
 
-    @resources     = { 'food': 10, 'wood': 10, 'iron': 0, 'gold': 0 }
+    @resources     = { 'food': 10, 'wood': 100, 'iron': 0, 'gold': 0 }
     @random = new Busyverse.Support.Randomness()
 
     if Busyverse.verbose
@@ -57,14 +57,14 @@ class Busyverse.City
     true
     
   create: (structure) =>
-    if Busyverse.debug
-      console.log "creating new building [name=#{structure.name}]"
+    console.log "City.create -- creating new building [name=#{structure.name}]"
+    console.log "               at #{structure.position}"
     return false unless @canAfford(structure)
 
     for resource of structure.costs
       @resources[resource] -= structure.costs[resource]
 
-    @buildings.push(structure)
+    @buildings.push structure
 
   indicateAccessible: (location) =>
     if Busyverse.trace
@@ -127,24 +127,14 @@ class Busyverse.City
     
 
   shouldNewBuildingBeStacked: (location, building_size, building_name) =>
-    # { position, name, stackable } = building
-    # console.log " --- pos #{position} / #{location}"
-    # console.log " --- stackable? #{stackable}"
-    # if position[0] == location[0] && position[1] == location[1] &&
-    #        name == nm && stackable
-    #   return true
     for building in @buildings
       if building.doesOverlap(location, building_size)
-        # note this assumes we're the same type, it seems possible we're not
-        # should maybe pass that in as a param
         { position, name, stackable } = building
-        console.log " --- pos #{position} / #{location}"
-        console.log " --- stackable? #{stackable}"
-        if position[0] == location[0] && position[1] == location[1] &&
-               name == building_name && stackable
+        if position[0] == location[0] &&
+           position[1] == location[1] &&
+           name == building_name && stackable
           return true
     return false
-
 
   availableForBuilding: (location, sz, nm) =>
     return false unless @isAreaFullyExplored(location, sz)
