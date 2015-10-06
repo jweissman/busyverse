@@ -11,6 +11,7 @@ class Tree
     @y = xy[1]
 
 class Busyverse.IsoView
+  camera: [-100,-100,100]
   geometry: new Busyverse.Support.Geometry()
 
   red: new Color(160, 60, 50, 0.4)
@@ -102,7 +103,6 @@ class Busyverse.IsoView
     models.sort(@isCloserToCamera)
 
   isCloserToCamera: (model_a,model_b) =>
-    @camera = [-10,-10,100]
 
     a = model_a.position
     b = model_b.position
