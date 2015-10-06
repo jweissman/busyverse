@@ -13,7 +13,7 @@ class Tree
 class Busyverse.IsoView
   geometry: new Busyverse.Support.Geometry()
 
-  red: new Color(160, 60, 50)
+  red: new Color(160, 60, 50, 0.4)
   blue: new Color(50, 60, 160)
   green: new Color(60, 150, 50)
   white: new Color(160, 160, 160)
@@ -63,9 +63,10 @@ class Busyverse.IsoView
       pos = [mousePosition[0], mousePosition[1], 0]
       building = Busyverse.Building.generate(name, pos)
 
+      color = @red
       if @world.tryToBuild(building, false)
         { red, green, blue } = building.color
-        color = new Color(red, green, blue)
+        color = new Color(red, green, blue, 0.2)
         shouldStack = @world.city.shouldNewBuildingBeStacked(
           building.position, building.size, building.name)
         if shouldStack
@@ -101,7 +102,7 @@ class Busyverse.IsoView
     models.sort(@isCloserToCamera)
 
   isCloserToCamera: (model_a,model_b) =>
-    @camera = [-10,-10,30]
+    @camera = [-10,-10,100]
 
     a = model_a.position
     b = model_b.position

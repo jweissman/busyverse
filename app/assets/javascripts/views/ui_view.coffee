@@ -32,7 +32,7 @@ class Busyverse.Views.UIView extends Busyverse.View
         size: cover
         fill: "rgba(0,0,192,0.125)"
 
-   
+  paletteElementSize: [ 200, 36 ]
   constructPalette: (city) ->
     palette = []
     building_list = Busyverse.BuildingType.all
@@ -52,9 +52,11 @@ class Busyverse.Views.UIView extends Busyverse.View
   
       palette.push {
         name: building.name
-        position: [13.5, (119.5 + building_index * 30)],
-        size: [143, 28]
+        position: [13.5, (119.5 + building_index * (@paletteElementSize[1]+2))],
+        size: @paletteElementSize
         fill: color
+        cost: building.cost
+        text: building.description
         clickable: affordable && !selected
       }
 
@@ -63,9 +65,11 @@ class Busyverse.Views.UIView extends Busyverse.View
 
   renderBuildingPalette: (city) =>
     palette = @constructPalette(city)
+    sz = [10 + @paletteElementSize[0],
+          10 + palette.length * (@paletteElementSize[1]+2) ]
     @rect
       position: [10.5,115.5]
-      size: [150, 10 + palette.length * 30 ]
+      size: sz
       fill: 'ivory'
 
     for element in palette
@@ -76,8 +80,26 @@ class Busyverse.Views.UIView extends Busyverse.View
 
       @text
         msg: element.name
+        position: [element.position[0] + 30, element.position[1] + 18]
+        size: '18px'
+
+      @text
+        msg: element.text
+        position: [element.position[0] + 30, element.position[1] + 30]
+        size: '12px'
+
+      @rect
+        position: element.position
+        size: [26, element.size[1]]
+        fill: 'darkblue'
+
+      @text
+        msg: element.cost
         position: [element.position[0] + 4, element.position[1] + 21]
-        size: '24px'
+        size: '14px'
+        fill: 'white'
+
+
 
   renderCityDetail: (city) =>
     @rect

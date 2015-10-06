@@ -24,7 +24,7 @@ var Busyverse = {
 
   stepLength: 24,
     
-  initialPopulation: 3,
+  initialPopulation: 1,
   startingResources: 500,
   defaultVisionRadius: 5,
 
