@@ -27,8 +27,10 @@ class Busyverse.Engine
 
   onPeopleCreated: ->
     people = @game.world.city.population
+
     options = $('#target')
-    options.append $('<option />').val(-1).text('all')
+    options.empty()
+           .append $('<option />').val(-1).text('all')
     $.each people, ->
       options.append $('<option />').val(@id).text(@name)
 

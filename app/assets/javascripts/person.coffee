@@ -37,10 +37,9 @@ class Busyverse.Person
           return "A NEW FARM REQUIRES 2 WOOD"
 
         @buildingToCreate = @random.valueFromList Busyverse.BuildingType.all
-        #new Busyverse.Buildings.Farm()
 
         { size } = @buildingToCreate
-        radius = 2*city.population.length
+        radius = 2+(3*city.population.length)
         openArea = world.findOpenAreaOfSizeInCity(city, size, radius)
 
         if typeof(openArea) == 'undefined' || openArea == null
@@ -49,9 +48,9 @@ class Busyverse.Person
         @destinationCell = openArea
         @buildingToCreatePosition = @destinationCell
 
-        # if Busyverse.debug and Busyverse.verbose
-        # console.log "building #{@buildingToCreate.name}..."
-        console.log "planning to build a #{@buildingToCreate} at #{@buildingToCreatePosition}"
+        if Busyverse.debug
+          console.log "planning to build a #{@buildingToCreate}"
+          console.log "         at #{@buildingToCreatePosition}"
 
       else if cmd == "gather"
         console.log "GATHER COMMAND RECEIVED" if Busyverse.debug

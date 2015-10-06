@@ -4,6 +4,14 @@ context "City", ->
   beforeEach ->
     @city = new Busyverse.City()
 
+    Busyverse.engine = {
+      onPeopleCreated: ->
+      game: {
+        world: {
+        }
+      }
+    }
+
     origin = [0,0]
     @farm = { position: origin, doesOverlap: -> true }
 

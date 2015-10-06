@@ -22,15 +22,15 @@ var Busyverse = {
 
   bufferSize: 16000,
 
-  stepLength: 22,
+  stepLength: 24,
     
-  initialPopulation: 10,
+  initialPopulation: 3,
   startingResources: 500,
-  defaultVisionRadius: 4,
+  defaultVisionRadius: 5,
 
   scale: 0.71,
 
-  evolveDepth: 12, // how long to smooth/evolve landscape
+  evolveDepth: 9, // how long to smooth/evolve landscape
 
   // banner
   banner: " _                                   \n"+        

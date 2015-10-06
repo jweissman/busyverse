@@ -1,8 +1,8 @@
-Color = Isomer.Color
-Shape = Isomer.Shape
+Color   = Isomer.Color
+Shape   = Isomer.Shape
 Pyramid = Shape.Pyramid
-Prism = Shape.Prism
-Point = Isomer.Point
+Prism   = Shape.Prism
+Point   = Isomer.Point
 
 class Tree
   size: [ 1, 1, 2.5 ]
@@ -11,8 +11,6 @@ class Tree
     @y = xy[1]
 
 class Busyverse.IsoView
-  #scale: Busyverse.scale
-
   geometry: new Busyverse.Support.Geometry()
 
   red: new Color(160, 60, 50)
@@ -23,20 +21,19 @@ class Busyverse.IsoView
   constructor: (@world) ->
     @scale = Busyverse.scale
 
-  assembleModels: (mousePosition) =>
-    models = []
+  constructStableModels: =>
+    stableModels = []
 
     for resource in @world.resources
       if @world.isLocationExplored resource.position
         shape = @constructResourceShape resource
-        models.push
+        stableModels.push
           shape: shape
           color: @green
           position: resource.position
 
     for building in @world.city.buildings
       { red, green, blue } = building.color
-      #console.log red
       color = new Color(red, green, blue)
       for dx in [0...building.size[0]]
         for dy in [0...building.size[1]]
@@ -44,14 +41,19 @@ class Busyverse.IsoView
           y = building.position[1] + dy
           z = building.position[2]
           shape = @constructBuildingShape building, x, y, z
-          models.push
+          stableModels.push
             shape: shape
             color: color
             position: [x,y,z]
 
+    stableModels
+
+  constructDynamicModels: (mousePosition) =>
+    dynamicModels = []
+
     for person in @world.city.population
       shape = @constructPersonShape person
-      models.push
+      dynamicModels.push
         shape: shape
         color: @white
         position: person.mapPosition(@world)
@@ -60,7 +62,6 @@ class Busyverse.IsoView
       name = Busyverse.engine.game.chosenBuilding.name
       pos = [mousePosition[0], mousePosition[1], 0]
       building = Busyverse.Building.generate(name, pos)
-      color = @white
 
       if @world.tryToBuild(building, false)
         { red, green, blue } = building.color
@@ -77,39 +78,51 @@ class Busyverse.IsoView
           y = building.position[1] + dy
           z = building.position[2] #+ dz
           shape = @constructBuildingShape building, x, y, z
-          models.push
+          dynamicModels.push
             shape: shape
             color: color
             position: [x,y,z]
+            building_id: building.id
+
+
+    dynamicModels
+
+  assembleModels: (mousePosition) =>
+    models = []
+
+    for model in @constructStableModels()
+      models.push model
+
+    models.sort(@isCloserToCamera)
+
+    for model in @constructDynamicModels(mousePosition)
+      models.push model
 
     models.sort(@isCloserToCamera)
 
   isCloserToCamera: (model_a,model_b) =>
-    @camera = [-10,-10] #,30]
+    @camera = [-10,-10,30]
 
     a = model_a.position
     b = model_b.position
 
-    if a[0] == b[0] && a[1] == b[1]
-      #console.log "same space on xy, comparing z"
-      #console.log a
-      #console.log b
-      return 1 if a[2] > b[2]
-      return -1 if a[2] < b[2]
-      return 0
+    a_pos = [a[0], a[1], a[2] || 0]
+    b_pos = [b[0], b[1], b[2] || 0]
 
-    a_pos = a
-    b_pos = b
-
-    delta_a = @geometry.euclideanDistance(a_pos, @camera)
-    delta_b = @geometry.euclideanDistance(b_pos, @camera)
+    delta_a = @geometry.euclideanDistance3(a_pos, @camera)
+    delta_b = @geometry.euclideanDistance3(b_pos, @camera)
 
     less_than_condition = delta_a < delta_b
     more_than_condition = delta_a > delta_b
 
-    return 1  if less_than_condition
-    return -1 if more_than_condition
-    return 0
+    value = if less_than_condition
+      1
+    else if more_than_condition
+      -1
+    else
+      0
+
+    return value
 
   constructResourceShape: (resource) =>
     tree = new Tree(resource.position)

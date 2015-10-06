@@ -11,7 +11,6 @@ class Busyverse.IsoRenderer
     sz = Busyverse.bufferSize
     @origin = { originX: sz * 0.50, originY: sz * 0.90 }
 
-    #@iso    = new Isomer(@canvasElement) #, @origin)
     @bg_iso = new Isomer(@backgroundCanvas, @origin)
     @fg_iso = new Isomer(@foregroundCanvas, @origin)
 

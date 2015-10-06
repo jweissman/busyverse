@@ -35,10 +35,10 @@ class Busyverse.City
   addResource: (resource) =>
     @resources[resource.name] = @resources[resource.name] + 1
 
-  grow: (world) =>
+  grow: (world, position) =>
     name     = @random.valueFromList Busyverse.humanNames
     
-    position = if world then world.mapToCanvasCoordinates(@center()) else [0,0]
+    position ?= if world then world.mapToCanvasCoordinates(@center()) else [0,0]
     id       = @population.length
 
     person = new Busyverse.Person(id, name, position, task)
@@ -46,6 +46,7 @@ class Busyverse.City
 
     person.send(task, world)
     @population.push(person)
+    Busyverse.engine.onPeopleCreated()
 
   update: (world) =>
     for person in @population
@@ -56,14 +57,18 @@ class Busyverse.City
       return false if @resources[resource] < structure.costs[resource]
     true
     
-  create: (structure) =>
-    if Busyverse.trace
-      console.log "City.create -- creating new #{structure.name}"
-      console.log "               at #{structure.position}"
+  create: (structure, world=Busyverse.engine.game.world) =>
+    #if Busyverse.trace
+    console.log "City.create -- creating new #{structure.name}"
+    console.log "               at #{structure.position}"
     return false unless @canAfford(structure)
 
     for resource of structure.costs
       @resources[resource] -= structure.costs[resource]
+
+    pos = [structure.position[0]*Busyverse.cellSize,
+           structure.position[1]*Busyverse.cellSize]
+    @grow(world, pos) if structure.subtype == 'residential'
 
     @buildings.push structure
 

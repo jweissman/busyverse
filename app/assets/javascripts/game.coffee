@@ -30,7 +30,7 @@ class Busyverse.Game
 
   setupBuildingTypes: (buildingData) =>
     for building in buildingData
-      { name, description, cost, stackable } = building
+      { name, description, cost, subtype, stackable } = building
       { width, length, height, red, green, blue } = building
       size = [ parseInt(width), parseInt(length), parseFloat(height) ]
       color =
@@ -45,6 +45,7 @@ class Busyverse.Game
         cost: cost
         size:  size
         color:  color
+        subtype: subtype
         
     @world.setupBuildings()
 
@@ -88,7 +89,8 @@ class Busyverse.Game
     unless ui_hit
       if @chosenBuilding != null
         @attemptToConstructBuilding(position)
-        @chosenBuilding = null if !@world.city.canAfford(@chosenBuilding) || !holdingShift
+        if !@world.city.canAfford(@chosenBuilding) || !holdingShift
+          @chosenBuilding = null
       else
         @ui.centerAt(position) if holdingShift
 

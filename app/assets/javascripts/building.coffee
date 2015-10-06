@@ -3,7 +3,7 @@
 class Busyverse.Building
   constructor: (@position, @type) ->
     @position[2] ?= 0
-    { @name, @color, @size, @costs, @stackable } = @type
+    { @name, @color, @size, @costs, @stackable, @subtype } = @type
 
   doesOverlap: (location, sz) ->
     a_x1 = location[0]
