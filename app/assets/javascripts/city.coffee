@@ -15,10 +15,7 @@ class Busyverse.City
     if Busyverse.verbose
       console.log "New city created with population #{@population}!"
 
-  detectIdleOrWanderingPerson: =>
-    for person in @population
-      if person.activeTask == 'idle' || person.activeTask == 'wander'
-        return person
+  radiusOfInfluence: => 2 + (3 * @population.length)
 
   center: =>
     if Busyverse.debug
@@ -37,6 +34,8 @@ class Busyverse.City
 
   grow: (world, position) =>
     name     = @random.valueFromList Busyverse.humanNames
+    nameIndex = Busyverse.humanNames.indexOf(name)
+    Busyverse.humanNames.splice(nameIndex,1)
     
     position ?= if world then world.mapToCanvasCoordinates(@center()) else [0,0]
     id       = @population.length

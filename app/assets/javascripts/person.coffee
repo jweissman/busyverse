@@ -33,13 +33,13 @@ class Busyverse.Person
 
     if cmd == "wander" or cmd == "idle" or cmd == "build" or cmd == "gather"
       if cmd == "build"
-        if city.resources['wood'] < 2
-          return "A NEW FARM REQUIRES 2 WOOD"
+        if city.resources['wood'] < 1
+          return "you must have at least one wood to build!"
 
         @buildingToCreate = @random.valueFromList Busyverse.BuildingType.all
 
         { size } = @buildingToCreate
-        radius = 2+(3*city.population.length)
+        radius   = city.radiusOfInfluence()
         openArea = world.findOpenAreaOfSizeInCity(city, size, radius)
 
         if typeof(openArea) == 'undefined' || openArea == null
@@ -61,7 +61,6 @@ class Busyverse.Person
         if resources.length == 0
           return "NO VISIBLE RESOURCES TO GATHER"
 
-        closest_resource = null
         min_dist = Infinity
         target = @mapPosition(world)
         sortedResources = resources.sort (a, b) =>
@@ -74,9 +73,8 @@ class Busyverse.Person
             1
           else
             0
-            
 
-        @resourceToGather = @random.valueFromList(sortedResources[..4])
+        @resourceToGather = @random.valueFromList(sortedResources[..5])
         @destinationCell  = @resourceToGather.position
         if Busyverse.debug
           name = @resourceToGather.name
@@ -94,10 +92,13 @@ class Busyverse.Person
 
     if @activeTask == "wander"
       @wander(world, city)
+
     else if @activeTask == "build"
       @build(world, city)
+
     else if @activeTask == "gather"
       @gather(world, city)
+
     if @activeTask != "idle"
       @move(world, city)
 
