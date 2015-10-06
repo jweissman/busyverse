@@ -25,12 +25,12 @@ var Busyverse = {
   stepLength: 24,
     
   initialPopulation: 1,
-  startingResources: 500,
-  defaultVisionRadius: 5,
+  startingResources: 800,
+  defaultVisionRadius: 6,
 
   scale: 0.71,
 
-  evolveDepth: 9, // how long to smooth/evolve landscape
+  evolveDepth: 25, // how long to smooth/evolve landscape
 
   // banner
   banner: " _                                   \n"+        

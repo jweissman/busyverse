@@ -1,3 +1,10 @@
+arrayUnique = (a) ->
+  a.reduce ((p, c) ->
+    if p.indexOf(c) < 0
+      p.push c
+    p
+  ), []
+
 class Busyverse.Terraformer
   constructor: () ->
     @random = new Busyverse.Support.Randomness()
@@ -25,9 +32,9 @@ class Busyverse.Terraformer
     console.log "evolve depth=#{depth}" if Busyverse.debug
     map.eachCell (cell) =>
       cell.color = @random.valueFromPercentageMap
-        25: cell.color
+        80: cell.color
         20: @mostCommonNeighborColor(map, cell)
-        #1: 'darkgreen'
+        #2:  'darkgreen'
     @evolve(map, depth-1, !noise)
     map
 
@@ -44,7 +51,7 @@ class Busyverse.Terraformer
       colors.push(neighbor.color)
 
     most_common_color = null
-    for color in colors
+    for color in arrayUnique colors
       color_counts[color] = @countNeighborsWithColor(map, cell, color)
       more_common = color_counts[color] > color_counts[most_common_color]
       if most_common_color == null || more_common
