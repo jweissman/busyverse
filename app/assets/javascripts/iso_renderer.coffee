@@ -1,17 +1,22 @@
 Point = Isomer.Point
 
 class Busyverse.IsoRenderer
-  constructor: (@canvasElement, @backgroundCanvas, @foregroundCanvas) ->
+  constructor: (
+    @canvasElement, @backgroundCanvas, @foregroundCanvas, @overlayCanvas) ->
+
     @newlyCreated = true
+    @lastInfluencedCells = []
 
     @context           = @canvasElement.getContext '2d'
     @offscreenContext  = @backgroundCanvas.getContext '2d'
     @foregroundContext = @foregroundCanvas.getContext '2d'
+    @overlayContext    = @overlayCanvas.getContext '2d'
 
     sz = Busyverse.bufferSize
     @origin = { originX: sz * 0.50, originY: sz * 0.90 }
 
     @bg_iso = new Isomer(@backgroundCanvas, @origin)
+    @overlay_iso = new Isomer(@overlayCanvas, @origin)
     @fg_iso = new Isomer(@foregroundCanvas, @origin)
 
     @projectedMousePos = null
@@ -39,22 +44,46 @@ class Busyverse.IsoRenderer
 
     for location in locations
       cell = world.map.getCellAt location
-      cell_model = view.assembleCellModel cell
+      view.assembleCellModel cell
 
-  drawCells: (cell_models, offset) =>
-    for cell_model in cell_models
-      @bg_iso.add cell_model.shape, cell_model.color
+  drawCells: (
+    cell_models, offset, iso=@bg_iso, ctx=@offscreenContext, clear=false) =>
 
     { x, y } = offset
     { width, height } = @canvasElement
-    src = @offscreenContext.canvas
+    src = ctx.canvas
 
     w = Math.floor width
     h = Math.floor height
     x = Math.floor x
     y = Math.floor y
 
+    ctx.clearRect(0,0,Busyverse.bufferSize,Busyverse.bufferSize) if clear
+
+    for cell_model in cell_models
+      iso.add cell_model.shape, cell_model.color
+
     @context.drawImage src, -x, -y, w, h, 0, 0, w, h
+
+  constructBackgroundOverlayModels: (view, world) ->
+    return [] unless world.city.influencedCells
+    world.city.recomputeInfluence() if world.city.influencedCells.length == 0
+    cells = world.city.influencedCells.slice()
+    return [] if cells.length == @lastInfluencedCells.length
+
+    @lastInfluencedCells = cells
+
+    color = Busyverse.engine.game.player.color
+    cell_color = new Isomer.Color(color.red, color.green, color.blue, 0.1125)
+    perimeter_color = new Isomer.Color(color.red, color.green, color.blue, 0.25)
+
+    for cell in cells
+      cell_model = view.assembleCellModel cell
+      cell_model.color = if world.city.onPerimeter(cell)
+        perimeter_color
+      else
+        cell_color
+      cell_model
 
   drawModels: (view, world, offset) =>
     { width, height } = @canvasElement
@@ -66,8 +95,9 @@ class Busyverse.IsoRenderer
     y = Math.floor y
 
     @foregroundContext.clearRect -x, -y, w, h
+    models = view.assembleModels(@projectedMousePos)
 
-    for model in view.assembleModels(@projectedMousePos)
+    for model in models
       @fg_iso.add(model.shape, model.color)
 
     @drawPeopleLabels(world)
@@ -88,8 +118,13 @@ class Busyverse.IsoRenderer
 
   drawBg: (world, offset) =>
     view = @constructView(world)
+
     cell_models = @constructCellModels(view,world)
     @drawCells(cell_models, offset)
+
+    overlay_models = @constructBackgroundOverlayModels(view,world)
+    clear = overlay_models.length != 0
+    @drawCells(overlay_models, offset, @overlay_iso, @overlayContext,clear)
 
   draw: (world, offset) =>
     view = @constructView(world)

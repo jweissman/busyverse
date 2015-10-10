@@ -14,7 +14,7 @@ class Busyverse.World
   startingResources: Busyverse.startingResources
 
   constructor: (@width, @height, @cellSize) ->
-    @age        = 480 # day one, 8 am
+    @age        = 480 # day zero, 8 am
     @city       = new Busyverse.City()
     @map        = new Busyverse.Grid(@width, @height)
     @resources  = []
@@ -45,17 +45,7 @@ class Busyverse.World
     building = Busyverse.Building.generate buildingType.name, origin
 
     @city.create building
-    @markExploredSurrounding(origin, 8)
     Busyverse.engine.ui.centerAt(origin)
-    @createPeople(origin)
-
-
-  createPeople: (origin) =>
-    for i in [1..@initialPopulation]
-      console.log "creating person at #{origin}" if Busyverse.debug
-      @city.grow @
-
-    Busyverse.engine.onPeopleCreated()
 
   distributeResoures: ->
     for j in [1..@startingResources]
@@ -192,23 +182,25 @@ class Busyverse.World
     @cellPatterns ?= {}
     unless @cellPatterns[maxDistance]
       @cellPatterns[maxDistance] = @computeCellPattern(maxDistance)
-    @applyCellPattern(@cellPatterns[maxDistance], center)
+    pattern = @cellPatterns[maxDistance]
+    @applyCellPattern pattern, center
 
-  computeCellPattern: (distance) ->
+  computeCellPattern: (dist) ->
     pattern = []
-    for x in [-distance..distance]
-      for y in [-distance..distance]
-        if @geometry.euclideanDistance([x,y], [0,0]) <= distance
+    distance = Math.ceil(dist) + 1
+    for x in [-(distance)..(distance)]
+      for y in [-(distance)..(distance)]
+        if @geometry.euclideanDistance([x,y], [0,0]) <= dist
           pattern.push([x,y])
     pattern
 
   applyCellPattern: (pattern, origin) ->
     cells = []
     for xy in pattern
-      x = Math.floor xy[0] + origin[0]
-      y = Math.floor xy[1] + origin[1]
+      x = Math.floor(xy[0] + origin[0])
+      y = Math.floor(xy[1] + origin[1])
       target = [ x, y ]
-      cell = @map.getCellAt(target)
+      cell = @map.getCellAt target
       if cell
         cells.push cell
     cells

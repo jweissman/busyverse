@@ -1,4 +1,5 @@
 #= require busyverse
+#= require underscore
 #= require person
 
 class Busyverse.City
@@ -9,13 +10,14 @@ class Busyverse.City
     @population   ?= []
     @buildings    ?= []
 
-    @resources     = { 'food': 10, 'wood': 100, 'iron': 0, 'gold': 0 }
+    @resources     = { 'food': 1000, 'wood': 1000, 'iron': 1000, 'gold': 1000 }
     @random = new Busyverse.Support.Randomness()
+    @geometry = new Busyverse.Support.Geometry()
+
+    @influencedCells = []
 
     if Busyverse.verbose
       console.log "New city created with population #{@population}!"
-
-  radiusOfInfluence: => 2 + (3 * @population.length)
 
   center: =>
     if Busyverse.debug
@@ -26,13 +28,15 @@ class Busyverse.City
     for building in @buildings
       xs = xs + building.position[0]
       ys = ys + building.position[1]
-    center = ([( xs / @buildings.length), (ys / @buildings.length )])
-    center
+    x = Math.floor(xs / @buildings.length)
+    y = Math.floor(ys / @buildings.length)
+    [x,y]
 
   addResource: (resource) =>
     @resources[resource.name] = @resources[resource.name] + 1
 
   grow: (world, position) =>
+    console.log "City#grow" if Busyverse.trace
     name     = @random.valueFromList Busyverse.humanNames
     nameIndex = Busyverse.humanNames.indexOf(name)
     Busyverse.humanNames.splice(nameIndex,1)
@@ -70,6 +74,7 @@ class Busyverse.City
     @grow(world, pos) if structure.subtype == 'residential'
 
     @buildings.push structure
+    @recomputeInfluence()
 
   indicateAccessible: (location) =>
     if Busyverse.trace
@@ -86,10 +91,10 @@ class Busyverse.City
   
   allExploredLocations: => @exploredLocations ||= []
 
-
-  explore:    (location) =>
+  explore: (location) =>
     if Busyverse.trace
       console.log "City#explore [location=#{location}]"
+
     @explored[location[0]] ?= []
     @explored[location[0]][location[1]] = true
 
@@ -122,6 +127,61 @@ class Busyverse.City
           return false
     true
 
+  radiusOfInfluence: =>
+    Math.floor(5 +
+      (0.5 * @population.length)) +
+      (0.125 * (@buildings.length))
+
+  recomputeInfluence: (world=Busyverse.engine.game.world) =>
+    console.log "City#recomputeInfluence" if Busyverse.trace
+    center = @center()
+    radius = @radiusOfInfluence()
+    @influencedCells = world.allCellsWithin radius, center
+    for cell in @influencedCells
+      @explore(cell.location)
+
+  onPerimeter: (cell) =>
+    center = @center()
+    radius = @radiusOfInfluence()
+    distance = @geometry.euclideanDistance(cell.location, center)
+    (distance) >= radius - 1
+
+  isInfluenced: (location) =>
+    @recomputeInfluence() if @influencedCells.length == 0
+    for cell in @influencedCells
+      return true if cell.location[0] == location[0] &&
+                     cell.location[1] == location[1]
+    false
+
+  isAreaUnderInfluence: (location, size) =>
+    if Busyverse.trace
+      console.log "City#isAreaUnderInfluence [loc=#{location}, size=#{size}]"
+    
+    for x in [0..size[0]]
+      for y in [0..size[1]]
+        shifted_location = [location[0] + x, location[1] + y]
+        if !@isInfluenced(shifted_location)
+          return false
+    true
+
+  availableForBuilding: (location, sz, nm, influence=true) =>
+    influenced = @isAreaUnderInfluence(location, sz)
+    explored = @isAreaFullyExplored(location, sz)
+    return false unless explored #j&&  && influenced
+    if influence
+      return false unless influenced
+
+    for building in @buildings
+      if building.doesOverlap(location, sz)
+        { position, name, stackable } = building
+        if position[0] == location[0] && position[1] == location[1] &&
+               name == nm && stackable
+          return true
+        else
+          return false
+
+    true
+
   stackHeight: (location) =>
     height = 0
     for building in @buildings
@@ -140,16 +200,3 @@ class Busyverse.City
            name == building_name && stackable
           return true
     return false
-
-  availableForBuilding: (location, sz, nm) =>
-    return false unless @isAreaFullyExplored(location, sz)
-    for building in @buildings
-      if building.doesOverlap(location, sz)
-        { position, name, stackable } = building
-        if position[0] == location[0] && position[1] == location[1] &&
-               name == nm && stackable
-          return true
-        else
-          return false
-
-    true

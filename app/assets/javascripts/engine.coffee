@@ -29,8 +29,7 @@ class Busyverse.Engine
     people = @game.world.city.population
 
     options = $('#target')
-    options.empty()
-           .append $('<option />').val(-1).text('all')
+    options.empty().append $('<option />').val(-1).text('all')
     $.each people, ->
       options.append $('<option />').val(@id).text(@name)
 
@@ -43,7 +42,7 @@ class Busyverse.Engine
     @game.click projectedPosition, event
 
   handleKeypress: (event) ->
-    console.log event.keyCode
+    console.log(event.keyCode) if Busyverse.debug
     if event.keyCode == 61 # +
       if Busyverse.scale <= 1.1
         Busyverse.scale = Busyverse.scale * 1.45

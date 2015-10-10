@@ -6,6 +6,7 @@ class Busyverse.Person
   speed: 2.0
   visionRadius: Busyverse.defaultVisionRadius
   velocity: [0,0]
+  color: { red: 150, green: 170, blue: 210 }
 
   constructor: (@id, @name, @position) ->
     @position   ?= [0,0]
@@ -19,6 +20,7 @@ class Busyverse.Person
 
   backgroundWorker: =>
     return @background_worker if (@background_worker?)
+
     @background_worker = Busyverse.createWorker()
     @background_worker.onmessage = (result) =>
       @handlePathResponse result.data.path

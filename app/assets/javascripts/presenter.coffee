@@ -12,13 +12,19 @@ class Busyverse.Presenter
     @offsetPos = [0,0]
 
   cachedCanvases: {}
-  getCanvas: (name) =>
+  getCanvas: (name, sz, clean=false) =>
     if !@cachedCanvases[name]
       canvas = document.createElement('canvas')
       @cachedCanvases[name] = canvas
+      @cachedCanvases[name].width = sz
+      @cachedCanvases[name].height = sz
       return canvas
+    else
+      if clean
+        console.log 'clear!' if Busyverse.debug
+        ctx = @cachedCanvases[name].getContext('2d')
+        ctx.clearRect 0,0,sz,sz
     @cachedCanvases[name]
-
 
   attach: (canvas) =>
     console.log "About to create drawing context" if Busyverse.verbose
@@ -28,15 +34,12 @@ class Busyverse.Presenter
       @context  = @canvas.getContext('2d')
 
       sz = Busyverse.bufferSize
-      @bgCanvas = @getCanvas("background")
-      @bgCanvas.width  = sz
-      @bgCanvas.height = sz
-      
-      @fgCanvas = @getCanvas("foreground")
-      @fgCanvas.width  = sz
-      @fgCanvas.height = sz
+      @bgCanvas = @getCanvas("background", sz, true)
+      @fgCanvas = @getCanvas("foreground", sz)
+      @overlayCanvas = @getCanvas("overlay", sz, true)
 
-      @renderer = new Busyverse.IsoRenderer(@canvas, @bgCanvas, @fgCanvas)
+      @renderer = new Busyverse.IsoRenderer(
+        @canvas, @bgCanvas, @fgCanvas, @overlayCanvas)
 
     else
       if Busyverse.debug
@@ -58,15 +61,15 @@ class Busyverse.Presenter
 
     @offset = {x: x, y: y}
 
-  # zoom: (direction) => if direction == 'in' then ... else ...
-
   render: (world) =>
     return false if @renderer == null
 
     console.log "Rendering!" if Busyverse.debug
     @clear()
+
     @renderer.drawBg(world, @offset)
     @renderer.draw(world, @offset)
+
     @ui_view = new Busyverse.Views.UIView(world.city, @context)
     @ui_view.render(world)
 

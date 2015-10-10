@@ -1,5 +1,6 @@
 #= require busyverse
 #= require player
+#= require support/randomness
 
 context "Player", ->
   describe ".score", ->

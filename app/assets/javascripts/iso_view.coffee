@@ -14,10 +14,10 @@ class Busyverse.IsoView
   camera: [-100,-100,100]
   geometry: new Busyverse.Support.Geometry()
 
-  red: new Color(160, 60, 50, 0.4)
+  red: new Color(160, 60, 50, 0.125)
   blue: new Color(50, 60, 160)
   green: new Color(60, 150, 50)
-  white: new Color(160, 160, 160)
+  white: new Color(160, 160, 160, 0.125)
 
   constructor: (@world) ->
     @scale = Busyverse.scale
@@ -54,10 +54,12 @@ class Busyverse.IsoView
 
     for person in @world.city.population
       shape = @constructPersonShape person
+      color = new Color(person.color.red, person.color.green, person.color.blue)
+      position = person.mapPosition(@world)
       dynamicModels.push
         shape: shape
-        color: @white
-        position: person.mapPosition(@world)
+        color: color
+        position: position
 
     if mousePosition && Busyverse.engine.game.chosenBuilding
       name = Busyverse.engine.game.chosenBuilding.name
@@ -103,7 +105,6 @@ class Busyverse.IsoView
     models.sort(@isCloserToCamera)
 
   isCloserToCamera: (model_a,model_b) =>
-
     a = model_a.position
     b = model_b.position
 
@@ -141,7 +142,9 @@ class Busyverse.IsoView
     @prism(x,y,0.0, 0.3,0.3,1.2)
 
   assembleCellModel: (cell) =>
-    cell_shape = @prism(cell.location[0], cell.location[1], 0, 0.95,0.95,0.01)
+    x = cell.location[0]
+    y = cell.location[1]
+    cell_shape = @prism(x, y, 0, 0.95,0.95,0.01)
     color = @blue
     if cell.color == 'darkgreen'
       color = @green

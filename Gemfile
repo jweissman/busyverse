@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 
 source 'https://rails-assets.org' do
   gem 'rails-assets-tabletop'
+  gem 'rails-assets-underscore'
 end
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'

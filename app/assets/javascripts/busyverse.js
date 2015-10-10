@@ -15,22 +15,22 @@ var Busyverse = {
   Worker: {},
 
   // config
-  width:  800,
-  height: 800,
+  width:  900,
+  height: 900,
 
-  cellSize: 10,
+  cellSize: 15,
 
   bufferSize: 16000,
 
   stepLength: 24,
     
-  initialPopulation: 1,
+  //initialPopulation: 1,
   startingResources: 800,
-  defaultVisionRadius: 6,
+  defaultVisionRadius: 4,
 
-  scale: 0.71,
+  scale: 0.68,
 
-  evolveDepth: 25, // how long to smooth/evolve landscape
+  evolveDepth: 20, // how long to smooth/evolve landscape
 
   // banner
   banner: " _                                   \n"+        

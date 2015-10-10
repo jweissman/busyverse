@@ -8,6 +8,7 @@ context "City", ->
       onPeopleCreated: ->
       game: {
         world: {
+          allCellsWithin: -> {}
         }
       }
     }
@@ -37,7 +38,8 @@ context "City", ->
 
     describe "#availableForBuilding", ->
       it 'should indicate building locations', ->
-        available = => @city.availableForBuilding(@farm.position, [1,1])
+        available = =>
+          @city.availableForBuilding(@farm.position, [1,1], 'Farm', false)
         expect(available()).to.equal(true)
         @city.create(@farm)
         expect(available()).to.equal(false)
