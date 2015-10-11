@@ -27,7 +27,7 @@ class Busyverse.World
       console.log "Dimensions of #{@name}: #{@width}x#{@height})"
       console.log @map
 
-  defaultDistribution: {55: 'darkgreen', 45: 'darkblue'},
+  defaultDistribution: {55: 'darkgreen', 45: 'darkblue'}
 
   setup: (dist=@defaultDistribution, evolve=true, resources=true) =>
     console.log "World#setup" if Busyverse.trace
@@ -38,8 +38,10 @@ class Busyverse.World
     @distributeResoures() if resources
 
   setupBuildings: =>
+    console.log "World#setupBuildings"
     until origin
       origin = @randomPassableAreaOfSize [4,4]
+    console.log "---> Found origin!"
 
     buildingType = Busyverse.BuildingType.all[0]
     building = Busyverse.Building.generate buildingType.name, origin
@@ -101,13 +103,13 @@ class Busyverse.World
     s = '000000000' + num
     s.substr s.length - size
 
+  describeDate: -> "Day #{@getDay()}"
+
   describeTime: ->
     hour = if @getHour()%12 == 0 then '12' else @getHour()%12
     min = @pad(@getMinute(),2)
     am_pm = if @getHour() >= 12 then 'PM' else 'AM'
-    time = "#{hour}:#{min}#{am_pm}"
-    date = "Day #{@getDay()}"
-    "#{date} (#{time})"
+    "#{hour}:#{min}#{am_pm}"
 
   center: => [ @width / 2, @height / 2 ]
 

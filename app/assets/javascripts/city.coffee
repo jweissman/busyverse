@@ -10,7 +10,7 @@ class Busyverse.City
     @population   ?= []
     @buildings    ?= []
 
-    @resources     = { 'food': 1000, 'wood': 1000, 'iron': 1000, 'gold': 1000 }
+    @resources     = { 'food': 100, 'wood': 100, 'iron': 100, 'gold': 100 }
     @random = new Busyverse.Support.Randomness()
     @geometry = new Busyverse.Support.Geometry()
 
@@ -33,7 +33,21 @@ class Busyverse.City
     [x,y]
 
   addResource: (resource) =>
+    @collectionEvents ?= []
+    @collectionEvents.push { instant: performance.now(), name: resource.name }
     @resources[resource.name] = @resources[resource.name] + 1
+
+  computeCollectionRateFor: (resource_name, timeframe = 3000) ->
+    return 0 unless @collectionEvents
+    now = performance.now()
+    cutoff = now - timeframe
+    events = @collectionEvents.filter (evt) ->
+      evt.name == resource_name && evt.instant > cutoff
+    console.log "counted #{events.length}" if Busyverse.debug
+
+    factor = timeframe / 1000
+    per_second = (events.length / factor)
+    per_second_rounded = Math.floor(per_second * 100) / 100
 
   grow: (world, position) =>
     console.log "City#grow" if Busyverse.trace

@@ -29,14 +29,17 @@ class Busyverse.View
     @context.stroke()
 
   text: (opts) =>
-    { msg, position, size, font, fill, style } = opts
+    { msg, position, size, font, fill, style, align } = opts
     font ?= "Helvetica"
     fill ?= 'black'
     size ?= '16px'
+    align ?= 'left'
     style ?= ''
 
     @context.fillStyle = fill
     @context.font = "#{style} #{size} #{font}"
+    @context.textAlign = align
+
 
     @context.fillText msg, position[0], position[1]
 

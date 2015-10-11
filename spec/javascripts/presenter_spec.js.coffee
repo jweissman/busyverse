@@ -20,6 +20,7 @@ context "Presenter", ->
       fillText: @fillText
       stroke: ->
       save: ->
+      canvas: -> { width: 0, height: 0 }
       translate: ->
       restore: ->
       drawImage: ->
@@ -39,6 +40,7 @@ context "Presenter", ->
       map: { eachCell: -> },
       isDay: -> false,
       describeTime: -> "midnight"
+      describeDate: -> "today"
     }
 
     @presenter = new Busyverse.Presenter()

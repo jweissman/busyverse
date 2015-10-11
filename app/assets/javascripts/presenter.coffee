@@ -21,7 +21,7 @@ class Busyverse.Presenter
       return canvas
     else
       if clean
-        console.log 'clear!' if Busyverse.debug
+        console.log 'would be clear!' if Busyverse.debug
         ctx = @cachedCanvases[name].getContext('2d')
         ctx.clearRect 0,0,sz,sz
     @cachedCanvases[name]
