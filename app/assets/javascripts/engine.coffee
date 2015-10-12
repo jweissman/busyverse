@@ -44,8 +44,9 @@ class Busyverse.Engine
 
   handleKeypress: (event) ->
     console.log(event.keyCode) #if Busyverse.debug
+
     if event.keyCode == 61 # +
-      if Busyverse.scale <= 1.1
+      if Busyverse.scale * 1.45 <= Busyverse.maxZoom
         Busyverse.scale = Busyverse.scale * 1.45
         @ui.attach(@canvas)
         @ui.centerAt(@ui.offsetPos)
@@ -53,7 +54,7 @@ class Busyverse.Engine
         console.log "already zoomed in as far as we will permit"
 
     else if event.keyCode == 45 # -
-      if Busyverse.scale >= 0.15
+      if Busyverse.scale * 0.6 >= 0.08
         Busyverse.scale = Busyverse.scale * 0.6
         @ui.attach(@canvas)
         @ui.centerAt(@ui.offsetPos)
