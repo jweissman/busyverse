@@ -15,24 +15,21 @@ var Busyverse = {
   Worker: {},
 
   // config
-  width:  800,
-  height: 800,
+  width:  1200,
+  height: 1200,
 
-  cellSize: 10,
+  cellSize: 15,
 
   bufferSize: 16000,
 
   stepLength: 18,
     
-  //initialPopulation: 1,
   startingResources: 650,
   defaultVisionRadius: 5,
 
   scale: 0.68,
 
   evolveDepth: 26, // how long to smooth/evolve landscape
-
-  input: null,
 
   // banner
   banner: " _                                   \n"+        
@@ -47,7 +44,7 @@ var Busyverse = {
   humanNames: [ "Alain", "Ferris", "Orff", "Enoch", "Carol", "Sam", "Deborah", "Liam", "Thiago", "Elias", "Sem", "Allard", "Artemis", "Stephanie", "Estrella", "Simon", "Paul", "Gilles", "Mia", "Anya", "Jen", "Ana", "Amelie", "Augustine", "Aaron", "Anton", "Andre", "Anders", "Ahmed", "Emma", "Lucas", "Bob", "Amy", "John", "Kevin", "Tom", "Alex", "Brad", "Carrie", "Sofia", "Elisabeth", "Luka", "Gabriel", "Felix", "Jean-Paul", "Michel", "Antoine", "Mohamed", "Fatima", "Juan", "Ali", "Hiroto", "Eden", "Maria", "Lisbet", "George", "Gina", "Dean", "Sarah", "Cindy", "Terrence", "Clark", "Karim", "Isabel", "William", "Aya" ],
 
 
-  tips: ["+/- to zoom", "shift-click to recenter", "space to return home"],
+  tips: ["* +/- to zoom", "* shift-click to recenter", "* space to return home","* type 'help' to list commands"],
   commands: ['gather', 'build', 'wander', 'idle'],
     
   // google sheet api ids

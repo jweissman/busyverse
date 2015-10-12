@@ -85,7 +85,7 @@ class Busyverse.IsoRenderer
         cell_color
       cell_model
 
-  drawModels: (view, world, offset) =>
+  drawModels: (view, world, offset, clear=true) =>
     { width, height } = @canvasElement
     { x, y } = offset
 
@@ -94,7 +94,7 @@ class Busyverse.IsoRenderer
     x = Math.floor x
     y = Math.floor y
 
-    @foregroundContext.clearRect -x, -y, w, h
+    @foregroundContext.clearRect(-x, -y, w, h ) if clear
     models = view.assembleModels(@projectedMousePos)
 
     for model in models

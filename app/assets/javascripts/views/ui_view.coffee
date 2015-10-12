@@ -20,18 +20,18 @@ class Busyverse.Views.UIView extends Busyverse.View
     @renderTime(world)
     @renderResources(city)
     @renderBuildingPalette(city)
-    @renderTips()
     @renderInput() if showTerm
 
   getInput: =>
+    Busyverse.input ?= null
     return Busyverse.input if Busyverse.input != null
 
     w = 800
     x = @context.canvas.width / 2 - (w/2)
-    y = @context.canvas.height * 0.8
+    y = (@context.canvas.height * 0.85) + 20
     input = new CanvasInput(
       canvas: @context.canvas
-      fontSize: 48
+      fontSize: 50
       x: x
       extraX: -x/2
       y: y
@@ -40,18 +40,24 @@ class Busyverse.Views.UIView extends Busyverse.View
       fontColor: '#efefef'
       fontWeight: 100
       width: w
-      height: 100
+      height: 120
       padding: 8
       borderWidth: 1
       borderColor: '#000'
       borderRadius: 5
       boxShadow: '1px 1px 0px #202'
       backgroundGradient: ['#404', '#202']
+      #backgroundColor: 'rgba(60,0,60,0.5)'
       innerShadow: '0px 0px 5px rgba(0, 0, 0, 0.5)'
       placeHolder: '>_')
 
     Busyverse.input = input
-    Busyverse.log = ["","","","","","","","",Busyverse.welcome]
+    Busyverse.log = [
+      "","","","","","","","","","","","","",
+      Busyverse.welcome,
+      "Some tips:"
+    ].concat(Busyverse.tips)
+
     Busyverse.logUpdatedAt = performance.now()
     input.onsubmit (data) ->
       console.log 'Terminal submit!' if Busyverse.trace
@@ -72,19 +78,17 @@ class Busyverse.Views.UIView extends Busyverse.View
 
     w = 800
     x = @context.canvas.width / 2 - (w/2)
-    y = @context.canvas.height * 0.88
+    y = @context.canvas.height * 0.95
 
-    alpha = if Busyverse.logUpdatedAt < (performance.now() - 2000)
-      0.95 - (performance.now() - Busyverse.logUpdatedAt)/10000
+    alpha = if Busyverse.logUpdatedAt < (performance.now() - 3000)
+      0.85 - (performance.now() - Busyverse.logUpdatedAt - 3000)/6000
     else
-      0.95
+      0.85
 
     lines_printed = 0
     max_lines = 10
 
     log_lines = for evt in Busyverse.log
-      #console.log "processing log line: '#{evt}'"
-
       opts = {
         msg: evt
         size: '32px'
@@ -100,18 +104,26 @@ class Busyverse.Views.UIView extends Busyverse.View
 
     lines_printed = 0
     for message in flattened_lines[-10..]
-      #console.log "---> Rendering message '#{message}'"
-      index = Busyverse.log.filter (entry) -> entry.indexOf(message) > -1
-      #green = if index % 2 == 0 then 160 else 80
-      green = 240
+      isPlayerInput = false
+      if message
+        if message.indexOf(">") == 0
+          isPlayerInput = true
 
-      @text
-        msg: message
-        font: 'Courier New'
-        position: [ x, y - 540 + (40 * lines_printed) ]
-        size: '32px'
-        fill: "rgba(240,#{green},240,#{alpha})"
-        maxWidth: w
+        style = 'normal'
+        if isPlayerInput
+          fill = "rgba(240,240,240,#{alpha})"
+          style = 'bold'
+        else
+          fill = "rgba(160,240,160,#{alpha})"
+
+        @text
+          msg: message
+          font: 'Courier New'
+          position: [ x, y - 540 + (40 * lines_printed) ]
+          size: '32px'
+          style: style
+          fill: fill #"rgba(240,240,240,#{alpha})"
+          maxWidth: w
       lines_printed = lines_printed + 1
 
   renderCover: (world) =>
@@ -134,7 +146,7 @@ class Busyverse.Views.UIView extends Busyverse.View
         size: cover
         fill: "rgba(0,0,192,0.125)"
 
-  paletteOrigin: => [ @context.canvas.width - 380, 150 ]
+  paletteOrigin: => [ @context.canvas.width - 380, 100 ]
   paletteElementSize: [ 300, 56 ]
   constructPalette: (city) ->
     palette = []
@@ -281,7 +293,7 @@ class Busyverse.Views.UIView extends Busyverse.View
       row = row + 1
 
   renderTime: (world) =>
-    origin = [(@context.canvas.width / 2) - 120, @context.canvas.height * 0.9]
+    origin = [(@context.canvas.width / 2) - 120, @context.canvas.height * 0.125]
     @rect
       position: origin
       size: [240, 100]
@@ -304,36 +316,3 @@ class Busyverse.Views.UIView extends Busyverse.View
       size: '28px'
       align: 'center'
 
-  renderTips: =>
-    @renderListWidget 'Controls', @controlOrigin, Busyverse.tips
-    @renderListWidget 'Commands', @commandOrigin, Busyverse.commands
-
-  controlOrigin: [10,300]
-  commandOrigin: [10,600]
-
-  renderListWidget: (name, origin, items) =>
-    height = 50 + (30 * items.length)
-
-    @rect
-      position: origin
-      size: [350, height + 110]
-      fill: @blank
-
-    @text
-      msg: name
-      position: [origin[0] + 25, origin[1] + 50]
-      size: '36px'
-
-    @rect
-      position: [origin[0] + 25, origin[1] + 80]
-      size: [290, height]
-      fill: @primary
-
-    item_index = 0
-    for message in items
-      lines = @text
-        msg: message
-        position: [ origin[0] + 50, origin[1] + 120 + (30 * item_index) ]
-        size: '26px'
-        maxWidth: 300
-      item_index = item_index + 1

@@ -5,7 +5,7 @@ Prism   = Shape.Prism
 Point   = Isomer.Point
 
 class Tree
-  size: [ 1, 1, 2.5 ]
+  size: [ 1,1,2.8 ]
   constructor: (xy) ->
     @x = xy[0]
     @y = xy[1]
@@ -32,20 +32,23 @@ class Busyverse.IsoView
           shape: shape
           color: @green
           position: resource.position
+          height: resource.size[2]
 
     for building in @world.city.buildings
       { red, green, blue } = building.color
       color = new Color(red, green, blue)
       for dx in [0...building.size[0]]
         for dy in [0...building.size[1]]
-          x = building.position[0] + dx
-          y = building.position[1] + dy
-          z = building.position[2]
-          shape = @constructBuildingShape building, x, y, z
-          stableModels.push
-            shape: shape
-            color: color
-            position: [x,y,z]
+          for dz in [0...building.size[2]]
+            x = building.position[0] + dx
+            y = building.position[1] + dy
+            z = building.position[2] + dz
+            h = Math.min(1.0, building.size[2])
+            shape = @constructBuildingShape building, x, y, z, h
+            stableModels.push
+              shape: shape
+              color: color
+              position: [x,y,z]
 
     stableModels
 
@@ -78,16 +81,17 @@ class Busyverse.IsoView
 
       for dx in [0...building.size[0]]
         for dy in [0...building.size[1]]
-          x = building.position[0] + dx
-          y = building.position[1] + dy
-          z = building.position[2] #+ dz
-          shape = @constructBuildingShape building, x, y, z
-          dynamicModels.push
-            shape: shape
-            color: color
-            position: [x,y,z]
-            building_id: building.id
-
+          for dz in [0...building.size[2]]
+            x = building.position[0] + dx
+            y = building.position[1] + dy
+            z = building.position[2] + dz
+            h = Math.min(1.0, building.size[2])
+            shape = @constructBuildingShape building, x, y, z, h
+            dynamicModels.push
+              shape: shape
+              color: color
+              position: [x,y,z]
+              building_id: building.id
 
     dynamicModels
 
@@ -108,8 +112,8 @@ class Busyverse.IsoView
     a = model_a.position
     b = model_b.position
 
-    a_pos = [a[0], a[1], a[2] || 0]
-    b_pos = [b[0], b[1], b[2] || 0]
+    a_pos = [a[0], a[1], (a[2] || 0) + (model_a.height || 0)]
+    b_pos = [b[0], b[1], (b[2] || 0) + (model_b.height || 0)]
 
     delta_a = @geometry.euclideanDistance3(a_pos, @camera)
     delta_b = @geometry.euclideanDistance3(b_pos, @camera)
@@ -130,10 +134,10 @@ class Busyverse.IsoView
     tree = new Tree(resource.position)
     @pyramid(tree.x, tree.y, tree.size)
 
-  constructBuildingShape: (building, x, y, z) =>
+  constructBuildingShape: (building, x, y, z, h) =>
     w = 1
     l = 1
-    h = building.size[2]
+    h ?= building.size[2]
     @prism(x, y, z, w, l, h)
 
   constructPersonShape: (person) =>

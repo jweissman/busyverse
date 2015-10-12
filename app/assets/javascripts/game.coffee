@@ -123,6 +123,10 @@ class Busyverse.Game
       console.log "Game#send command=#{command} person_id=#{person_id}"
       console.log command
     op = command
+
+    if op == 'help'
+      return "Commands: #{Busyverse.commands}"
+
     unless person_id
       console.log "WARNING: NO TARGET ID person_id PROVIDED FOR COMMAND"
 

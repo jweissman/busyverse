@@ -27,7 +27,7 @@ class Busyverse.Person
     @background_worker
 
   send: (msg, world=Busyverse.engine.game.world) =>
-    @activeTask = "idle"
+    #@activeTask = "idle"
     console.log "Person#send msg=#{msg}" if Busyverse.trace
     city = world.city
     console.log "updating #{@name}'s active task to #{cmd}" if Busyverse.debug
