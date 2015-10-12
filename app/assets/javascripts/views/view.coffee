@@ -28,20 +28,50 @@ class Busyverse.View
     @context.strokeStyle = stroke
     @context.stroke()
 
-  text: (opts) =>
-    { msg, position, size, font, fill, style, align } = opts
+  text: (opts, write=true) =>
+    { msg, position, size, font, fill, style, align, maxWidth } = opts
     font ?= "Helvetica"
     fill ?= 'black'
     size ?= '16px'
     align ?= 'left'
     style ?= ''
+    maxWidth ?= 1000
+    position ?= [0,0]
+
+    console.log "View#text msg='#{msg}'" if Busyverse.trace
 
     @context.fillStyle = fill
     @context.font = "#{style} #{size} #{font}"
     @context.textAlign = align
 
+    x = position[0]
+    y = position[1]
 
-    @context.fillText msg, position[0], position[1]
+    metrics = @context.measureText(msg)
+    lineHeight = 40
+
+    return unless msg
+
+    words = msg.split(' ')
+    line = ''
+    n = 0
+    lines = []
+    while n < words.length
+      testLine = line + words[n] + ' '
+      metrics = @context.measureText(testLine)
+      testWidth = metrics.width
+      if testWidth > maxWidth and n > 0
+        @context.fillText(line, x, y) if write
+        lines.push line
+        line = words[n] + ' '
+        y += lineHeight
+      else
+        line = testLine
+      n++
+    @context.fillText(line, x, y) if write
+    lines.push line
+    lines
+
 
   textWidth: (opts) =>
     { msg, font, size, style } = opts

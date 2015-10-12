@@ -10,6 +10,7 @@ class Busyverse.Presenter
     @renderer = null
     @offset   = { x: 0, y: 0 }
     @offsetPos = [0,0]
+    @showTerminal = true
 
   cachedCanvases: {}
   getCanvas: (name, sz, clean=false) =>
@@ -61,7 +62,7 @@ class Busyverse.Presenter
 
     @offset = {x: x, y: y}
 
-  render: (world) =>
+  render: (world, widgets=true) =>
     return false if @renderer == null
 
     console.log "Rendering!" if Busyverse.debug
@@ -70,8 +71,9 @@ class Busyverse.Presenter
     @renderer.drawBg(world, @offset)
     @renderer.draw(world, @offset)
 
-    @ui_view = new Busyverse.Views.UIView(world.city, @context)
-    @ui_view.render(world)
+    if widgets
+      @ui_view = new Busyverse.Views.UIView(world.city, @context)
+      @ui_view.render(world, @showTerminal)
 
   clear: ->
     return false if @renderer == null
@@ -84,3 +86,6 @@ class Busyverse.Presenter
       box = new Busyverse.BoundingBox(name, position, size)
       boxes.push(box) if element.clickable
     boxes
+
+  toggleTerminal: =>
+    @showTerminal = !@showTerminal

@@ -1,4 +1,5 @@
 #= require jquery
+#= require canvasInput
 
 class Busyverse.Engine
   constructor: (@game, @ui) ->
@@ -42,7 +43,7 @@ class Busyverse.Engine
     @game.click projectedPosition, event
 
   handleKeypress: (event) ->
-    console.log(event.keyCode) if Busyverse.debug
+    console.log(event.keyCode) #if Busyverse.debug
     if event.keyCode == 61 # +
       if Busyverse.scale <= 1.1
         Busyverse.scale = Busyverse.scale * 1.45
@@ -61,6 +62,9 @@ class Busyverse.Engine
 
     else if event.keyCode == 32 # space
       @ui.centerAt(@game.world.city.center())
+
+    #else if event.keyCode == 96 # ~
+      #@ui.toggleTerminal()
 
   handleCommand: (event) =>
     command = $("input:first").val()

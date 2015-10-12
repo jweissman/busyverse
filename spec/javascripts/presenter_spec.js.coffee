@@ -11,6 +11,7 @@ context "Presenter", ->
     Busyverse.engine = { game: { chosenBuilding: {name: "Small Farm"}}}
     @rect = sinon.spy()
     @fillText = sinon.spy()
+    @drawImage = sinon.spy()
 
     @context  =
       beginPath: ->
@@ -23,7 +24,8 @@ context "Presenter", ->
       canvas: -> { width: 0, height: 0 }
       translate: ->
       restore: ->
-      drawImage: ->
+      drawImage: -> @drawImage
+      measureText: -> { width: 0 }
 
     @canvas    =
       getContext: => @context
@@ -46,11 +48,13 @@ context "Presenter", ->
     @presenter = new Busyverse.Presenter()
     @presenter.attach @canvas
 
+    @drawBg = sinon.spy @presenter.renderer, 'drawBg'
+
   describe '#attach', ->
     it 'should capture the current canvas context', ->
       expect(@presenter.canvas).to.eql(@canvas)
 
   describe "#render", ->
     it 'should render the world', ->
-      @presenter.render @world
-      @fillText.should.have.been.called.twice
+      @presenter.render @world, false
+      @drawBg.should.have.been.called.once

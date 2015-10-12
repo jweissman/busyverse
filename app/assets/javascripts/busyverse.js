@@ -22,15 +22,17 @@ var Busyverse = {
 
   bufferSize: 16000,
 
-  stepLength: 24,
+  stepLength: 18,
     
   //initialPopulation: 1,
-  startingResources: 500,
+  startingResources: 650,
   defaultVisionRadius: 5,
 
   scale: 0.68,
 
   evolveDepth: 26, // how long to smooth/evolve landscape
+
+  input: null,
 
   // banner
   banner: " _                                   \n"+        
@@ -40,6 +42,7 @@ var Busyverse = {
           "            |___|                    \n"+
           "                   v0.0.1",
 
+  welcome: "Thanks so much for playing Busyverse! Please enjoy the game.",
   // language
   humanNames: [ "Alain", "Ferris", "Orff", "Enoch", "Carol", "Sam", "Deborah", "Liam", "Thiago", "Elias", "Sem", "Allard", "Artemis", "Stephanie", "Estrella", "Simon", "Paul", "Gilles", "Mia", "Anya", "Jen", "Ana", "Amelie", "Augustine", "Aaron", "Anton", "Andre", "Anders", "Ahmed", "Emma", "Lucas", "Bob", "Amy", "John", "Kevin", "Tom", "Alex", "Brad", "Carrie", "Sofia", "Elisabeth", "Luka", "Gabriel", "Felix", "Jean-Paul", "Michel", "Antoine", "Mohamed", "Fatima", "Juan", "Ali", "Hiroto", "Eden", "Maria", "Lisbet", "George", "Gina", "Dean", "Sarah", "Cindy", "Terrence", "Clark", "Karim", "Isabel", "William", "Aya" ],
 

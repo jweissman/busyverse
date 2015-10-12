@@ -27,7 +27,7 @@ class Busyverse.World
       console.log "Dimensions of #{@name}: #{@width}x#{@height})"
       console.log @map
 
-  defaultDistribution: {55: 'darkgreen', 45: 'darkblue'}
+  defaultDistribution: {60: 'darkgreen', 40: 'darkblue'}
 
   setup: (dist=@defaultDistribution, evolve=true, resources=true) =>
     console.log "World#setup" if Busyverse.trace

@@ -38,14 +38,15 @@ class Busyverse.Person
         if city.resources['wood'] < 1
           return "you must have at least one wood to build!"
 
-        @buildingToCreate = @random.valueFromList Busyverse.BuildingType.all
+        until openArea
+          @buildingToCreate = @random.valueFromList Busyverse.BuildingType.all
 
-        { size } = @buildingToCreate
-        radius   = city.radiusOfInfluence()
-        openArea = world.findOpenAreaOfSizeInCity(city, size, radius)
+          { size } = @buildingToCreate
+          radius   = city.radiusOfInfluence()
+          openArea = world.findOpenAreaOfSizeInCity(city, size, radius)
 
-        if typeof(openArea) == 'undefined' || openArea == null
-          return "NO OPEN AREAS FOR BUILDING"
+        #if typeof(openArea) == 'undefined' || openArea == null
+        #  return "NO OPEN AREAS FOR BUILDING"
 
         @destinationCell = openArea
         @buildingToCreatePosition = @destinationCell
@@ -84,7 +85,7 @@ class Busyverse.Person
 
 
       @activeTask  = cmd
-      return "#{@name} now performing '#{@activeTask}'"
+      return "#{@name} #{@activeTask}ing"
 
     else
       return "Unknown command #{cmd}"

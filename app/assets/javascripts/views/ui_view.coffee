@@ -1,4 +1,6 @@
 #= require views/view
+#= require canvasInput
+#= require underscore
 
 class Busyverse.Views.UIView extends Busyverse.View
   blank: 'whitesmoke'
@@ -7,18 +9,110 @@ class Busyverse.Views.UIView extends Busyverse.View
   accent: 'rgba(80,0,80,0.25)'
   contrast: 'powderblue'
 
-  render: (world) =>
+  render: (world, showTerm=false) =>
     city = @model
 
     @renderCover(world)
-    @renderUi(world, city)
+    @renderUi(world, city, showTerm)
 
-  renderUi: (world, city) =>
+  renderUi: (world, city, showTerm=false) =>
     @renderCityDetail(city)
     @renderTime(world)
     @renderResources(city)
     @renderBuildingPalette(city)
     @renderTips()
+    @renderInput() if showTerm
+
+  getInput: =>
+    return Busyverse.input if Busyverse.input != null
+
+    w = 800
+    x = @context.canvas.width / 2 - (w/2)
+    y = @context.canvas.height * 0.8
+    input = new CanvasInput(
+      canvas: @context.canvas
+      fontSize: 48
+      x: x
+      extraX: -x/2
+      y: y
+      extraY: -y/2
+      fontFamily: 'Courier New'
+      fontColor: '#efefef'
+      fontWeight: 100
+      width: w
+      height: 100
+      padding: 8
+      borderWidth: 1
+      borderColor: '#000'
+      borderRadius: 5
+      boxShadow: '1px 1px 0px #202'
+      backgroundGradient: ['#404', '#202']
+      innerShadow: '0px 0px 5px rgba(0, 0, 0, 0.5)'
+      placeHolder: '>_')
+
+    Busyverse.input = input
+    Busyverse.log = ["","","","","","","","",Busyverse.welcome]
+    Busyverse.logUpdatedAt = performance.now()
+    input.onsubmit (data) ->
+      console.log 'Terminal submit!' if Busyverse.trace
+      cmd = Busyverse.input.value()
+      Busyverse.input.value("")
+      response = Busyverse.engine.game.send(cmd, -1)
+      console.log response #if Busyverse.debug
+      Busyverse.log.push "> #{cmd}"
+      Busyverse.log.push response
+      Busyverse.logUpdatedAt = performance.now()
+    input
+
+  renderInput: =>
+    console.log "UiView#renderInput" if Busyverse.trace
+    # should also render past output and response?
+    input = @getInput()
+    input.render()
+
+    w = 800
+    x = @context.canvas.width / 2 - (w/2)
+    y = @context.canvas.height * 0.88
+
+    alpha = if Busyverse.logUpdatedAt < (performance.now() - 2000)
+      0.95 - (performance.now() - Busyverse.logUpdatedAt)/10000
+    else
+      0.95
+
+    lines_printed = 0
+    max_lines = 10
+
+    log_lines = for evt in Busyverse.log
+      #console.log "processing log line: '#{evt}'"
+
+      opts = {
+        msg: evt
+        size: '32px'
+        font: 'Courier New'
+        maxWidth: w
+      }
+
+      @text(opts, false)
+
+    flattened_lines =  log_lines.reduce(((a, b) ->
+      a.concat(b)
+    ), [])
+
+    lines_printed = 0
+    for message in flattened_lines[-10..]
+      #console.log "---> Rendering message '#{message}'"
+      index = Busyverse.log.filter (entry) -> entry.indexOf(message) > -1
+      #green = if index % 2 == 0 then 160 else 80
+      green = 240
+
+      @text
+        msg: message
+        font: 'Courier New'
+        position: [ x, y - 540 + (40 * lines_printed) ]
+        size: '32px'
+        fill: "rgba(240,#{green},240,#{alpha})"
+        maxWidth: w
+      lines_printed = lines_printed + 1
 
   renderCover: (world) =>
     cover = [Busyverse.width * Busyverse.cellSize,
@@ -118,7 +212,7 @@ class Busyverse.Views.UIView extends Busyverse.View
 
       @text
         msg: element.cost
-        position: [element.position[0] + 20, element.position[1] + 35]
+        position: [element.position[0] + 24, element.position[1] + 35]
         size: '28px'
         fill: @blank
         align: 'center'
@@ -141,7 +235,7 @@ class Busyverse.Views.UIView extends Busyverse.View
       fill: 'white'
 
     @text
-      msg: "Pop: #{city.population.length}"
+      msg: "Population: #{city.population.length}"
       position: [origin[0], origin[1] + 90]
       size: '24px'
       align: 'center'
@@ -237,8 +331,9 @@ class Busyverse.Views.UIView extends Busyverse.View
 
     item_index = 0
     for message in items
-      @text
+      lines = @text
         msg: message
         position: [ origin[0] + 50, origin[1] + 120 + (30 * item_index) ]
         size: '26px'
+        maxWidth: 300
       item_index = item_index + 1

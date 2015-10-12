@@ -37,7 +37,7 @@ class Busyverse.City
     @collectionEvents.push { instant: performance.now(), name: resource.name }
     @resources[resource.name] = @resources[resource.name] + 1
 
-  computeCollectionRateFor: (resource_name, timeframe = 3000) ->
+  computeCollectionRateFor: (resource_name, timeframe = 10000) ->
     return 0 unless @collectionEvents
     now = performance.now()
     cutoff = now - timeframe
