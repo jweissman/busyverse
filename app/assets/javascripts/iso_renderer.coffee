@@ -26,6 +26,10 @@ class Busyverse.IsoRenderer
       return
     ), false
 
+  reset: =>
+    @newlyCreated = true
+    @lastInfluencedCells = []
+
   getMousePos: (canvas, evt) ->
     rect = canvas.getBoundingClientRect()
     {

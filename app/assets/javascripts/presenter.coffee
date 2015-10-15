@@ -57,6 +57,11 @@ class Busyverse.Presenter
     
     @translate(w/2 - target.x, h/2 - target.y)
 
+  reset: =>
+    @bgCanvas.
+      getContext('2d').
+      clearRect(0,0,Busyverse.bufferSize,Busyverse.bufferSize)
+    @renderer.reset()
 
   translate: (x, y) =>
     if Busyverse.trace

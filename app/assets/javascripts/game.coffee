@@ -71,6 +71,29 @@ class Busyverse.Game
 
   render: () => @ui.render(@world)
 
+  press: (keyCode) =>
+    console.log(keyCode) if Busyverse.debug
+
+    if keyCode == 61 # +
+      if Busyverse.scale * 1.45 <= Busyverse.maxZoom
+        Busyverse.scale = Busyverse.scale * 1.45
+        @ui.reset()
+        @ui.centerAt(@ui.offsetPos)
+      else
+        console.log "already zoomed in as far as we will permit"
+
+    else if keyCode == 45 # -
+      if Busyverse.scale * 0.6 >= 0.08
+        Busyverse.scale = Busyverse.scale * 0.6
+        @ui.reset()
+        @ui.centerAt(@ui.offsetPos)
+      else
+        console.log "already zoomed out as far as we will permit"
+
+    else if keyCode == 32 # space
+      @ui.centerAt(@world.city.center())
+      @chosenPerson = null
+
   click: (position, event) =>
     console.log "Game#click position=#{position}" if Busyverse.trace
     return unless @ui && @ui.renderer
@@ -101,7 +124,8 @@ class Busyverse.Game
           @ui.centerAt(position)
         for person in @world.city.population
           pos = person.mapPosition(@world)
-          if pos[0] == position[0] && pos[1] == position[1]
+          if Math.abs(pos[0] - position[0]) <= 1 &&
+             Math.abs(pos[1] - position[1]) <= 1
             @chosenPerson = person
             return
 
@@ -130,7 +154,7 @@ class Busyverse.Game
 
     @world.tryToBuild(building, true)
 
-  send: (command, person_id) =>
+  send: (command) =>
     if Busyverse.trace
       console.log "Game#send command=#{command} person_id=#{person_id}"
       console.log command
@@ -139,14 +163,10 @@ class Busyverse.Game
     if op == 'help'
       return "Commands: #{Busyverse.commands}"
 
-    unless person_id
-      console.log "WARNING: NO TARGET ID person_id PROVIDED FOR COMMAND"
-
-    if person_id < 0 # 'all'
+    if @chosenPerson == null
       responses = ""
       for person in @world.city.population
         responses += person.send(op) + ". "
       responses
-    else # not 'all'
-      person = @world.city.population[person_id]
-      person.send op
+    else if @chosenPerson
+      @chosenPerson.send op

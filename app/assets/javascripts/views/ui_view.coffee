@@ -63,8 +63,9 @@ class Busyverse.Views.UIView extends Busyverse.View
       console.log 'Terminal submit!' if Busyverse.trace
       cmd = Busyverse.input.value()
       Busyverse.input.value("")
-      response = Busyverse.engine.game.send(cmd, -1)
-      console.log response #if Busyverse.debug
+      response = Busyverse.engine.game.send(cmd)
+      if Busyverse.debug
+        console.log response
       Busyverse.log.push "> #{cmd}"
       Busyverse.log.push response
       Busyverse.logUpdatedAt = performance.now()
