@@ -108,6 +108,9 @@ class Busyverse.IsoView
 
     models.sort(@isCloserToCamera)
 
+  distanceToCamera: (position) =>
+    @geometry.euclideanDistance3(position, @camera)
+
   isCloserToCamera: (model_a,model_b) =>
     a = model_a.position
     b = model_b.position
@@ -115,8 +118,8 @@ class Busyverse.IsoView
     a_pos = [a[0], a[1], (a[2] || 0) + (model_a.height || 0)]
     b_pos = [b[0], b[1], (b[2] || 0) + (model_b.height || 0)]
 
-    delta_a = @geometry.euclideanDistance3(a_pos, @camera)
-    delta_b = @geometry.euclideanDistance3(b_pos, @camera)
+    delta_a = @distanceToCamera(a_pos)
+    delta_b = @distanceToCamera(b_pos)
 
     less_than_condition = delta_a < delta_b
     more_than_condition = delta_a > delta_b

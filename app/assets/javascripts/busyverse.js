@@ -15,19 +15,19 @@ var Busyverse = {
   Worker: {},
 
   // config
-  width:  500,
-  height: 500,
+  width:  1000,
+  height: 1000,
 
-  cellSize: 10,
+  cellSize: 20,
 
   bufferSize: 4000,
 
   stepLength: 20,
-    
+
   startingResources: 650,
   defaultVisionRadius: 5,
 
-  scale: 0.28,
+  scale: 0.4,
   maxZoom: 0.7,
 
   evolveDepth: 26, // how long to smooth/evolve landscape

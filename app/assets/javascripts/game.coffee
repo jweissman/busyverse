@@ -22,6 +22,7 @@ class Busyverse.Game
     @world  ?= new Busyverse.World(@width, @height, @cellSize)
 
     @chosenBuilding = null
+    @chosenPerson = null
 
     Tabletop.init
       key: Busyverse.buildingSheetId
@@ -60,6 +61,9 @@ class Busyverse.Game
 
   step: =>
     @update()
+
+    if @chosenPerson
+      @ui.centerAt(@chosenPerson.position, Busyverse.scale / Busyverse.cellSize)
     @render()
     setTimeout @step, @stepLength
 
@@ -92,7 +96,15 @@ class Busyverse.Game
         if !@world.city.canAfford(@chosenBuilding) || !holdingShift
           @chosenBuilding = null
       else
-        @ui.centerAt(position) if holdingShift
+        if holdingShift
+          @chosenPerson = null
+          @ui.centerAt(position)
+        for person in @world.city.population
+          pos = person.mapPosition(@world)
+          if pos[0] == position[0] && pos[1] == position[1]
+            @chosenPerson = person
+            return
+
 
   handleClickElement: (elementName) =>
     console.log "Game#handleClickElement: #{elementName} " if Busyverse.trace

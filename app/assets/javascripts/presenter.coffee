@@ -54,7 +54,9 @@ class Busyverse.Presenter
     
     w = @canvas.width
     h = @canvas.height
+    
     @translate(w/2 - target.x, h/2 - target.y)
+
 
   translate: (x, y) =>
     if Busyverse.trace
