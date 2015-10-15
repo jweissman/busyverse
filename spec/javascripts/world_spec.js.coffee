@@ -2,6 +2,7 @@
 #= require grid
 #= require resource
 #= require resources/wood
+#= require resources/iron
 #= require world
 #= require sinon
 #= require spec_helper
@@ -10,7 +11,6 @@ context "World", ->
   beforeEach ->
     @width  = 5
     @height = 5
-
     @world = new Busyverse.World(@width, @height)
 
   describe ".width", ->
@@ -28,12 +28,12 @@ context "World", ->
         @world.height / 2
       ])
 
-  describe "#setup", ->
+  describe "#setupResources", ->
     it 'should distribute resources', ->
-      @world.setup({ 100: 'darkgreen' }, false, true, false)
-
-      expect(@world.resources.length).to.eql(@world.startingResources)
-
+      world = new Busyverse.World(10,10)
+      world.setup()
+      world.setupResources({100: 'wood'})
+      expect(world.resources.length).to.eql(Busyverse.startingResources)
 
   describe "#randomCell", ->
     it 'should be within the world', ->

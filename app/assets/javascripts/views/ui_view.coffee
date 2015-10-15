@@ -11,8 +11,6 @@ class Busyverse.Views.UIView extends Busyverse.View
 
   render: (world, showTerm=false) =>
     city = @model
-
-    @renderCover(world)
     @renderUi(world, city, showTerm)
 
   renderUi: (world, city, showTerm=false) =>

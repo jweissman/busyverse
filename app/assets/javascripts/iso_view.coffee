@@ -4,14 +4,8 @@ Pyramid = Shape.Pyramid
 Prism   = Shape.Prism
 Point   = Isomer.Point
 
-class Tree
-  size: [ 1,1,2.8 ]
-  constructor: (xy) ->
-    @x = xy[0]
-    @y = xy[1]
-
 class Busyverse.IsoView
-  camera: [-100,-100,100]
+  camera: [-40,-40,40]
   geometry: new Busyverse.Support.Geometry()
 
   red: new Color(160, 60, 50, 0.125)
@@ -23,46 +17,32 @@ class Busyverse.IsoView
     @scale = Busyverse.scale
 
   constructStableModels: =>
-    stableModels = []
-
-    for resource in @world.resources
-      if @world.isLocationExplored resource.position
-        shape = @constructResourceShape resource
-        stableModels.push
-          shape: shape
-          color: @green
-          position: resource.position
-          height: resource.size[2]
-
     for building in @world.city.buildings
-      { red, green, blue } = building.color
-      color = new Color(red, green, blue)
-      for dx in [0...building.size[0]]
-        for dy in [0...building.size[1]]
-          for dz in [0...building.size[2]]
-            x = building.position[0] + dx
-            y = building.position[1] + dy
-            z = building.position[2] + dz
-            h = Math.min(1.0, building.size[2])
-            shape = @constructBuildingShape building, x, y, z, h
-            stableModels.push
-              shape: shape
-              color: color
-              position: [x,y,z]
-
-    stableModels
+      @constructBuildingModel building
 
   constructDynamicModels: (mousePosition) =>
     dynamicModels = []
 
+    for resource in @world.resources
+      if @world.isAnyPartOfAreaExplored resource.position, resource.size
+        shape = @constructResourceShape resource
+        { position, size } = resource
+        { red, green, blue } = resource.color
+        color = new Color(red, green, blue)
+        dynamicModels.push { color, shape, position, size }
+
     for person in @world.city.population
       shape = @constructPersonShape person
-      color = new Color(person.color.red, person.color.green, person.color.blue)
-      position = person.mapPosition(@world)
-      dynamicModels.push
-        shape: shape
-        color: color
-        position: position
+      { red, green, blue } = person.color
+      color = new Color(red, green, blue)
+      position = [
+        (person.position[0] / Busyverse.cellSize),
+        (person.position[1] / Busyverse.cellSize),
+        0
+      ]
+      size = person.size
+
+      dynamicModels.push { shape, color, position, size }
 
     if mousePosition && Busyverse.engine.game.chosenBuilding
       name = Busyverse.engine.game.chosenBuilding.name
@@ -79,20 +59,8 @@ class Busyverse.IsoView
           building.position[2] = building.size[2] *
                                  @world.city.stackHeight(building.position)
 
-      for dx in [0...building.size[0]]
-        for dy in [0...building.size[1]]
-          for dz in [0...building.size[2]]
-            x = building.position[0] + dx
-            y = building.position[1] + dy
-            z = building.position[2] + dz
-            h = Math.min(1.0, building.size[2])
-            shape = @constructBuildingShape building, x, y, z, h
-            dynamicModels.push
-              shape: shape
-              color: color
-              position: [x,y,z]
-              building_id: building.id
-
+      model = @constructBuildingModel(building, color)
+      dynamicModels.push(model)
     dynamicModels
 
   assembleModels: (mousePosition) =>
@@ -101,52 +69,73 @@ class Busyverse.IsoView
     for model in @constructStableModels()
       models.push model
 
-    models.sort(@isCloserToCamera)
-
     for model in @constructDynamicModels(mousePosition)
       models.push model
 
-    models.sort(@isCloserToCamera)
+    models.sort @isCloserToCamera
 
-  distanceToCamera: (position) =>
-    @geometry.euclideanDistance3(position, @camera)
+  computeModelDepth: (model, size=true) ->
+    factor = 10000000
+    depth = Math.floor((model.position[0])*factor) +
+            Math.floor((model.position[1])*factor) -
+            (0.01 * (model.position[2]||0))
+    if size
+      depth += Math.floor((model.size[0]/2) * factor) +
+               Math.floor((model.size[1]/2) * factor) +
+               0.01 * model.size[2]
+    depth
 
   isCloserToCamera: (model_a,model_b) =>
-    a = model_a.position
-    b = model_b.position
-
-    a_pos = [a[0], a[1], (a[2] || 0) + (model_a.height || 0)]
-    b_pos = [b[0], b[1], (b[2] || 0) + (model_b.height || 0)]
-
-    delta_a = @distanceToCamera(a_pos)
-    delta_b = @distanceToCamera(b_pos)
-
-    less_than_condition = delta_a < delta_b
-    more_than_condition = delta_a > delta_b
-
-    value = if less_than_condition
+    a = @computeModelDepth(model_a)
+    b = @computeModelDepth(model_b)
+    if a < b
       1
-    else if more_than_condition
+    else if b < a
       -1
     else
       0
 
-    return value
+  constructBuildingModel: (building, color) =>
+    { red, green, blue } = building.color
+    color ?= new Color(red, green, blue)
+    x = building.position[0]
+    y = building.position[1]
+    z = building.position[2]
+    h = building.size[2]
+    shape = @constructBuildingShape building, x, y, z, h
+    {
+      shape: shape
+      color: color
+      position: [x, y, z]
+      size: building.size
+    }
 
   constructResourceShape: (resource) =>
-    tree = new Tree(resource.position)
-    @pyramid(tree.x, tree.y, tree.size)
+    { size, age, name, position } = resource
+    x = position[0]
+    y = position[1]
+    if age < 10 && name == 'wood'
+      size = [
+        size[0] * ((age+5)/15),
+        size[1] * ((age+5)/15),
+        size[2] * ((age+5)/15)
+      ]
+      x += 0.5 - size[0]/2
+      y += 0.5 - size[1]/2
+
+    pyramid = @pyramid(x, y, size)
+    pyramid
 
   constructBuildingShape: (building, x, y, z, h) =>
-    w = 1
-    l = 1
+    w = building.size[0]
+    l = building.size[1]
     h ?= building.size[2]
     @prism(x, y, z, w, l, h)
 
   constructPersonShape: (person) =>
     x = person.position[0] / Busyverse.cellSize
     y = person.position[1] / Busyverse.cellSize
-    @prism(x,y,0.0, 0.3,0.3,1.2)
+    @prism(x,y,0.0, person.size[0],person.size[1],person.size[2])
 
   assembleCellModel: (cell) =>
     x = cell.location[0]

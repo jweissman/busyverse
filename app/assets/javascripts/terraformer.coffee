@@ -10,6 +10,7 @@ class Busyverse.Terraformer
     @random = new Busyverse.Support.Randomness()
    
   compose: (map, distribution, evolve=true) =>
+    console.log "Terraformer#compose" if Busyverse.trace
     @generate map,distribution
     @evolve(map) if evolve
     map

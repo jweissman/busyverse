@@ -13,6 +13,7 @@ class Busyverse.Presenter
     @showTerminal = true
 
   cachedCanvases: {}
+
   getCanvas: (name, sz, clean=false) =>
     if !@cachedCanvases[name]
       canvas = document.createElement('canvas')
@@ -28,6 +29,8 @@ class Busyverse.Presenter
     @cachedCanvases[name]
 
   attach: (canvas) =>
+    console.log "Presenter#attach" if Busyverse.trace
+
     console.log "About to create drawing context" if Busyverse.verbose
 
     if canvas != null
@@ -69,11 +72,18 @@ class Busyverse.Presenter
 
     @offset = {x: x, y: y}
 
+  renderSplash: =>
+    ctx = @canvas.getContext('2d')
+    splash = new Busyverse.Views.SplashView(null, ctx)
+    splash.render()
+
   render: (world, widgets=true) =>
-    return false if @renderer == null
+    @clear()
+    if @renderer == null || !world.ready
+      @renderSplash()
+      return
 
     console.log "Rendering!" if Busyverse.debug
-    @clear()
 
     @renderer.drawBg(world, @offset)
     @renderer.draw(world, @offset)
@@ -87,6 +97,7 @@ class Busyverse.Presenter
     @context.clearRect 0, 0, @canvas.width, @canvas.height
 
   boundingBoxes: (world) ->
+    return unless @ui_view
     boxes = []
     for element in @ui_view.constructPalette(world.city)
       {name, position, size} = element

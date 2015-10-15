@@ -8,25 +8,29 @@ class Busyverse.Views.PersonView extends Busyverse.View
 
   renderName: (x, y) =>
     person = @model
+    ox = x + 45.5
+    oy = y - 55.5
+    
     @rect
-      position: [x+30, y-15]
-      size: [100, 38]
-      fill: 'lightblue'
+      position: [ox, oy]
+      size: [130, 64]
+      fill: 'whitesmoke'
       stroke: 'black'
 
     @text
-      position: [x+35, y+2]
-      size: '18px'
+      position: [ox + 10, oy + 24]
+      size: '24px'
       msg: person.name
 
     @rect
-      position: [x+34, y+6]
-      size: [92, 14]
-      fill: 'lightgreen'
+      position: [ox + 10, oy + 32]
+      size: [110, 24]
+      fill: 'blanchedalmond'
       stroke: 'black'
 
     @text
-      position: [x+38, y+17]
-      size: '12px'
+      position: [ox + 66, oy + 50]
+      size: '20px'
       msg: person.activeTask
+      align: 'center'
 

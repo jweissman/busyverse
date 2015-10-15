@@ -10,7 +10,7 @@ class Busyverse.City
     @population   ?= []
     @buildings    ?= []
 
-    @resources     = { 'food': 100, 'wood': 100, 'iron': 100, 'gold': 100 }
+    @resources     = { 'food': 100, 'wood': 500, 'iron': 100, 'gold': 100 }
     @random = new Busyverse.Support.Randomness()
     @geometry = new Busyverse.Support.Geometry()
 
@@ -63,7 +63,6 @@ class Busyverse.City
 
     person.send(task, world)
     @population.push(person)
-    Busyverse.engine.onPeopleCreated()
 
   update: (world) =>
     for person in @population
@@ -142,9 +141,9 @@ class Busyverse.City
     true
 
   radiusOfInfluence: =>
-    Math.floor(5 +
-      (0.5 * @population.length)) +
-      (0.125 * (@buildings.length))
+    Math.floor(Busyverse.baseCityInfluence +
+      (0.75 * @population.length)) +
+      (0.25 * (@buildings.length))
 
   recomputeInfluence: (world=Busyverse.engine.game.world) =>
     console.log "City#recomputeInfluence" if Busyverse.trace
@@ -178,10 +177,11 @@ class Busyverse.City
           return false
     true
 
+     
   availableForBuilding: (location, sz, nm, influence=true) =>
     influenced = @isAreaUnderInfluence(location, sz)
     explored = @isAreaFullyExplored(location, sz)
-    return false unless explored #j&&  && influenced
+    return false unless explored
     if influence
       return false unless influenced
 

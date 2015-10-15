@@ -7,3 +7,4 @@ Busyverse.verbose = false
 Busyverse.width = 20
 Busyverse.height = 20
 Busyverse.bufferSize = 1
+Busyverse.startingResources = 5

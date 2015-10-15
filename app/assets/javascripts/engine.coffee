@@ -9,32 +9,14 @@ class Busyverse.Engine
   renderBanner: -> console.log(Busyverse.banner)
 
   setup: ->
+    console.log "Engine#setup" if Busyverse.trace
     @renderBanner()
-
     @canvas = document.getElementById('busyverse')
-    if @canvas != null
+    if @canvas?
       @canvas.addEventListener 'mousedown', @handleClick
-      (new Busyverse.Views.SplashView(null, @canvas.getContext('2d'))).render()
-    else
-      console.log "--- warning: canvas is null" if Busyverse.debug
-
-    @game.setup()
-    @ui.attach(@canvas)
-
-    $('#terminal').submit @handleCommand
-    document.onkeypress = (e) => @handleKeypress(e)
-
-    true
-
-  onPeopleCreated: ->
-    people = @game.world.city.population
-
-    options = $('#target')
-    options.empty().append $('<option />').val(-1).text('all')
-    $.each people, ->
-      options.append $('<option />').val(@id).text(@name)
-
-  run: -> @game.play(@ui)
+      document.onkeypress = (e) => @handleKeypress(e)
+      @ui.attach(@canvas)
+    @game.play(@ui)
 
   handleClick: (event) =>
     console.log "Engine#handleClick" if Busyverse.trace
@@ -45,8 +27,7 @@ class Busyverse.Engine
   handleKeypress: (event) => @game.press(event.keyCode)
 
   @instrument: ->
+    console.log "Engine.instrument" if Busyverse.trace
     engine = new Busyverse.Engine()
-    window.onload = ->
-      engine.setup()
-      engine.run()
+    window.onload = -> engine.setup()
     engine

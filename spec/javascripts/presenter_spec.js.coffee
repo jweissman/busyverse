@@ -2,6 +2,7 @@
 #= require views/view
 #= require views/ui_view
 #= require views/person_view
+#= require views/splash_view
 #= require game
 #= require presenter
 #= require spec_helper
@@ -43,6 +44,7 @@ context "Presenter", ->
       isDay: -> false,
       describeTime: -> "midnight"
       describeDate: -> "today"
+      ready: true
     }
 
     @presenter = new Busyverse.Presenter()

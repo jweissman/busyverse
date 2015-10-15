@@ -12,12 +12,12 @@ class Busyverse.IsoRenderer
     @foregroundContext = @foregroundCanvas.getContext '2d'
     @overlayContext    = @overlayCanvas.getContext '2d'
 
-    sz = Busyverse.bufferSize
-    @origin = { originX: sz * 0.50, originY: sz * 0.90 }
+    sz           = Busyverse.bufferSize
+    @origin      = { originX: sz * 0.50, originY: sz * 0.90 }
 
-    @bg_iso = new Isomer(@backgroundCanvas, @origin)
+    @bg_iso      = new Isomer(@backgroundCanvas, @origin)
     @overlay_iso = new Isomer(@overlayCanvas, @origin)
-    @fg_iso = new Isomer(@foregroundCanvas, @origin)
+    @fg_iso      = new Isomer(@foregroundCanvas, @origin)
 
     @projectedMousePos = null
     @canvasElement.addEventListener 'mousemove', ((evt) =>
@@ -37,7 +37,8 @@ class Busyverse.IsoRenderer
       y: evt.clientY - (rect.top)
     }
 
-  constructView: (world) -> new Busyverse.IsoView(world)
+  constructView: (world) =>
+    @iso_view = new Busyverse.IsoView(world)
 
   constructCellModels: (view, world) ->
     locations = world.city.getNewlyExploredLocations()

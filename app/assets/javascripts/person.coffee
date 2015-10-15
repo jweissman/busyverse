@@ -2,7 +2,8 @@
 #= require support/geometry
 
 class Busyverse.Person
-  size: [5,9]
+  size: [0.45,0.45,1.6]
+  mapSize: [5,9]
   speed: 2.0
   visionRadius: Busyverse.defaultVisionRadius
   velocity: [0,0]
@@ -14,6 +15,7 @@ class Busyverse.Person
     @geometry   ?= new Busyverse.Support.Geometry()
 
     @activeTask = "idle"
+    @recomputing = false
     if Busyverse.debug
       console.log "new person (#{@id} -- #{@name}) created at #{@position}"
       console.log "current task is #{@activeTask}"
@@ -37,17 +39,11 @@ class Busyverse.Person
       if cmd == "build"
         if city.resources['wood'] < 1
           return "you must have at least one wood to build!"
-
         until openArea
           @buildingToCreate = @random.valueFromList Busyverse.BuildingType.all
-
           { size } = @buildingToCreate
           radius   = city.radiusOfInfluence()
           openArea = world.findOpenAreaOfSizeInCity(city, size, radius)
-
-        #if typeof(openArea) == 'undefined' || openArea == null
-        #  return "NO OPEN AREAS FOR BUILDING"
-
         @destinationCell = openArea
         @buildingToCreatePosition = @destinationCell
 
@@ -58,37 +54,40 @@ class Busyverse.Person
       else if cmd == "gather"
         console.log "GATHER COMMAND RECEIVED" if Busyverse.debug
         return "no resources to gather!" unless world.resources.length > 0
-        resources = world.resources.filter (resource) ->
-          world.isLocationExplored(resource.position)
-
-        if resources.length == 0
-          return "NO VISIBLE RESOURCES TO GATHER"
-
-        min_dist = Infinity
-        target = @mapPosition(world)
-        sortedResources = resources.sort (a, b) =>
-          distance_to_a = @geometry.euclideanDistance(a.position, target)
-          distance_to_b = @geometry.euclideanDistance(b.position, target)
-
-          return if distance_to_a < distance_to_b
-            -1
-          else if distance_to_b < distance_to_a
-            1
-          else
-            0
-
-        @resourceToGather = @random.valueFromList(sortedResources[..5])
+        chosen_resource = @pickResource world
+        return "no resources under influence?!" unless chosen_resource
+        @resourceToGather = chosen_resource
         @destinationCell  = @resourceToGather.position
         if Busyverse.debug
           name = @resourceToGather.name
           console.log "Gathering #{name} at #{@destinationCell}"
-
 
       @activeTask  = cmd
       return "#{@name} #{@activeTask}ing"
 
     else
       return "Unknown command #{cmd}"
+
+  pickResource: (world) =>
+    influencedResources = []
+    for resource in (world.resources)
+      for cell in world.city.influencedCells
+        if resource.doesOverlap(cell.location, [1,1])
+          influencedResources.push resource
+
+    pos = [@position[0] / Busyverse.cellSize,
+           @position[1] / Busyverse.cellSize ]
+    sortedResources = influencedResources.sort (a,b) =>
+      da = @geometry.euclideanDistance(a.position, pos)
+      db = @geometry.euclideanDistance(b.position, pos)
+      if da < db
+        -1
+      else if db < da
+        1
+      else
+        0
+
+    @random.valueFromList sortedResources[..5]
 
   update: (world, city) =>
     console.log "Person#update called!" if Busyverse.debug and Busyverse.verbose
@@ -162,8 +161,8 @@ class Busyverse.Person
   atSoughtLocation: (world) =>
     return false unless @destinationCell
 
-    x_off = (Busyverse.cellSize / 2) - @size[0] / 2
-    y_off = (Busyverse.cellSize / 2) - @size[1] / 2
+    x_off = (Busyverse.cellSize / 2) - @mapSize[0] / 2
+    y_off = (Busyverse.cellSize / 2) - @mapSize[1] / 2
     offset = [ x_off, y_off ]
 
     target = world.mapToCanvasCoordinates(@destinationCell, offset)
@@ -187,8 +186,8 @@ class Busyverse.Person
     more_path_left = @path && @path.length > 0
 
     if more_path_left && @arrayEqual(@path[@path.length-1], @destinationCell)
-      x_off = (Busyverse.cellSize / 2) - @size[0] / 2
-      y_off = (Busyverse.cellSize / 2) - @size[1] / 2
+      x_off = (Busyverse.cellSize / 2) - @mapSize[0] / 2
+      y_off = (Busyverse.cellSize / 2) - @mapSize[1] / 2
       offset = [ x_off, y_off ]
       nextTarget = world.mapToCanvasCoordinates(@path[0], offset)
       distance = @geometry.euclideanDistance(nextTarget, @position)
@@ -199,8 +198,8 @@ class Busyverse.Person
         @path.splice(0, src_index+1)
 
       if @path.length >= 1
-        x_off = (Busyverse.cellSize / 2) - @size[0] / 2
-        y_off = (Busyverse.cellSize / 2) - @size[1] / 2
+        x_off = (Busyverse.cellSize / 2) - @mapSize[0] / 2
+        y_off = (Busyverse.cellSize / 2) - @mapSize[1] / 2
         offset = [ x_off, y_off ]
         nextTarget = world.mapToCanvasCoordinates(@path[0], offset)
         @destination = nextTarget
@@ -209,7 +208,6 @@ class Busyverse.Person
     else
       recompute = true
 
-    @recomputing ?= false
     if recompute && !@recomputing
       @recomputing = true
      
@@ -223,7 +221,7 @@ class Busyverse.Person
       console.log msg if Busyverse.trace
 
       worker = @backgroundWorker()
-      worker.postMessage(msg)
+      worker.postMessage msg
        
   handlePathResponse: (pathData) =>
     console.log "Person#handlePathResponse" if Busyverse.trace

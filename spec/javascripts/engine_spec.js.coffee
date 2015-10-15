@@ -10,7 +10,7 @@ context "Engine", ->
     @ui = { attach: -> }
     @engine = new Busyverse.Engine(@game, @ui)
 
-  describe "#run", ->
-    it 'should kick game engine', ->
-      @engine.run()
+  describe "#setup", ->
+    it 'should bootstrap game engine', ->
+      @engine.setup()
       @play.should.have.been.called.once

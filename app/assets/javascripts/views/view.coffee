@@ -30,6 +30,7 @@ class Busyverse.View
 
   text: (opts, write=true) =>
     { msg, position, size, font, fill, style, align, maxWidth } = opts
+    #console.log "Render text #{msg}"
     font ?= "Helvetica"
     fill ?= 'black'
     size ?= '16px'

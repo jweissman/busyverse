@@ -24,6 +24,8 @@ class Busyverse.Game
     @chosenBuilding = null
     @chosenPerson = null
 
+    @buildingTypesSetup = false
+
     Tabletop.init
       key: Busyverse.buildingSheetId
       callback: @setupBuildingTypes
@@ -38,19 +40,9 @@ class Busyverse.Game
         red: parseInt(red)
         green: parseInt(green)
         blue: parseInt(blue)
-
-      buildingType = new Busyverse.BuildingType
-        name: name
-        description: description
-        stackable: stackable
-        cost: cost
-        size:  size
-        color:  color
-        subtype: subtype
-        
-    @world.setupBuildings()
-
-  setup: -> @world.setup()
+      opts = { name, description, stackable, cost, size, color, subtype }
+      buildingType = new Busyverse.BuildingType(opts)
+    @buildingTypesSetup = true
 
   play: (ui) =>
     @ui = ui
@@ -64,27 +56,51 @@ class Busyverse.Game
 
     if @chosenPerson
       @ui.centerAt(@chosenPerson.position, Busyverse.scale / Busyverse.cellSize)
+
     @render()
     setTimeout @step, @stepLength
 
-  update: () => @world.update()
+  update: () =>
+    if @world.ready
+      @world.update()
+    else
+      @continueSetup()
+
+  continueSetup: =>
+    if @world.composeComplete
+      if @world.resourcesDistributed
+        if @world.woodsDeveloped
+          @world.setupBuildings()
+          @world.ready = true
+          Busyverse.loadingMessages.push "Boot complete!"
+        else
+          @world.developWoods()
+          Busyverse.loadingMessages.push "Placing first building!"
+      else
+        @world.setupResources()
+        Busyverse.loadingMessages.push "Developing woods..."
+    else if @buildingTypesSetup
+      @world.setup()
+      Busyverse.loadingMessages.push "Distributing resources..."
+
 
   render: () => @ui.render(@world)
 
+  zoomFactor: 1.25
   press: (keyCode) =>
     console.log(keyCode) if Busyverse.debug
 
     if keyCode == 61 # +
-      if Busyverse.scale * 1.45 <= Busyverse.maxZoom
-        Busyverse.scale = Busyverse.scale * 1.45
+      if Busyverse.scale * @zoomFactor <= Busyverse.maxZoom
+        Busyverse.scale = Busyverse.scale * @zoomFactor
         @ui.reset()
         @ui.centerAt(@ui.offsetPos)
       else
         console.log "already zoomed in as far as we will permit"
 
     else if keyCode == 45 # -
-      if Busyverse.scale * 0.6 >= 0.08
-        Busyverse.scale = Busyverse.scale * 0.6
+      if Busyverse.scale * (1/@zoomFactor) >= 0.08
+        Busyverse.scale = Busyverse.scale * (1/@zoomFactor)
         @ui.reset()
         @ui.centerAt(@ui.offsetPos)
       else
@@ -107,11 +123,13 @@ class Busyverse.Game
     adjusted_pos = [ pos.x * 2, pos.y * 2 ]
 
     ui_hit = false
-    for box in @ui.boundingBoxes(@world)
-      hit = box.hit adjusted_pos
-      if hit
-        @handleClickElement(box.name)
-        ui_hit = true
+    boxes = @ui.boundingBoxes(@world)
+    if boxes
+      for box in boxes
+        hit = box.hit adjusted_pos
+        if hit
+          @handleClickElement(box.name)
+          ui_hit = true
 
     unless ui_hit
       if @chosenBuilding != null

@@ -5,7 +5,7 @@ class Busyverse.Building
     @position[2] ?= 0
     { @name, @color, @size, @costs, @stackable, @subtype } = @type
 
-  doesOverlap: (location, sz) ->
+  doesOverlap: (location, sz=[0,0]) ->
     a_x1 = location[0]
     a_x2 = location[0] + sz[0]
 
