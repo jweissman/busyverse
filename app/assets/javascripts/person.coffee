@@ -1,7 +1,8 @@
 #= require support/randomness
 #= require support/geometry
+#= require agent
 
-class Busyverse.Person
+class Busyverse.Person extends Busyverse.Agent
   size: [0.45,0.45,1.6]
   mapSize: [5,9]
   speed: 2.0
@@ -16,20 +17,13 @@ class Busyverse.Person
 
     @activeTask = "idle"
     @recomputing = false
+
     if Busyverse.debug
       console.log "new person (#{@id} -- #{@name}) created at #{@position}"
       console.log "current task is #{@activeTask}"
-
-  backgroundWorker: =>
-    return @background_worker if (@background_worker?)
-
-    @background_worker = Busyverse.createWorker()
-    @background_worker.onmessage = (result) =>
-      @handlePathResponse result.data.path
-    @background_worker
+    super(@id, @name, @position)
 
   send: (msg, world=Busyverse.engine.game.world) =>
-    #@activeTask = "idle"
     console.log "Person#send msg=#{msg}" if Busyverse.trace
     city = world.city
     console.log "updating #{@name}'s active task to #{cmd}" if Busyverse.debug
@@ -145,8 +139,6 @@ class Busyverse.Person
     nearbyCell = world.nearbyUnexploredCell(pos, 1 + (@visionRadius) ) ||
                  world.nearbyUnexploredCell(pos, 2 + (@visionRadius*5) ) ||
                  world.nearbyCell(pos, 3 + (@visionRadius*2))
-                 #world.nearbyUnexploredCell(pos, 8 + (@visionRadius*5) )
-
     nearbyCell
 
   wander: (world, city) =>
@@ -212,33 +204,7 @@ class Busyverse.Person
       @recomputing = true
      
       console.log "POST MESSAGE -- RECOMPUTE" if Busyverse.verbose
-      msg = {
-        map: JSON.stringify world.map.cells
-        src: srcCell.location
-        tgt: destCell.location
-        personId: @id
-      }
-      console.log msg if Busyverse.trace
-
-      worker = @backgroundWorker()
-      worker.postMessage msg
-       
-  handlePathResponse: (pathData) =>
-    console.log "Person#handlePathResponse" if Busyverse.trace
-    @recomputing = false
-    @path = pathData
-
-    if @path && @path.length > 1
-      console.log "GOT PATH! Setting destination..." if Busyverse.verbose
-      world = Busyverse.engine.game.world
-      x_off = (Busyverse.cellSize / 2) - @size[0] / 2
-      y_off = (Busyverse.cellSize / 2) - @size[1] / 2
-      offset = [ x_off, y_off ]
-      @destination = world.mapToCanvasCoordinates(@path[1], offset)
-      console.log "new destination = #{@destination}" if Busyverse.verbose
-    else
-      @path = null
-      @destinationCell = null
+      @findShortestPathSoon srcCell.location, destCell.location
 
   seek: (world) =>
     @updatePath(world)
